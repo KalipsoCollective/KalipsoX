@@ -1,0 +1,32 @@
+{
+    "name": "kc/kx",
+    "type": "project",
+    "description": "KalipsoX - a powerful and slim php framework",
+    "keywords": ["framework", "kalipso", "kalipsox", "php-framework"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "KalipsoCollective",
+            "email": "hello@koalapix.com",
+            "homepage": "https://koalapix.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1|^8.0",
+        "ext-pdo": "*",
+        "izniburak/pdox": "^1.6",
+        "phpmailer/phpmailer": "^6.7"
+    },
+    "autoload": {
+        "psr-4": {
+            "KX\\": "app"
+        }
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
