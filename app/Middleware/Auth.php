@@ -18,8 +18,8 @@ class Auth extends \KX\Core\Middleware {
     public $auth = false;
     public $return = [];
 
-    const LOGIN_ROUTE = '/hesap/giris';
-    const ACCOUNT_ROUTE = '/hesap';
+    const LOGIN_ROUTE = '/auth/login';
+    const ACCOUNT_ROUTE = '/auth';
 
     public function __construct($container) {
 
@@ -57,12 +57,14 @@ class Auth extends \KX\Core\Middleware {
                     
                 } else {
                     $getUser = $session;
-                    if (is_string($recordedSession->update_data)) {
-                        $recordedSession->update_data = json_decode($recordedSession->update_data);
-                    }
-                    
-                    foreach ($recordedSession->update_data as $area => $val) {
-                        $getUser->{$area} = $val;
+                    if (is_object($getUser)) {
+                        if (is_string($recordedSession->update_data)) {
+                            $recordedSession->update_data = json_decode($recordedSession->update_data);
+                        }
+                        
+                        foreach ($recordedSession->update_data as $area => $val) {
+                            $getUser->{$area} = $val;
+                        }
                     }
                 }
                 $getUser = Helper::privateDataCleaner($getUser);
