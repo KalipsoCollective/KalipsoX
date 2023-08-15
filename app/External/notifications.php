@@ -18,7 +18,7 @@ return [
         $body = str_replace(
             ['[USER]', '[VERIFY_LINK]'], 
             [$name, $link], 
-            Helper::lang('notification.registration_email_body')
+            (string) Helper::lang('notification.registration_email_body')
         );
 
         $email = $hook->addEmail([
@@ -56,8 +56,8 @@ return [
         </a>';
         $body = str_replace(
             ['[USER]', '[RECOVERY_LINK]'], 
-            [$name, $link], 
-            Helper::lang('notification.recovery_request_email_body')
+            [$name, $link],
+            (string) Helper::lang('notification.recovery_request_email_body')
         );
 
         $email = $hook->addEmail([
@@ -83,8 +83,8 @@ return [
         $name = (empty($external['first_name']) ? $external['user_name'] : $external['first_name']);
         $body = str_replace(
             ['[USER]'], 
-            [$name], 
-            Helper::lang('notification.account_recovered_email_body')
+            [$name],
+            (string) Helper::lang('notification.account_recovered_email_body')
         );
 
         $email = $hook->addEmail([
@@ -120,8 +120,8 @@ return [
         </a>';
         $body = str_replace(
             ['[USER]', '[VERIFY_LINK]', '[CHANGES]'], 
-            [$name, $link, $external['changes']], 
-            Helper::lang('notification.email_change_email_body')
+            [$name, $link, $external['changes']],
+            (string) Helper::lang('notification.email_change_email_body')
         );
 
         $email = $hook->addEmail([
