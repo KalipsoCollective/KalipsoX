@@ -1,5 +1,8 @@
 # KalipsoX
 
+> **Note**
+> It is the reproduced version of KalipsoCMS and KalipsoNext projects. This repo is the only repo for new updates.
+
 ## Description
 Simple and powerful PHP framework. You can quickly build your applications on it.
 
