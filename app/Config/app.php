@@ -15,4 +15,5 @@ return [
 	'charset'	=> 'utf-8',
 	'title_format' => '[TITLE] [SEPERATOR] [APP]',
 	'available_languages' => ['tr'],
+	'auth' => 'jwt', // cookie, jwt
 ];

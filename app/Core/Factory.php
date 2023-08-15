@@ -70,7 +70,9 @@ final class Factory
          * 
          * Start session and output buffering
          **/
-        Helper::sessionStart(); // It is created using KX_SESSION_NAME
+        if (Helper::config('app.auth') === 'cookie') {
+            Helper::sessionStart(); // It is created using KX_SESSION_NAME
+        }
         ob_start();
 
         /**
