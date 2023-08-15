@@ -877,11 +877,16 @@ final class Factory
                 if (isset($layoutVars[$layout]) !== false) {
                     $layoutVars = $layoutVars[$layout];
                 } else {
-                    $layoutVars = $layoutVars['default'];
+                    $layoutVars = $layoutVars['app'];
+                }  
+
+                if (isset($layoutVars['layout']) !== false) {
+                    $layout = $layoutVars['layout'];
                 }
                 
+                $Helper = Helper::class;
 
-                foreach ($layoutVars as $part) {
+                foreach ($layoutVars['parts'] as $part) {
 
                     if ($part === '_')
                         $part = strpos((string)$file, '.') !== false ? str_replace('.', '/', $file) : $file;
