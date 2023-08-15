@@ -1,4 +1,4 @@
-# KalipsoNext - A simple PHP framework/boilerplate
+# KalipsoX
 
 ## Description
 Simple and powerful PHP framework. You can quickly build your applications on it.
@@ -49,7 +49,7 @@ You can refer to the examples in index.php for adding new routes.
 
 For example;
 ```php
-    $app = (new KN\Core\Factory);
+    $app = (new KX\Core\Factory);
 
     // Single route
     $app->route('GET', '/', 'AppController@index', ['Auth@verifyAccount']);
