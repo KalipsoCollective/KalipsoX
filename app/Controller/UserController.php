@@ -119,7 +119,7 @@ final class UserController extends Controller
                 'description' => Helper::lang('base.login_message')
             ],
             'alerts' => $alerts,
-            'view' => 'user.login',
+            'view' => ['auth.login', 'auth'],
         ];
 
         if (isset($redirect)) {
