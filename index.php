@@ -9,12 +9,14 @@ declare(strict_types=1);
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/app/bootstrap.php';
 
+define('KX_VERSION', '0.0.1');
+
 try {
 
     $app = (new KX\Core\Factory);
 
     // Single route
-    $app->route('POST', '/', 'AppController@index', ['Auth@verifyAccount']);
+    $app->route('GET', '/', 'AppController@index', ['Auth@verifyAccount']);
 
     // Do not remove this route for the KN script library.
     $app->route('GET,POST', '/cron', 'AppController@cronJobs');

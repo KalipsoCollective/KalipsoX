@@ -5,7 +5,6 @@
  **/
 define('KX_START', microtime(true)); // We use it for the exec. time recorded in the log.
 define('KX_ROOT',  rtrim($_SERVER["DOCUMENT_ROOT"], '/').'/');
-define('KX_VERSION', '0.4.0');
 
 /**
  * Shutdown function registration
