@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace KX\Model;
 
 use KX\Core\Model;
-use KX\Core\Helper;
 
 final class UserRoles extends Model {
 

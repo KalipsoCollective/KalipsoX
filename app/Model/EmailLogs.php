@@ -2,7 +2,7 @@
 
 /**
  * @package KX
- * @subpackage Model\Logs
+ * @subpackage Model\EmailLogs
  */
 
 declare(strict_types=1);
@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace KX\Model;
 
 use KX\Core\Model;
-use KX\Core\Helper;
 
 final class EmailLogs extends Model {
 

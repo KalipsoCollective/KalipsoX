@@ -12,10 +12,6 @@ use KX\Core\Helper;
 
 class JWT extends \KX\Core\Middleware {
     
-        public function __construct() {
-            parent::__construct();
-        }
-    
         public function handle() {
             /*
             $token = $this->get('request')->getHeader('Authorization');

@@ -2,7 +2,7 @@
 
 /**
  * @package KX
- * @subpackage Controller
+ * @subpackage Controller\NotificationController
  */
 
 declare(strict_types=1);

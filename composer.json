@@ -1,7 +1,7 @@
 {
     "name": "kc/kx",
     "type": "project",
-    "description": "KalipsoX - a powerful and slim php framework",
+    "description": "KalipsoX - Simple and powerful PHP framework. You can quickly build your applications on it.",
     "keywords": ["framework", "kalipso", "kalipsox", "php-framework"],
     "license": "MIT",
     "authors": [
@@ -15,7 +15,8 @@
         "php": "^7.1|^8.0",
         "ext-pdo": "*",
         "izniburak/pdox": "^1.6",
-        "phpmailer/phpmailer": "^6.7"
+        "phpmailer/phpmailer": "^6.7",
+        "verot/class.upload.php": "^2.1"
     },
     "autoload": {
         "psr-4": {

@@ -2,7 +2,7 @@
 
 /**
  * @package KX
- * @subpackage Controller
+ * @subpackage Controller\AppController
  */
 
 declare(strict_types=1);

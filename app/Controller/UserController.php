@@ -15,13 +15,11 @@ use KX\Model\UserRoles as UserRolesModel;
 use KX\Model\Sessions as SessionsModel;
 use KX\Controller\NotificationController as Notification;
 
-final class UserController extends Controller {
+final class UserController extends Controller
+{
 
-    const LOGIN_ROUTE = '/hesap/giris';
-    const ACCOUNT_ROUTE = '/hesap';
-    const RECOVERY_ROUTE = '/hesap/kurtar';
-
-    public function login() {
+    public function login()
+    {
 
         $alerts = [];
 
@@ -32,15 +30,15 @@ final class UserController extends Controller {
                 'password' => 'nulled_text'
             ], $this->get('request')->params));
 
-            if (! is_null($username) AND ! is_null($password)) {
+            if (!is_null($username) and !is_null($password)) {
 
                 $users = (new UsersModel());
 
-                $getUser = $users->select('id, user_name, first_name, last_name, email, password, token, role_id, details, status')
-                    ->where('user_name', $username)->orWhere('email', $username)
+                $getUser = $users->select('id, u_name, f_name, l_name, email, password, token, role_id, b_date, status')
+                ->where('u_name', $username)->orWhere('email', $username)
                     ->get();
 
-                if ( ! empty($getUser)) {
+                if (!empty($getUser)) {
 
                     if ($getUser->status == 'deleted') {
 
@@ -48,26 +46,21 @@ final class UserController extends Controller {
                             'status' => 'error',
                             'message' => Helper::lang('base.your_account_has_been_blocked')
                         ];
-
                     } else {
 
                         if (password_verify($password, $getUser->password)) {
 
-                            $userRoles = (new UserRolesModel());
-                            $getUserRole = $userRoles
-                                ->select('routes, name')
-                                ->where('id', $getUser->role_id)
-                                ->get();
+                            $userRoles = new UserRolesModel();
+                            $getUserRole = $userRoles->select('routes, name')->where('id', $getUser->role_id)->get();
 
-                            if (! empty($getUserRole)) {
+                            if (!empty($getUserRole)) {
 
                                 $getUser->role_name = $getUserRole->name;
                                 $getUser->routes = (object) explode(',', $getUserRole->routes);
-
                             }
                             $getUser = Helper::privateDataCleaner($getUser);
 
-                            $sessions = (new SessionsModel());
+                            $sessions = new SessionsModel();
                             $logged = $sessions->insert([
                                 'auth_code' => Helper::authCode(),
                                 'user_id' => $getUser->id,
@@ -86,47 +79,36 @@ final class UserController extends Controller {
                                     'message' => Helper::lang('base.welcome_back'),
                                 ];
 
-                                $redirect = self::ACCOUNT_ROUTE;
-
+                                $redirect = '/auth';
                             } else {
 
                                 $alerts[] = [
                                     'status' => 'warning',
                                     'message' => Helper::lang('base.login_problem')
                                 ];
-
                             }
-
                         } else {
 
                             $alerts[] = [
                                 'status' => 'warning',
                                 'message' => Helper::lang('base.your_login_info_incorrect')
                             ];
-
                         }
-
                     }
-
-
                 } else {
 
                     $alerts[] = [
                         'status' => 'warning',
                         'message' => Helper::lang('base.account_not_found')
                     ];
-
                 }
-
             } else {
 
                 $alerts[] = [
                     'status' => 'warning',
                     'message' => Helper::lang('base.form_cannot_empty')
                 ];
-
             }
-            
         }
 
         $return = [
@@ -137,7 +119,7 @@ final class UserController extends Controller {
                 'description' => Helper::lang('base.login_message')
             ],
             'alerts' => $alerts,
-            'view' => 'auth.login',
+            'view' => 'user.login',
         ];
 
         if (isset($redirect)) {
@@ -145,16 +127,16 @@ final class UserController extends Controller {
         }
 
         return $return;
-
     }
 
-    public function account() {
+    public function account()
+    {
 
         $steps = [
-            'profil' => [
+            'profile' => [
                 'icon' => 'ti ti-tool', 'lang' => 'base.profile'
-            ], 
-            'oturumlar' => [
+            ],
+            'sessions' => [
                 'icon' => 'ti ti ti-devices', 'lang' => 'base.sessions'
             ],
         ];
@@ -170,7 +152,7 @@ final class UserController extends Controller {
         $statusCode = 200;
 
         switch ($action) {
-            case 'profil':
+            case 'profile':
                 $head = Helper::lang('base.profile');
                 $title = $head . ' | ' . $title;
                 $description = Helper::lang('base.profile_message');
@@ -179,34 +161,26 @@ final class UserController extends Controller {
                 if ($this->get('request')->method === 'POST' && is_object($output)) {
 
                     extract(Helper::input([
-                        'email' => 'nulled_email', 
-                        'first_name' => 'nulled_text', 
-                        'last_name' => 'nulled_text',
-                        'details' => 'nulled_text',
+                        'email' => 'nulled_email',
+                        'f_name' => 'nulled_text',
+                        'l_name' => 'nulled_text',
+                        'b_date' => 'date',
                         'password' => 'nulled_password'
                     ], $this->get('request')->params));
 
-                    if (! is_null($email) AND ! is_null($first_name) AND ! is_null($last_name) AND ! is_null($details)) {
-
-                        if (is_array($details)) {
-                            if (isset($details['birth_date']) !== false) {
-                                $details['birth_date'] = strtotime($details['birth_date']);
-                            }
-                        } else {
-                            $details = [];
-                        }
+                    if (!is_null($email) and !is_null($f_name) and !is_null($l_name) and !is_null($b_date)) {
 
                         $check = (new UsersModel)->select('id')
-                            ->where('email', $email)
+                        ->where('email', $email)
                             ->notWhere('id', Helper::userData('id'))
                             ->get();
 
                         if (empty($check)) {
 
                             $newData = [
-                                'first_name' => $first_name,
-                                'last_name' => $last_name,
-                                'details' => json_encode($details)
+                                'f_name' => $f_name,
+                                'l_name' => $l_name,
+                                'b_date' => $b_date
                             ];
 
                             if ($password)
@@ -218,28 +192,17 @@ final class UserController extends Controller {
                                 $sendLink = true;
                             }
 
-                            $update = (new UsersModel)
-                                ->where('id', $output->id)
-                                ->update($newData);
-
-                            $newData['details'] = json_decode($newData['details']);
-
-                        } else 
+                            $update = (new UsersModel)->where('id', $output->id)->update($newData);
+                        } else
                             $update = false;
 
                         if ($update) {
-
-                            (new SessionsModel)
-                                ->where('user_id', $output->id)
-                                ->update(
-                                    ['update_data' => json_encode($newData)]
-                                );
-
+                            (new SessionsModel)->where('user_id', $output->id)->update(['update_session' => 'true']);
                             $alerts[] = [
                                 'status' => 'success',
                                 'message' => Helper::lang('base.save_success')
                             ];
-                            $redirect = '/hesap/profil';
+                            $redirect = '/auth/profile';
 
                             if (isset($sendLink)) {
 
@@ -248,10 +211,8 @@ final class UserController extends Controller {
                                 <span style="color: red;">' . Helper::userData('email') . '</span> → 
                                 <span style="color: green;">' . $email . '</span>';
                                 $args = array_merge($args, $newData);
-                                (new NotificationController($this->get()))->add('email_change', $args);
-
+                                (new Notification($this->get()))->add('email_change', $args);
                             }
-
                         } else {
 
                             $alerts[] = [
@@ -259,43 +220,40 @@ final class UserController extends Controller {
                                 'message' => Helper::lang('base.save_problem')
                             ];
                         }
-
                     } else {
 
                         $alerts[] = [
                             'status' => 'warning',
                             'message' => Helper::lang('base.form_cannot_empty')
                         ];
-
                     }
-
                 }
 
                 break;
 
-            case 'oturumlar':
+            case 'sessions':
                 $head = Helper::lang('base.sessions');
                 $title = $head . ' | ' . $title;
                 $description = Helper::lang('base.sessions_message');
                 $output = [];
-                $sessions = (new SessionsModel());
+                $sessions = new SessionsModel();
 
                 $session = Helper::getSession('user');
                 $authCode = Helper::authCode();
                 if (is_object($session) AND isset($session->id) !== false) {
 
                     $records = $sessions->select('id, header, auth_code, ip, last_action_date, last_action_point')
-                        ->where('user_id', $session->id)
+                    ->where('user_id', $session->id)
                         ->getAll();
 
                     if ($records) {
                         $output = [];
                         foreach ($records as $record) {
 
-                            if (isset($this->get('request')->params['terminate']) !== false AND $record->id == $this->get('request')->params['terminate']) {
+                            if (isset($this->get('request')->params['terminate']) !== false and $record->id == $this->get('request')->params['terminate']) {
 
                                 $delete = $sessions->where('id', $record->id)->delete();
-                                if ($authCode != $record->auth_code AND $delete) {
+                                if ($authCode != $record->auth_code and $delete) {
                                     $alerts[] = [
                                         'status' => 'success',
                                         'message' => Helper::lang('base.session_terminated')
@@ -323,7 +281,7 @@ final class UserController extends Controller {
                 $head = Helper::lang('base.account');
                 $description = Helper::lang('base.account_message');
                 break;
-            
+
             default:
                 $head = Helper::lang('base.account');
                 $description = Helper::lang('base.account_message');
@@ -331,7 +289,7 @@ final class UserController extends Controller {
                     'status' => 'warning',
                     'message' => Helper::lang('error.page_not_found')
                 ];
-                $redirect = self::ACCOUNT_ROUTE;
+                $redirect = '/auth';
                 $statusCode = 404;
                 break;
         }
@@ -348,7 +306,7 @@ final class UserController extends Controller {
                 'action' => $action
             ],
             'alerts' => $alerts,
-            'view' => 'auth.account'
+            'view' => 'user.account'
         ];
 
         if (isset($session) !== false)
@@ -361,43 +319,43 @@ final class UserController extends Controller {
             $return['redirect'] = $redirect;
 
         return $return;
-
     }
 
-    public function register() {
+    public function register()
+    {
 
         $alerts = [];
 
         if ($this->get('request')->method === 'POST') {
 
             extract(Helper::input([
-                'email' => 'nulled_email', 
+                'email' => 'nulled_email',
                 'username' => 'nulled_text',
                 'name' => 'nulled_text',
                 'surname' => 'nulled_text',
                 'password' => 'nulled_text'
             ], $this->get('request')->params));
 
-            if (! is_null($username) AND ! is_null($email) AND ! is_null($password)) {
+            if (!is_null($username) and !is_null($email) and !is_null($password)) {
 
                 $users = (new UsersModel());
 
                 $getWithEmail = $users->select('email')->where('email', $email)->get();
-                if ( !$getWithEmail) {
+                if (!$getWithEmail) {
 
-                    $getWithUsername = $users->select('user_name')->where('user_name', $username)->get();
-                    if ( !$getWithUsername) {
+                    $getWithUsername = $users->select('u_name')->where('u_name', $username)->get();
+                    if (!$getWithUsername) {
 
                         $row = [
-                            'user_name' => $username,
-                            'first_name' => $name,
-                            'last_name' => $surname,
-                            'email' => $email,
-                            'password' => password_hash($password, PASSWORD_DEFAULT),
-                            'token'  => Helper::tokenGenerator(80),
+                            'u_name'    => $username,
+                            'f_name'    => $name,
+                            'l_name'    => $surname,
+                            'email'     => $email,
+                            'password'  => password_hash($password, PASSWORD_DEFAULT),
+                            'token'     => Helper::tokenGenerator(80),
                             'role_id'   => Helper::config('settings.default_user_role'),
-                            'created_at'=> time(),
-                            'status' => 'passive'
+                            'created_at' => time(),
+                            'status'    => 'passive'
                         ];
 
                         $insert = $users->insert($row);
@@ -411,44 +369,35 @@ final class UserController extends Controller {
                                 'status' => 'success',
                                 'message' => Helper::lang('base.registration_successful')
                             ];
-                            $redirect = [$this->get()->url(self::LOGIN_ROUTE), 4];
-
+                            $redirect = [$this->get()->url('/auth/login'), 4];
                         } else {
 
                             $alerts[] = [
                                 'status' => 'warning',
                                 'message' => Helper::lang('base.registration_problem')
                             ];
-
                         }
-
                     } else {
 
                         $alerts[] = [
                             'status' => 'warning',
                             'message' => Helper::lang('base.username_is_already_used')
                         ];
-
                     }
-
                 } else {
 
                     $alerts[] = [
                         'status' => 'warning',
                         'message' => Helper::lang('base.email_is_already_used')
                     ];
-
                 }
-
             } else {
 
                 $alerts[] = [
                     'status' => 'warning',
                     'message' => Helper::lang('base.form_cannot_empty')
                 ];
-
             }
-            
         }
 
         $return = [
@@ -459,24 +408,24 @@ final class UserController extends Controller {
                 'description' => Helper::lang('base.register_message')
             ],
             'alerts' => $alerts,
-            'view' => 'auth.register',
+            'view' => 'user.register',
         ];
 
         if (isset($redirect))
             $return['redirect'] = $redirect;
 
         return $return;
-
     }
 
-    public function logout() {
+    public function logout()
+    {
 
-        
+
         $deleteSession = (new SessionsModel)
             ->where('auth_code', Helper::authCode())
             ->delete();
 
-        if ($deleteSession !== false AND $deleteSession !== null) {
+        if ($deleteSession !== false and $deleteSession !== null) {
 
             Helper::clearSession();
             return [
@@ -485,10 +434,9 @@ final class UserController extends Controller {
                     'status' => 'success',
                     'message' => Helper::lang('base.signed_out'),
                 ]],
-                'redirect' => self::LOGIN_ROUTE,
+                'redirect' => '/',
                 'view' => null
             ];
-
         } else {
 
             return [
@@ -502,10 +450,10 @@ final class UserController extends Controller {
                 'view' => ['error', 'error']
             ];
         }
-
     }
 
-    public function recovery() {
+    public function recovery()
+    {
 
         $alerts = [];
         $step = 1;
@@ -518,15 +466,15 @@ final class UserController extends Controller {
                 'token' => 'nulled_text',
             ], $this->get('request')->params));
 
-            if (! is_null($email) AND (is_null($password) AND is_null($token))) { // Step 1: Request 
+            if (!is_null($email) and (is_null($password) and is_null($token))) { // Step 1: Request 
 
                 $users = (new UsersModel());
-                $getUser = $users->select('id, token, status, first_name, user_name, email')
-                    ->where('email', $email)
+                $getUser = $users->select('id, token, status, f_name, u_name, email')
+                ->where('email', $email)
                     ->notWhere('status', 'deleted')
                     ->get();
 
-                if ( ! empty($getUser) ) {
+                if (!empty($getUser)) {
 
                     if ($getUser->status === 'active') {
 
@@ -537,40 +485,33 @@ final class UserController extends Controller {
                                 'status' => 'success',
                                 'message' => Helper::lang('base.recovery_request_successful')
                             ];
-                            $redirect = $this->get()->url(self::LOGIN_ROUTE);
-
+                            $redirect = $this->get()->url('/auth/login');
                         } else {
 
                             $alerts[] = [
                                 'status' => 'warning',
                                 'message' => Helper::lang('base.recovery_request_problem')
                             ];
-
                         }
-
                     } else {
 
                         $alerts[] = [
                             'status' => 'warning',
                             'message' => Helper::lang('base.account_not_verified')
                         ];
-
                     }
-
                 } else {
 
                     $alerts[] = [
                         'status' => 'warning',
                         'message' => Helper::lang('base.account_not_found')
                     ];
-
                 }
-
-            } elseif (is_null($email) AND (! is_null($password) AND ! is_null($token))) { // Step 3: Reset
+            } elseif (is_null($email) and (!is_null($password) and !is_null($token))) { // Step 3: Reset
 
                 $users = (new UsersModel());
-                $getUser = $users->select('id, token, status, first_name, user_name, email')->where('token', $token)->where('status', 'active')->get();
-                if (! empty($getUser)) {
+                $getUser = $users->select('id, token, status, f_name, u_name, email')->where('token', $token)->where('status', 'active')->get();
+                if (!empty($getUser)) {
 
                     $update = $users->where('id', $getUser->id)
                         ->update([
@@ -585,8 +526,7 @@ final class UserController extends Controller {
                             'status' => 'success',
                             'message' => Helper::lang('base.account_recovered')
                         ];
-                        $redirect = $this->get()->url(self::LOGIN_ROUTE);
-
+                        $redirect = $this->get()->url('/auth/login');
                     } else {
 
                         $alerts[] = [
@@ -594,25 +534,21 @@ final class UserController extends Controller {
                             'message' => Helper::lang('base.account_not_recovered')
                         ];
                     }
-
                 } else {
 
                     $alerts[] = [
                         'status' => 'error',
                         'message' => Helper::lang('base.account_not_found')
                     ];
-                    $redirect = $this->get()->url(self::RECOVERY_ROUTE);
+                    $redirect = $this->get()->url('/auth/recovery');
                 }
-
             } else {
 
                 $alerts[] = [
                     'status' => 'warning',
                     'message' => Helper::lang('base.form_cannot_empty')
                 ];
-
             }
-            
         } elseif (isset($this->get('request')->params['token']) !== false) { // Step 2: Verify
 
             extract(Helper::input([
@@ -621,17 +557,16 @@ final class UserController extends Controller {
 
             $users = (new UsersModel());
             $getUser = $users->select('id')->where('token', $token)->where('status', 'active')->get();
-            if (! empty($getUser)) {
+            if (!empty($getUser)) {
 
                 $step = 2;
-
             } else {
 
                 $alerts[] = [
                     'status' => 'error',
                     'message' => Helper::lang('base.account_not_found')
                 ];
-                $redirect = $this->get()->url(self::RECOVERY_ROUTE);
+                $redirect = $this->get()->url('/auth/recovery');
             }
         }
 
@@ -644,7 +579,7 @@ final class UserController extends Controller {
                 'step' => $step,
             ],
             'alerts' => $alerts,
-            'view' => 'auth.recovery',
+            'view' => 'user.recovery',
         ];
 
         if (isset($redirect))
@@ -654,7 +589,5 @@ final class UserController extends Controller {
             $return['arguments']['token'] = $token;
 
         return $return;
-
     }
-
 }
