@@ -482,7 +482,6 @@ class Helper
         return $alert;
     }
 
-
     /**
      * Language Translation
      * @param  $key 
@@ -510,7 +509,6 @@ class Helper
 
         return $key;
     }
-
 
     /**
      * Assets File Controller
@@ -585,7 +583,6 @@ class Helper
         return $return;
     }
 
-
     /**
      * CSRF Token Verifier
      * @param string $token  Token
@@ -629,7 +626,6 @@ class Helper
         }
     }
 
-
     /**
      * Session Starter
      * Assign to session name and start session
@@ -637,7 +633,7 @@ class Helper
      */
     public static function sessionStart()
     {
-
+        
         session_name(KX_SESSION_NAME);
         session_start();
     }
