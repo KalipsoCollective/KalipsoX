@@ -1,5 +1,5 @@
 # Credits
-
+## We love open source. We use open source. We are grateful to open source supporters.
 - izniburak - pdox [MIT](https://github.com/izniburak/pdox/blob/master/LICENCE.md)
 - verot.net - class.upload.php [GPL](https://github.com/verot/class.upload.php/blob/master/LICENSE.txt)
 - PHPMailer - PHPMailer [LGPL](https://github.com/PHPMailer/PHPMailer/blob/master/LICENSE)
