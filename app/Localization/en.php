@@ -587,6 +587,9 @@ return [
     'documentation' => 'Documentation',
     'licence' => 'Licence',
     'source_code' => 'Source Code',
+    'cols' => 'Cols',
+    'available_languages' => 'Available Languages',
+    'available_folders' => 'Available Folders',
   ],
   'app' => []
 ];
