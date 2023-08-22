@@ -65,7 +65,9 @@ final class AppController extends CoreController
                 $action = $this->get('request')->attributes['action'];
 
             $title = Helper::lang('base.sandbox');
-            $output = '';
+            $output = [
+                'alert' => []
+            ];
             $dbSchema = require Helper::path('app/External/db_schema.php');
 
             switch ($action) {
@@ -78,103 +80,73 @@ final class AppController extends CoreController
 
                         $init = (new Model)->dbInit($dbSchema);
                         if ($init) {
-                            $output .= '<p class="text-success">' . Helper::lang('base.db_init_success') . '</p>';
+                            $output['alert'][] = [
+                                'type' => 'success',
+                                'title' => Helper::lang('base.success'),
+                                'message' => Helper::lang('base.db_init_success')
+                            ];
                         } else {
-                            $init = (string) $init;
-                            $output .= '<p class="text-danger">' . str_replace('[ERROR]', $init, (string) Helper::lang('base.db_init_problem')) . '</p>';
+                            $output['alert'][] = [
+                                'type' => 'danger',
+                                'title' => Helper::lang('base.danger'),
+                                'message' => str_replace('[ERROR]', (string) $init, (string) Helper::lang('base.db_init_problem'))
+                            ];
                         }
+
                     } else {
+
+                        $output['table'] = [];
+
+                        $output['alert'][] = [
+                            'type' => 'danger',
+                            'title' => Helper::lang('base.danger'),
+                            'message' => str_replace(
+                                ['[DB_NAME]', '[COLLATION]'], 
+                                ['<kbd>' . Helper::config('database.name') . '</kbd>', '<kbd>' . Helper::config('database.collation') . '</kbd>'],
+                                (string) Helper::lang('base.db_init_alert')
+                            )
+                        ];
 
                         foreach ($dbSchema['tables'] as $table => $detail) {
 
-                            $cols = '
-							<div class="table-responsive">
-								<table class="table table-dark table-sm table-hover table-striped caption-bottom">
-									<thead>
-										<tr>
-											<th scope="col">' . Helper::lang('base.column') . '</th>
-											<th scope="col">' . Helper::lang('base.type') . '</th>
-											<th scope="col">' . Helper::lang('base.auto_inc') . '</th>
-											<th scope="col">' . Helper::lang('base.attribute') . '</th>
-											<th scope="col">' . Helper::lang('base.default') . '</th>
-											<th scope="col">' . Helper::lang('base.index') . '</th>
-										</tr>
-									</thead>
-									<tbody>';
+                            $output['table'][$table] = [
+                                'rows' => [
+                                    'col' => Helper::lang('base.column'),
+                                    'type' => Helper::lang('base.type'),
+                                    'auto_inc' => Helper::lang('base.auto_inc'),
+                                    'attr' => Helper::lang('base.attribute'),
+                                    'default' => Helper::lang('base.default'),
+                                    'index' => Helper::lang('base.index'),
+                                ],
+                                'table_values' => [
+                                    'charset' => (isset($dbSchema['table_values']['specific'][$table]['charset']) !== false ? $dbSchema['table_values']['specific'][$table]['charset'] : $dbSchema['table_values']['charset']),
+                                    'collate' => (isset($dbSchema['table_values']['specific'][$table]['collate']) !== false ? $dbSchema['table_values']['specific'][$table]['collate'] : $dbSchema['table_values']['collate']),
+                                    'engine' => (isset($dbSchema['table_values']['specific'][$table]['engine']) !== false ? $dbSchema['table_values']['specific'][$table]['engine'] : $dbSchema['table_values']['engine']),
+                                ],
+                                'cols' => []
+                            ];
 
                             foreach ($detail['cols'] as $col => $colDetail) {
 
-                                $cols .= '
-										<tr>
-											<th scope="row">' . $col . '</th>
-											<td scope="col">
-												' . $colDetail['type'] . (isset($colDetail['type_values']) !== false ?
-                                    (is_array($colDetail['type_values']) ? '(' . implode(',', $colDetail['type_values']) . ')' :
-                                        '(' . $colDetail['type_values']) . ')' : ''
-                                ) . '
-											</td>
-											<td scope="col">' . Helper::lang('base.' . (isset($colDetail['auto_inc']) !== false ? 'yes' : 'no')) . '</td>
-											<td scope="col">' . (isset($colDetail['attr']) !== false ? $colDetail['attr'] : '') . '</td>
-											<td scope="col">' . (isset($colDetail['default']) !== false ? $colDetail['default'] : '') . '</td>
-											<td scope="col">' . (isset($colDetail['index']) !== false ? $colDetail['index'] : '') . '</td>
-										<tr>';
+                                $output['table'][$table]['cols'][$col] = [
+                                    'type' => $colDetail['type'] . (isset($colDetail['type_values']) !== false ?
+                                        (is_array($colDetail['type_values']) ? '(' . implode(',', $colDetail['type_values']) . ')' :
+                                            '(' . $colDetail['type_values']) . ')' : ''
+                                    ),
+                                    'auto_inc' => Helper::lang('base.' . (isset($colDetail['auto_inc']) !== false ? 'yes' : 'no')),
+                                    'attr' => (isset($colDetail['attr']) !== false ? $colDetail['attr'] : ''),
+                                    'default' => (isset($colDetail['default']) !== false ? $colDetail['default'] : ''),
+                                    'index' => (isset($colDetail['index']) !== false ? $colDetail['index'] : ''),
+                                ];
                             }
 
-                            $tableValues = '';
+                            if (count($output['table'])) {
 
-                            $tableValues = '<h3 class="small text-muted">
-								' . (isset($dbSchema['table_values']['specific'][$table]['charset']) !== false ?
-                                Helper::lang('base.charset') . ': <strong>' . $dbSchema['table_values']['specific'][$table]['charset'] . '</strong><br>' :
-                                ''
-                            ) . '
-								' . (isset($dbSchema['table_values']['specific'][$table]['collate']) !== false ?
-                                Helper::lang('base.collate') . ': <strong>' . $dbSchema['table_values']['specific'][$table]['collate'] . '</strong><br>' :
-                                ''
-                            ) . '
-								' . (isset($dbSchema['table_values']['specific'][$table]['engine']) !== false ?
-                                Helper::lang('base.engine') . ': <strong>' . $dbSchema['table_values']['specific'][$table]['engine'] . '</strong><br>' :
-                                ''
-                            ) . '
-							</h3>';
-
-                            $cols .= '
-									</tbody>
-									<caption>' . $tableValues . '</caption>
-								</table>
-							</div>';
-
-                            $output .= '<details><summary>' . $table . '</summary>' . $cols . '</details>';
-                        }
-
-                        if ($output != '') {
-                            $output = '
-							<h3 class="small text-muted">
-								' . Helper::lang('base.db_name') . ': 
-								<strong>' . Helper::config('database.name') . '</strong><br>
-								' . Helper::lang('base.db_charset') . ': 
-								<strong>' . (isset($dbSchema['table_values']['charset']) !== false ? $dbSchema['table_values']['charset'] : '-') . '</strong><br>
-								' . Helper::lang('base.db_collate') . ': 
-								<strong>' . (isset($dbSchema['table_values']['collate']) !== false ? $dbSchema['table_values']['collate'] : '-') . '</strong><br>
-								' . Helper::lang('base.db_engine') . ': 
-								<strong>' . (isset($dbSchema['table_values']['engine']) !== false ? $dbSchema['table_values']['engine'] : '-') . '</strong><br>
-							</h3>
-							' . $output . '
-							<p class="small text-danger mt-5">
-								' . str_replace(
-                                [
-                                    '[DB_NAME]',
-                                    '[COLLATION]'
-                                ],
-                                [
-                                    '<strong>' . Helper::config('database.name') . '</strong>',
-                                    '<strong>' . Helper::config('database.collation') . '</strong>'
-                                ],
-                                (string) Helper::lang('base.db_init_alert')
-                            ) . '
-							</p>
-							<a class="btn btn-light btn-sm" href="' . $this->get()->url('/sandbox/db-init?start') . '">
-								' . Helper::lang('base.db_init_start') . '
-							</a>';
+                                $output['table_button'] = [
+                                    'text' => Helper::lang('base.db_init_start'),
+                                    'link' => $this->get()->url('/sandbox/db-init?start'),
+                                ]; 
+                            }
                         }
                     }
                     break;
@@ -195,7 +167,11 @@ final class AppController extends CoreController
 
                     if (isset($_GET['start']) !== false) {
 
-                        $output = '<p class="text-muted">' . Helper::lang('base.seeding') . '</p>';
+                        $output['alert'][] = [
+                            'type' => 'info',
+                            'title' => Helper::lang('base.info'),
+                            'message' => Helper::lang('base.seeding')
+                        ];
 
                         /* Fake User Insert
 						for ($i=0; $i < 1000; $i++) { 
@@ -226,56 +202,50 @@ final class AppController extends CoreController
                         $init = (new Model)->dbSeed($dbSchema);
 
                         if ($init !== false) {
-                            $output .= '<p class="text-success">' . Helper::lang('base.db_seed_success') . '</p>';
+                            $output['alert'][] = [
+                                'type' => 'success',
+                                'title' => Helper::lang('base.success'),
+                                'message' => Helper::lang('base.db_seed_success')
+                            ];
                         } else {
                             $init = (string) $init;
-                            $output .= '<p class="text-danger">' . str_replace('[ERROR]', $init, (string) Helper::lang('base.db_seed_problem')) . '</p>';
+                            $output['alert'][] = [
+                                'type' => 'danger',
+                                'title' => Helper::lang('base.danger'),
+                                'message' => str_replace('[ERROR]', $init, (string) Helper::lang('base.db_seed_problem'))
+                            ];
                         }
                     } else {
 
+                        $output['table'] = [];
+
                         foreach ($dbSchema['data'] as $table => $detail) {
 
-                            $cols = '
-							<div class="table-responsive">
-								<table class="table table-dark table-sm table-hover table-striped">
-									<thead>
-										<tr>
-											<th scope="col">' . Helper::lang('base.table') . '</th>
-											<th scope="col">' . Helper::lang('base.data') . '</th>
-										</tr>
-									</thead>
-									<tbody>';
+                            $output['table'][$table] = [
+                                'rows' => [
+                                    'col' => Helper::lang('base.column'),
+                                    'data' => Helper::lang('base.data'),
+                                ],
+                                'cols' => []
+                            ];
 
                             foreach ($detail as $tableDataDetail) {
 
-                                $dataList = '<ul class="list-group list-group-flush">';
                                 foreach ($tableDataDetail as $col => $data) {
-                                    $dataList .= '
-									<li class="list-group-item d-flex justify-content-between align-items-start space">
-										<strong>' . $col . '</strong> <span class="ml-2">' . $data . '</span>
-									</li>';
+
+                                    $output['table'][$table]['cols'][$col] = [
+                                        'data' => $data
+                                    ];
                                 }
-                                $dataList .= '</ul>';
-
-                                $cols .= '
-								<tr>
-									<th scope="row">' . $table . '</th>
-									<td scope="col">
-										' . $dataList . '
-									</td>
-								<tr>';
                             }
-                            $cols .= '
-								</table>
-							</div>';
-
-                            $output .= '<details><summary>' . $table . '</summary>' . $cols . '</details>';
                         }
 
-                        if ($output != '') {
-                            $output .= '<a class="btn btn-light mt-5 btn-sm" href="' . $this->get()->url('/sandbox/db-seed?start') . '">
-								' . Helper::lang('base.db_seed_start') . '
-							</a>';
+                        if (count($output['table'])) {
+
+                            $output['table_button'] = [
+                                'text' => Helper::lang('base.db_seed_start'),
+                                'link' => $this->get()->url('/sandbox/db-seed?start'),
+                            ];
                         }
                     }
                     break;
@@ -287,9 +257,11 @@ final class AppController extends CoreController
 
                     ob_start();
                     phpinfo();
-                    $output = ob_get_clean();
-                    $output = Helper::cleanHTML($output, ['script', 'meta', 'style', 'title']);;
-                    $output = '<pre>' . trim($output) . '</pre>';
+                    $output['pre'] = ob_get_clean();
+                    $output['pre'] = Helper::cleanHTML($output['pre'], ['script', 'meta', 'style', 'title', 'head']);
+                    // get only body content
+                    $output['pre'] = preg_replace('/^.*<body>(.*)<\/body>.*$/s', '$1', $output['pre']);
+                    $output['pre'] = trim($output['pre']);
                     break;
 
                 case 'session':
@@ -297,17 +269,25 @@ final class AppController extends CoreController
                     $title = $head . ' | ' . $title;
                     $description = Helper::lang('base.session_message');
 
-                    $output = '';
+                    $output['table'][Helper::lang('base.available_languages')] = [
+                        'rows' => [
+                            'lang' => Helper::lang('base.language'),
+                            'action' => '',
+                        ],
+                        'cols' => []
+                    ];
                     foreach (Helper::config('app.available_languages') as $lang) {
-                        $output .= '<a class="ms-2" href="' . $this->get()->url('/sandbox/session?lang=' . $lang) . '">
-							' . $lang . '
-						</a>';
+                        $output['table'][Helper::lang('base.available_languages')]['cols'][$lang] = [
+                            'lang' => $lang,
+                            'action' => '<a class="btn btn-sm btn-primary" href="' . $this->get()->url('/sandbox/session?lang=' . $lang) . '">
+                                ' . Helper::lang('base.change_language') . '
+                            </a>'
+                        ];
                     }
-                    $output = '<p class="text-muted">' . Helper::lang('base.change_language') . ': ' . $output . '</p>';
 
                     ob_start();
-                    Helper::dump($_SESSION);
-                    $output .= ob_get_clean();
+                    print_r($_SESSION);
+                    $output['pre'] = ob_get_clean();
                     break;
 
                 case 'clear-storage':
@@ -318,7 +298,7 @@ final class AppController extends CoreController
                     if (!is_dir($dir = Helper::path('app/Storage'))) mkdir($dir);
 
                     $path = Helper::path('app/Storage/*');
-                    $deleteAction = (isset($_GET['delete']) !== false and count($_GET['delete'])) ? $_GET['delete'] : null;
+                    $deleteAction = (isset($_GET['delete']) !== false AND is_array($_GET['delete']) AND count($_GET['delete'])) ? $_GET['delete'] : null;
                     if ($deleteAction) {
                         $glob = glob($path, GLOB_BRACE);
                         if ($glob and count($glob)) {
@@ -326,25 +306,25 @@ final class AppController extends CoreController
                                 if (in_array(basename($folder), $deleteAction))
                                     Helper::removeDir($folder);
                             }
-                            echo '<p class="text-success">' . Helper::lang('base.clear_storage_success') . '</p>';
+                            $output['alert'][] = [
+                                'type' => 'success',
+                                'title' => Helper::lang('base.success'),
+                                'message' => Helper::lang('base.clear_storage_success')
+                            ];
                         }
                     }
 
                     $glob = glob($path, GLOB_BRACE);
 
                     if ($glob and count($glob)) {
-
-                        echo '
-						<form method="get">
-							<div class="table-responsive">
-								<table class="table table-hover table-dark table-borderless table-striped">
-									<thead>
-										<tr>
-											<th scope="col" width="5%">#</th>
-											<th scope="col">' . Helper::lang('base.folder') . '</th>
-										</tr>
-									</thead>
-									<tbody>';
+                        $output['table_form'] = true;
+                        $output['table'][Helper::lang('base.available_folders')] = [
+                            'rows' => [
+                                'folder' => Helper::lang('base.folder'),
+                                'action' => '',
+                            ],
+                            'cols' => []
+                        ];
                         $deleteBtn = false;
                         foreach ($glob as $folder) {
 
@@ -357,35 +337,34 @@ final class AppController extends CoreController
 
                             $basename = basename($folder);
 
-                            echo '
-										<tr>
-											<td>
-												<div class="form-check">
-													<input class="form-check-input" 
-														type="checkbox" name="delete[]" 
-														value="' . $basename . '"
-														' . (!$size ? ' disabled' : ' checked') . '>
-												</div>
-											</td>
-											<td>/' . $basename . ' 
-												<small class="' . (!$size ? 'text-muted' : 'text-primary') . '">
-													' . Helper::formatSize($size) . '
-												</small>
-											</td>
-										</tr>';
+                            $output['table'][Helper::lang('base.available_folders')]['cols'][$basename] = [
+                                'folder' => '<div class="form-check">
+                                                <input class="form-check-input" 
+                                                    type="checkbox" name="delete[]" 
+                                                    value="' . $basename . '"
+                                                    ' . (!$size ? ' disabled' : ' checked') . '>
+                                            </div>',
+                                'action' => '/' . $basename . ' 
+                                            <small class="' . (!$size ? 'text-muted' : 'text-primary') . '">
+                                                ' . Helper::formatSize($size) . '
+                                            </small>'
+                            ];
                         }
-                        echo '
-									</tbody>
-								</table>
-							</div>
-							<button type="submit" class="btn btn-danger btn-sm"' . (!$deleteBtn ? ' disabled' : '') . '>
-								' . Helper::lang('base.delete') . '
-							</button>
-						</form>';
+
+                        if ($deleteBtn) {
+                            $output['table_button'] = [
+                                'text' => Helper::lang('base.clear_storage'),
+                                'type' => 'submit',
+                            ];
+                        }
+
                     } else {
-                        echo '<p class="text-danger">' . Helper::lang('base.folder_not_found') . '</p>';
+                        $output['alert'][] = [
+                            'type' => 'danger',
+                            'title' => Helper::lang('base.danger'),
+                            'message' => Helper::lang('base.folder_not_found')
+                        ];
                     }
-                    $output = ob_get_clean();
                     break;
 
                 case 'check_languages':
@@ -418,20 +397,17 @@ final class AppController extends CoreController
 
                     if (count($diff)) {
 
-                        $cols = '
-						<div class="table-responsive">
-							<table class="table table-dark table-sm table-hover table-striped">
-								<thead>
-									<tr>
-										<th scope="col">' . Helper::lang('base.language') . '</th>
-										<th scope="col">' . Helper::lang('base.data') . '</th>
-									</tr>
-								</thead>
-								<tbody>';
+                        $output['table'][Helper::lang('base.missing_definitions')] = [
+                            'rows' => [
+                                'lang' => Helper::lang('base.language'),
+                                'data' => Helper::lang('base.data'),
+                            ],
+                            'cols' => []
+                        ];
 
                         foreach ($diff as $key => $missing) {
 
-                            $dataList = '<ul class="list-group list-group-flush">';
+                            $dataList .= '<ul class="list-group list-group-flush">';
                             $missing = array_unique($missing);
                             foreach ($missing as $missingData) {
                                 $dataList .= '
@@ -441,22 +417,18 @@ final class AppController extends CoreController
                             }
                             $dataList .= '</ul>';
 
-                            $cols .= '
-							<tr>
-								<th scope="row">' . $key . '</th>
-								<td scope="col">
-									' . $dataList . '
-								</td>
-							<tr>';
+                            $output['table'][Helper::lang('base.missing_definitions')]['cols'][$key] = [
+                                'lang' => $key,
+                                'data' => $dataList
+                            ];
                         }
-                        $cols .= '
-							</table>
-						</div>';
                     } else {
-                        $cols = '<p class="text-success">' . Helper::lang('base.no_missing_definitions.') . '</p>';
+                        $output['alert'][] = [
+                            'type' => 'success',
+                            'title' => Helper::lang('base.success'),
+                            'message' => Helper::lang('base.no_missing_definitions')
+                        ];
                     }
-
-                    $output = $cols;
                     break;
 
                 default:
