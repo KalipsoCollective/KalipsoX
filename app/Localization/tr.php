@@ -194,7 +194,7 @@ return [
         'default' => 'Varsayılan',
         'index' => 'İndis',
         'yes' => 'evet',
-        'no' => 'yes',
+        'no' => 'hayır',
         'charset' => 'Karakter Seti',
         'collate' => 'Karşılaştırma Seti',
         'engine' => 'Motor',
@@ -587,6 +587,14 @@ return [
         'documentation' => 'Dokümantasyon',
         'licence' => 'Lisans',
         'source_code' => 'Kaynak Kodu',
+        'cols' => 'Sütun',
+        'danger' => 'Uyarı!',
+        'warning' => 'Uyarı!',
+        'info' => 'Bilgi!',
+        'success' => 'Başarılı!',
+        'error' => 'Hata!',
+        'available_languages' => 'Kullanılabilir Diller',
+        'available_folders' => 'Kullanılabilir Klasörler',
     ],
     'app' => []
 ];
