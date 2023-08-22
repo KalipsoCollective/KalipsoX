@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="<?php echo $Helper::lang('lang.code'); ?>" dir="<?php echo $Helper::lang('lang.dir'); ?>">
 
 <head>
   <title><?php echo $title; ?></title>
