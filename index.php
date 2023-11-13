@@ -7,17 +7,20 @@
 declare(strict_types=1);
 
 require __DIR__ . '/vendor/autoload.php';
-require __DIR__ . '/app/bootstrap.php';
+// require __DIR__ . '/app/bootstrap.php';
 
-define('KX_VERSION', '0.0.1');
+define('KX_VERSION', 'alpha');
 
 try {
 
-    $app = (new KX\Core\Factory);
+    $app = (new KX\Core\Factory)->setup();
+
+    echo $a;
 
     // Single route
-    $app->route('GET', '/', 'AppController@index', ['Auth@verifyAccount']);
+    // $app->route('GET', '/', 'AppController@index', ['Auth@verifyAccount']);
 
+    /*
     // Root-bound route group
     $app->routeGroup(['GET,POST', '/auth', 'UserController@account', ['Auth@with']], function () {
         return [
@@ -118,6 +121,7 @@ try {
     $app->excludeWhileInMaintenance([
         'auth/login'
     ]);
+    */
     $app->run();
 } catch (Exception $e) {
 
