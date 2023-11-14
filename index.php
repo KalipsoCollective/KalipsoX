@@ -15,7 +15,11 @@ try {
 
     $app = (new KX\Core\Factory)->setup();
 
-    echo $a;
+
+    echo '<pre>';
+    var_dump(KX\Core\Helper::config('env.DEV_MODE'));
+    echo '</pre>';
+    exit;
 
     // Single route
     // $app->route('GET', '/', 'AppController@index', ['Auth@verifyAccount']);
