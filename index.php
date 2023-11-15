@@ -17,7 +17,9 @@ try {
 
 
     echo '<pre>';
-    var_dump(KX\Core\Helper::config('env.DEV_MODE'));
+    // print timezone
+    // global $kxLangParameters;
+    // var_dump($kxLangParameters);
     echo '</pre>';
     exit;
 
