@@ -15,13 +15,25 @@ try {
 
     $app = (new KX\Core\Factory)->setup();
 
+    // single route
+    $app->route(['GET', 'POST'], '/', 'AppController@index');
+    // multi route
+    $app->routes([
+        [['GET', 'POST'], '/', 'AppController@index'],
+        [['GET', 'POST'], '/api', 'AppController@test'],
+    ]);
 
-    echo '<pre>';
-    // print timezone
-    // global $kxLangParameters;
-    // var_dump($kxLangParameters);
-    echo '</pre>';
-    exit;
+    // route group
+    $app->routeGroup(['GET', '/auth', 'UserController@account', 'UserMiddleware@root'], [
+        ['GET', '/login', 'UserController@login'],
+        ['GET', '/register', 'UserController@register'],
+        ['GET', '/recovery', 'UserController@recovery'],
+        [['POST', 'GET'], '/logout', 'UserController@logout', ['UserMiddleware@isLogged', 'UserMiddleware@isLoggedAsAdmin']],
+        ['GET', '/:action', 'UserController@account'],
+        ['GET', '/:action', 'UserController@account'],
+    ]);
+
+    $app->run();
 
     // Single route
     // $app->route('GET', '/', 'AppController@index', ['Auth@verifyAccount']);
@@ -128,7 +140,6 @@ try {
         'auth/login'
     ]);
     */
-    $app->run();
 } catch (Exception $e) {
 
     KX\Core\Exception::exceptionHandler($e);
