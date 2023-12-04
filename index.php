@@ -18,6 +18,9 @@ try {
 
     $app = (new KX\Core\Factory)->setup();
 
+    // $app->response->setLayout('layout'); // set global layout
+    $app->setLayout('layout');
+
     /**
      * Custom error handler
      **/
@@ -38,7 +41,28 @@ try {
      **/
     $app->routes([
         [['GET', 'POST'], '/test', 'AppController@test'],
-        [['GET', 'POST'], '/hi', function (Request $request, Response $response) {
+        [['GET', 'POST'], '/hi', function (Request $request, Response $response, $factory) {
+            $response->setBody('Hi!');
+
+            return $response->render('basic/hi', [
+                'title' => 'Hi!',
+                'description' => 'This is a description.',
+            ]);
+        }],
+        [['GET', 'POST'], '/hi/ho/:val', function (Request $request, Response $response, $factory) {
+            $response->setBody('Hi!');
+
+            return $response->render('basic/hi', [
+                'title' => 'Hi ' . $request->getParam('val') . '!',
+                'description' => 'This is a description.',
+            ]);
+        }],
+        [['GET', 'POST'], '/ho', function (Request $request, Response $response, $factory) {
+
+            return $response->json([
+                'title' => 'Hi!',
+                'description' => 'This is a description.',
+            ]);
         }],
     ]);
 
