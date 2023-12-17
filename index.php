@@ -29,12 +29,12 @@ try {
         $response->setStatusCode(500);
         $response->setBody('<pre>Error: ' . $errMsg . ' in ' . $file . ' on line ' . $line . '</pre>');
         $response->send();
-    }); */
+    });
 
     /**
      * Single route
      **/
-    $app->route(['POST'], '/', 'AppController@index');
+    $app->route(['GET'], '/', 'App@index', ['Test@redirectTo']);
 
     /**
      * Multi route
@@ -42,10 +42,10 @@ try {
     $app->routes([
         [['GET', 'POST'], '/test', 'AppController@test'],
         [['GET', 'POST'], '/hi', function (Request $request, Response $response, $factory) {
-            $response->setBody('Hi!');
+            $response->setBody('Hi from test!');
 
             return $response->render('basic/hi', [
-                'title' => 'Hi!',
+                'title' => 'Hi from test!',
                 'description' => 'This is a description.',
             ]);
         }],
