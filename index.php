@@ -49,7 +49,7 @@ try {
                 'description' => 'This is a description.',
             ]);
         }],
-        [['GET', 'POST'], '/hi/ho/:val', function (Request $request, Response $response, $factory) {
+        [['GET', 'POST'], '/hi/:val', function (Request $request, Response $response, $factory) {
             $response->setBody('Hi!');
 
             return $response->render('basic/hi', [
