@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 return [
 	'name' => 'KalipsoX',
@@ -20,7 +20,7 @@ return [
 	'mail_queue' => true,
 	'view_cache' => false,
 	'db_cache' => false,
-	'route_cache' => false,
+	'route_cache' => true,
 	'last_updated_at' => 1655275294,
 	'last_updated_by' => 1,
 ];
