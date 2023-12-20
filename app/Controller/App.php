@@ -10,11 +10,13 @@ declare(strict_types=1);
 namespace KX\Controller;
 
 use KX\Core\Helper;
-// use KX\Core\Model;
+use KX\Core\Model;
 
 
 use KX\Core\Request;
 use KX\Core\Response;
+
+use KX\Model\System;
 
 final class App
 {
@@ -22,6 +24,9 @@ final class App
     public function index(Request $request, Response $response)
     {
 
+        $systemModel = new Model();
+        $systemModel->setupModels();
+        Helper::dump($systemModel, true);
         return $response->send('Hi from controller!');
     }
 
