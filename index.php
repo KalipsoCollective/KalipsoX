@@ -34,7 +34,7 @@ try {
     /**
      * Single route
      **/
-    $app->route(['GET'], '/', 'App@index', ['Test@redirectTo']);
+    $app->route(['GET'], '/', 'App@index', ['Test@run']);
 
     /**
      * Multi route
