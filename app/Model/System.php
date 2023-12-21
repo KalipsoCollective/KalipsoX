@@ -76,6 +76,25 @@ final class System extends Model
 			'collation' => 'utf8mb4_unicode_520_ci',
 		]);
 
+		$this->setBulkData([
+			[
+				'keyy' => 'test',
+				'valuee' => 'test',
+				'created_at' => '2020-01-01 00:00:00',
+				'updated_at' => '2020-01-01 00:00:00',
+				'text' => 'test',
+				'json' => '{"test": "test"}',
+			],
+			[
+				'keyy' => 'test2',
+				'valuee' => 'test2',
+				'created_at' => '2022-01-01 00:00:00',
+				'updated_at' => '2022-01-01 00:00:00',
+				'text' => 'test2',
+				'json' => '{"test": "test2"}',
+			],
+		]);
+
 		parent::__construct();
 	}
 }
