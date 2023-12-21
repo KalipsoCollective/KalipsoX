@@ -25,7 +25,7 @@ final class App
     {
 
         $systemModel = new Model();
-        $systemModel->setupModels();
+        $systemModel->setupModels(true);
         Helper::dump($systemModel, true);
         return $response->send('Hi from controller!');
     }
