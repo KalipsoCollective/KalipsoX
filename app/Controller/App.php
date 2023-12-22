@@ -21,6 +21,20 @@ use KX\Model\System;
 final class App
 {
 
+    public function setup(Request $request, Response $response)
+    {
+
+        $availableSubRoutes = [
+            'setup_routes' => [
+                '/setup/models' => 'Set up the entire database with model classes.',
+                '/setup/models-with-seed' => 'Set up the entire database with model classes and import sample data as well.',
+                '/setup/sync-models' => 'Synchronize the database for new column definitions.',
+            ]
+        ];
+
+        return $response->json($availableSubRoutes);
+    }
+
     public function index(Request $request, Response $response)
     {
 

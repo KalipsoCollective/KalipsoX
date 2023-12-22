@@ -13,6 +13,7 @@ use KX\Core\Request;
 use KX\Core\Response;
 
 define('KX_VERSION', 'alpha');
+exit;
 
 try {
 
@@ -92,6 +93,13 @@ try {
         [['POST', 'GET'], '/logout', 'UserController@logout', ['UserMiddleware@isLogged', 'UserMiddleware@isLoggedAsAdmin']],
         ['GET', '/:action', 'UserController@account'],
         ['GET', '/:action', 'UserController@account'],
+    ]);
+
+    // inital setup routes
+    $app->routeGroup(['GET', '/app', 'App@setup'], [
+        ['GET', '/models', 'App@setupModels'],
+        ['GET', '/models-with-seed', 'App@setupModelsWithSeed'],
+        ['GET', '/sync-models', 'App@syncDatabase'],
     ]);
 
     $app->run();
