@@ -23,34 +23,40 @@ final class System extends Model
 				'id' => [
 					'type' => 'int',
 					'length' => 11,
-					'null' => false,
+					'nullable' => false,
 					'auto_increment' => true,
 					'primary' => true,
 				],
 				'keyy' => [
 					'type' => 'varchar',
 					'length' => 255,
-					'null' => false,
+					'nullable' => false,
 				],
 				'valuee' => [
 					'type' => 'text',
-					'null' => false,
+					'nullable' => false,
 				],
 				'created_at' => [
 					'type' => 'datetime',
-					'null' => false,
+					'nullable' => false,
 				],
 				'json' => [
 					'type' => 'json',
-					'null' => false,
+					'nullable' => false,
 				],
 				'text' => [
 					'type' => 'text',
-					'null' => false,
+					'nullable' => false,
+				],
+				'sync' => [
+					'type' => 'varchar',
+					'length' => 255,
+					'nullable' => true,
+					'default' => null,
 				],
 				'updated_at' => [
 					'type' => 'datetime',
-					'null' => false,
+					'nullable' => false,
 				],
 			],
 			'indexes' => [
