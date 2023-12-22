@@ -25,8 +25,8 @@ final class App
     {
 
         $systemModel = new Model();
-        $systemModel->setupModels(true);
-        Helper::dump($systemModel, true);
+        // $systemModel->setupModels(true);
+        $systemModel->syncTables();
         return $response->send('Hi from controller!');
     }
 
