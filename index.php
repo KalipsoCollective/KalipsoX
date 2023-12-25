@@ -13,7 +13,6 @@ use KX\Core\Request;
 use KX\Core\Response;
 
 define('KX_VERSION', 'alpha');
-exit;
 
 try {
 
@@ -25,9 +24,8 @@ try {
     /**
      * Custom error handler
      **/
-    /*
     $app->setCustomErrorHandler(function (Request $request, Response $response, $errNo, string $errMsg, string $file, int $line) {
-        $response->setStatusCode(500);
+        $response->setStatus(500);
         $response->setBody('<pre>Error: ' . $errMsg . ' in ' . $file . ' on line ' . $line . '</pre>');
         $response->send();
     });
@@ -95,11 +93,12 @@ try {
         ['GET', '/:action', 'UserController@account'],
     ]);
 
-    // inital setup routes
-    $app->routeGroup(['GET', '/app', 'App@setup'], [
-        ['GET', '/models', 'App@setupModels'],
-        ['GET', '/models-with-seed', 'App@setupModelsWithSeed'],
-        ['GET', '/sync-models', 'App@syncDatabase'],
+    // inital setup and app routes
+    $app->routeGroup(['GET', '/kalipso', 'App@setup'], [
+        ['GET', '/setup-models', 'App@setupModels'],
+        ['GET', '/setup-models-with-seed', 'App@setupModelsWithSeed'],
+        ['GET', '/sync-models', 'App@syncModels'],
+        ['GET', '/cron', 'App@cronJobs'],
     ]);
 
     $app->run();
