@@ -40,9 +40,9 @@ final class Logs extends Model
                 'status_code' => [
                     'type' => 'int'
                 ],
-                'auth_key' => [
-                    'type' => 'varchar',
-                    'length' => 150,
+                'auth_token' => [
+                     'type' => 'varchar',
+                    'length' => 650,
                     'nullable' => true,
                 ],
                 'ip' => [
@@ -67,7 +67,11 @@ final class Logs extends Model
                 ],
                 'indexed_fields' => [
                     'type' => 'index',
-                    'columns' => ['ip', 'header', 'auth_key', 'status_code'],
+                    'columns' => ['ip', 'header', 'status_code'],
+                ],
+                'fulltext_fields' => [
+                    'type' => 'fulltext',
+                    'columns' => ['auth_token'],
                 ],
             ],
             'engine' => 'InnoDB',
