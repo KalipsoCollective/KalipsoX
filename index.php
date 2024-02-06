@@ -19,7 +19,7 @@ try {
     $app = (new KX\Core\Factory)->setup();
 
     // $app->response->setLayout('layout'); // set global layout
-    $app->setLayout('layout');
+    // $app->setLayout('layout');
 
     /**
      * Custom error handler
@@ -39,7 +39,6 @@ try {
      * Multi route
      **/
     $app->routes([
-        [['GET', 'POST'], '/test', 'AppController@test'],
         [['GET', 'POST'], '/hi', function (Request $request, Response $response, $factory) {
             $response->setBody('Hi from test!');
 
