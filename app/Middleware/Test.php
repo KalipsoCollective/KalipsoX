@@ -15,11 +15,12 @@ use KX\Core\Middleware;
 
 
 use KX\Core\Request;
+use KX\Core\Response;
 
 final class Test extends Middleware
 {
 
-    public function run(Request $request)
+    public function run(Request $request, Response $response)
     {
         return $this->next();
     }
