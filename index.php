@@ -36,60 +36,14 @@ try {
     $app->route(['GET'], '/', 'App@index', ['Test@run']);
 
     /**
-     * Multi route
-     **/
-    $app->routes([
-        [['GET', 'POST'], '/hi', function (Request $request, Response $response, $factory) {
-            $response->setBody('Hi from test!');
-
-            return $response->render('basic/hi', [
-                'title' => 'Hi from test!',
-                'description' => 'This is a description.',
-            ]);
-        }],
-        [['GET', 'POST'], '/hi/:val', function (Request $request, Response $response, $factory) {
-            $response->setBody('Hi!');
-
-            return $response->render('basic/hi', [
-                'title' => 'Hi ' . $request->getParam('val') . '!',
-                'description' => 'This is a description.',
-            ]);
-        }],
-        [['GET', 'POST'], '/hi/werwer', function (Request $request, Response $response, $factory) {
-            $response->setBody('Hi!');
-
-            return $response->render('basic/hi', [
-                'title' => 'Hi ' . $request->getParam('val') . '!',
-                'description' => 'This is a description.',
-            ]);
-        }],
-        [['GET', 'POST'], '/hi/:test', function (Request $request, Response $response, $factory) {
-            $response->setBody('Hi!');
-
-            return $response->render('basic/hi', [
-                'title' => 'Hi ' . $request->getParam('val') . '!',
-                'description' => 'This is a description.',
-            ]);
-        }],
-        [['GET', 'POST'], '/ho', function (Request $request, Response $response, $factory) {
-
-            return $response->json([
-                'title' => 'Hi!',
-                'description' => 'This is a description.',
-            ]);
-        }],
-    ]);
-
-    /**
      * Route group
      **/
-    $app->routeGroup(['GET', '/auth', 'UserController@account', 'UserMiddleware@root'], [
-        ['GET', '/login', 'UserController@login'],
-        ['GET', '/register', 'UserController@register'],
-        ['GET', '/recovery', 'UserController@recovery'],
-        [['POST', 'GET'], '/logout', 'UserController@logout', ['UserMiddleware@isLogged', 'UserMiddleware@isLoggedAsAdmin']],
-        ['GET', '/:action', 'UserController@account'],
-        ['GET', '/:action', 'UserController@account'],
+    $app->routeGroup(['GET', '/auth', 'User@account', 'Auth@isLogged'], [
+        ['GET', '/login', 'User@login'],
+        ['GET', '/register', 'User@register'],
+        ['GET', '/recovery', 'User@recovery'],
+        [['POST', 'GET'], '/logout', 'User@logout', ['Auth@isLogged']],
+        ['GET', '/:action', 'User@account'],
     ]);
 
     // inital setup and app routes
