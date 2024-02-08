@@ -19,7 +19,7 @@ This documentation has been created to give you a quick start.
 - `composer install`
 - Visit http://localhost/kalipso
 - Prepare DB
-- Seed DB
+- Seed DB or Sync DB
 - Start Development
 
 ### Tricks
