@@ -28,7 +28,10 @@ final class User
 
     public function login(Request $request, Response $response)
     {
-        return $response->json(['login' => 'login']);
+        return $response->render('auth/login', [
+            'title' => 'Hello World!',
+            'description' => 'This is a sample index page.',
+        ], 'layout');
     }
 
     public function register(Request $request, Response $response)
