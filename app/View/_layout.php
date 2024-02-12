@@ -1,8 +1,13 @@
 <?php
 
 return [
-    '_parts/header',
-    'x',
-    '_parts/footer',
-    '_parts/end'
+    'schema' => [
+        '_parts/header',
+        'x',
+        '_parts/footer',
+        '_parts/end'
+    ],
+    'variables' => [
+        'bodyClass' => 'body',
+    ]
 ];

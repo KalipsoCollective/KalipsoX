@@ -48,3 +48,7 @@ body {
   font-family: var(--tblr-font-sans-serif);
   font-feature-settings: "cv03", "cv04", "cv11";
 }
+
+.kx-auth .navbar-brand-image {
+  height: 6rem;
+}

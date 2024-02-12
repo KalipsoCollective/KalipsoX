@@ -29,8 +29,8 @@ final class User
     public function login(Request $request, Response $response)
     {
         return $response->render('auth/login', [
-            'title' => 'Hello World!',
-            'description' => 'This is a sample index page.',
+            'title' => Helper::lang('auth.login'),
+            'description' => Helper::lang('auth.login_desc'),
         ], 'layout');
     }
 
