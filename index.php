@@ -38,7 +38,7 @@ try {
     /**
      * Route group
      **/
-    $app->routeGroup(['GET', '/auth', 'User@account', 'Auth@isLogged'], [
+    $app->routeGroup(['GET', '/:lang/auth', 'User@account', 'Auth@isLogged'], [
         ['GET', '/login', 'User@login'],
         ['GET', '/register', 'User@register'],
         ['GET', '/recovery', 'User@recovery'],
