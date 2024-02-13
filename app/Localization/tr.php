@@ -25,5 +25,15 @@ return [
         'register_desc' => 'Yeni bir hesap oluşturun',
         'recovery' => 'Hesabı Kurtar',
         'recovery_desc' => 'Hesabınızı kurtarın',
-    ]
+        'email_or_username' => 'E-posta veya Kullanıcı Adı',
+        'password' => 'Şifre',
+        'show_password' => 'Şifreyi Göster',
+        'remember_me' => 'Beni Hatırla',
+        'recovery_account' => 'Hesabı Kurtar',
+        'dont_have_account_yet' => 'Henüz bir hesabınız yok mu?',
+    ],
+    'base' => [
+        'toggle_theme' => 'Renk Modunu Değiştir',
+        'copyright' => 'Telif Hakkı',
+    ],
 ];
