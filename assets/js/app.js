@@ -1,4 +1,7 @@
 class KalipsoXJS {
+  // version
+  version = "1.0.0";
+
   constructor() {
     this.init();
 
@@ -7,7 +10,48 @@ class KalipsoXJS {
 
   init() {
     //event listeners
-    document.addEventListener("click", (e) => {});
+    document.addEventListener("click", (e) => {
+      let el = e.target;
+
+      if (
+        e.target.nodeName.toUpperCase() === "BUTTON" ||
+        e.target.nodeName.toUpperCase() === "A"
+      ) {
+        if (el.hasAttribute("data-kx-action")) {
+          const action = el.getAttribute("data-kx-action");
+          switch (action) {
+            case "toggle_theme":
+              const newTheme =
+                document.body.getAttribute("data-bs-theme") === "light"
+                  ? "dark"
+                  : "light";
+              this.changeColorScheme(newTheme);
+              if (el.querySelector("i.ti")) {
+                el.querySelector("i.ti").setAttribute("class", "ti");
+                el.querySelector("i.ti").classList.add(
+                  newTheme === "dark" ? "ti-sun" : "ti-moon"
+                );
+              }
+
+              break;
+
+            case "show_password":
+              const parent = this.findParent(el, ".input-group");
+              if (parent) {
+                const input = parent.querySelector("input");
+                if (input.type === "password") {
+                  input.type = "text";
+                } else {
+                  input.type = "password";
+                }
+              }
+              break;
+            default:
+              break;
+          }
+        }
+      }
+    });
 
     // color scheme
     if (localStorage.getItem("kx_theme")) {
@@ -30,8 +74,36 @@ class KalipsoXJS {
     }
     document.body.setAttribute("data-bs-theme", color);
     localStorage.setItem("kx_theme", color);
+    if (color === "dark") {
+      document.documentElement.classList.add("dark");
+    }
+
+    if (document.querySelector('[data-kx-action="toggle_theme"] i.ti')) {
+      document
+        .querySelector('[data-kx-action="toggle_theme"] i')
+        .setAttribute("class", "ti");
+      document
+        .querySelector('[data-kx-action="toggle_theme"] i')
+        .classList.add(color === "dark" ? "ti-sun" : "ti-moon");
+    }
   }
-  showPassword(e) {}
+
+  findParent(el, tagClassOrId) {
+    let parent = el.parentElement;
+    while (parent) {
+      if (parent.tagName === tagClassOrId.toUpperCase()) {
+        return parent;
+      }
+      if (parent.classList.contains(tagClassOrId.replace(".", ""))) {
+        return parent;
+      }
+      if (parent.id === tagClassOrId.replace("#", "")) {
+        return parent;
+      }
+      parent = parent.parentElement;
+    }
+    return null;
+  }
 }
 
 window.kx = new KalipsoXJS();
