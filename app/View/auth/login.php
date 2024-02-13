@@ -1,34 +1,30 @@
 <div class="page page-center kx-auth">
     <div class="container container-tight py-4">
         <div class="text-center mb-4">
-            <a href="/" class="navbar-brand navbar-brand-autodark">
+            <a href="<?php echo $Helper::base(); ?>" class="navbar-brand navbar-brand-autodark">
                 <img src="<?php echo $Helper::assets('img/x/logo.svg'); ?>" alt="KalipsoX" class="navbar-brand-image">
             </a>
         </div>
         <div class="card card-md">
             <div class="card-body">
                 <h2 class="h2 text-center mb-4"><?php echo $Helper::lang('auth.login_desc'); ?></h2>
-                <form action="./" method="get" autocomplete="off" novalidate>
+                <form action="<?php echo $Helper::base('auth/login'); ?>" method="get" autocomplete="off" novalidate>
                     <div class="mb-3">
-                        <label class="form-label">Email address</label>
-                        <input type="email" class="form-control" placeholder="your@email.com" autocomplete="off">
+                        <label class="form-label"><?php echo $Helper::lang('auth.email_or_username'); ?></label>
+                        <input type="email" class="form-control" placeholder="email@example.com" autocomplete="off">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">
-                            Password
+                            <?php echo $Helper::lang('auth.password'); ?>
                             <span class="form-label-description">
-                                <a href="./forgot-password.html">I forgot password</a>
+                                <a href="<?php echo $Helper::base('auth/recovery'); ?>"><?php echo $Helper::lang('auth.recovery_account'); ?></a>
                             </span>
                         </label>
                         <div class="input-group input-group-flat">
-                            <input type="password" class="form-control" placeholder="Your password" autocomplete="off">
+                            <input type="password" class="form-control" autocomplete="off">
                             <span class="input-group-text">
-                                <a href="#" class="link-secondary" title="Show password" data-bs-toggle="tooltip"><!-- Download SVG icon from http://tabler-icons.io/i/eye -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                        <path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" />
-                                    </svg>
+                                <a data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
+                                    <i class="ti ti-eye"></i>
                                 </a>
                             </span>
                         </div>
@@ -36,17 +32,23 @@
                     <div class="mb-2">
                         <label class="form-check">
                             <input type="checkbox" class="form-check-input" />
-                            <span class="form-check-label">Remember me on this device</span>
+                            <span class="form-check-label"><?php echo $Helper::lang('auth.remember_me'); ?></span>
                         </label>
                     </div>
                     <div class="form-footer">
-                        <button type="submit" class="btn btn-primary w-100">Sign in</button>
+                        <button type="submit" class="btn btn-primary w-100"><?php echo $Helper::lang('auth.login'); ?></button>
                     </div>
                 </form>
             </div>
         </div>
-        <div class="text-center text-secondary mt-3">
-            Don't have account yet? <a href="./sign-up.html" tabindex="-1">Sign up</a>
-        </div>
+        <p class="text-center text-secondary mt-3 mb-0">
+            <?php echo $Helper::lang('auth.dont_have_account_yet'); ?> <a href="<?php echo $Helper::base('auth/register'); ?>" tabindex="-1"><?php echo $Helper::lang('auth.register'); ?></a>.
+            <button class="btn btn-sm btn-ghost-primary" data-kx-action="toggle_theme" data-bs-toggle="tooltip" title="<?php echo $Helper::lang('base.toggle_theme'); ?>" tabindex="-1">
+                <i class="ti ti-sun"></i>
+            </button>
+        </p>
+        <p class="text-center text-secondary my-1 small">
+            <?php echo $Helper::lang('base.copyright') . ' © ' . date('Y') . ' - ' . $Helper::config('settings.name'); ?>
+        </p>
     </div>
 </div>
