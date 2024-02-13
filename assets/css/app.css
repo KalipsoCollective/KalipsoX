@@ -52,3 +52,24 @@ body {
 .kx-auth .navbar-brand-image {
   height: 6rem;
 }
+
+a, a:hover, a:active, a:visited {
+  text-decoration: none !important;
+}
+
+[data-bs-theme=dark] :is(.form-control:focus, .form-check-input:focus, .input-group-flat:focus-within .form-control,
+.input-group-flat:focus-within .input-group-text) {
+  border-color: #4c75a6 !important;
+}
+
+a > *, button > * {
+  pointer-events: none;
+}
+
+a, button {
+  cursor: pointer;
+}
+
+[data-bs-theme=dark] .tooltip {
+  --tblr-tooltip-bg: #000 !important
+}
