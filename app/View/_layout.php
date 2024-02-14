@@ -8,6 +8,6 @@ return [
         '_parts/end'
     ],
     'variables' => [
-        'bodyClass' => 'body',
+        'bodyClass' => '',
     ]
 ];
