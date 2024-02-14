@@ -31,6 +31,16 @@ try {
     });
 
     /**
+     * Set defaults
+     **/
+    $app->setDefaultViewFolder('basic');
+    // $app->setDefaultViewLayout('layout');
+    /*
+    $app->setErrorPageContents([
+        '404' => ['']
+    ]);*/
+
+    /**
      * Single route
      **/
     $app->route(['GET'], '/', 'App@index', ['Test@run']);
@@ -43,7 +53,7 @@ try {
         ['GET', '/register', 'User@register'],
         ['GET', '/recovery', 'User@recovery'],
         [['POST', 'GET'], '/logout', 'User@logout', ['Auth@isLogged']],
-        ['GET', '/:action', 'User@account'],
+        ['POST', '/:action', 'User@account'],
     ]);
 
     // inital setup and app routes
