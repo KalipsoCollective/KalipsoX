@@ -1,4 +1,3 @@
-NProgress.start();
 class KalipsoXJS {
   // version
   version = "1.0.0";
@@ -96,7 +95,7 @@ class KalipsoXJS {
 
     setTimeout(() => {
       NProgress.done();
-    }, 1000);
+    }, 250);
   }
 
   changeColorScheme(color = "light") {
@@ -136,11 +135,11 @@ class KalipsoXJS {
     return null;
   }
 
-  notify(message, type = "info") {
+  notify(message, type = "info", duration = 3000, close = true) {
     Toastify({
       text: message,
-      close: true,
-      duration: 300000,
+      close: close,
+      duration: duration,
       gravity: "top",
       position: "right",
       stopOnFocus: true,
@@ -150,4 +149,42 @@ class KalipsoXJS {
   }
 }
 
-window.kx = new KalipsoXJS();
+(function (w) {
+  // Initialize
+  NProgress.start();
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: "smooth" });
+
+  // Initialize KalipsoXJS
+  w.kx = new KalipsoXJS();
+
+  $(document).on("pjax:send", function () {
+    NProgress.start();
+  });
+
+  $(document).on("pjax:complete", function () {
+    NProgress.done();
+  });
+
+  $(document).on("pjax:end", function () {
+    NProgress.done();
+  });
+
+  $(document).on("pjax:timeout", function () {
+    NProgress.done();
+  });
+
+  $(document).on("pjax:error", function () {
+    NProgress.done();
+  });
+
+  $(document).on("pjax:popstate", function () {
+    NProgress.done();
+  });
+
+  $(document).pjax('a:not([target="_blank"])', "body");
+  $(document).on("submit", "form[data-kx-form]", function (event) {
+    $.pjax.submit(event, "body");
+  });
+})(window);
