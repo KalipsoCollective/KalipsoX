@@ -1,7 +1,7 @@
 <div class="page page-center kx-auth">
     <div class="container container-tight py-4">
         <div class="text-center mb-4">
-            <a href="<?php echo $Helper::base(); ?>" class="navbar-brand navbar-brand-autodark">
+            <a href="<?php echo $Helper::base(); ?>" class="navbar-brand">
                 <img src="<?php echo $Helper::assets('img/x/logo.svg'); ?>" alt="KalipsoX" class="navbar-brand-image">
             </a>
         </div>
@@ -41,8 +41,9 @@
                 </form>
             </div>
         </div>
-        <p class="text-center text-secondary mt-3 mb-0">
-            <?php echo $Helper::lang('auth.dont_have_account_yet'); ?> <a href="<?php echo $Helper::base('auth/register'); ?>" tabindex="-1"><?php echo $Helper::lang('auth.register'); ?></a>.
+        <p class="text-secondary mt-3 mb-0 d-flex justify-content-center align-items-center">
+            <span class="me-1"><?php echo $Helper::lang('auth.dont_have_account_yet'); ?></span>
+            <a class="me-1" href="<?php echo $Helper::base('auth/register'); ?>" tabindex="-1"><?php echo $Helper::lang('auth.register'); ?>.</a>
             <button class="btn btn-sm btn-ghost-primary" data-kx-action="toggle_theme" data-bs-toggle="tooltip" title="<?php echo $Helper::lang('base.toggle_theme'); ?>" tabindex="-1">
                 <i class="ti ti-sun"></i>
             </button>
