@@ -18,6 +18,24 @@ return [
         'tr' => 'Türkçe',
         'en' => 'İngilizce',
     ],
+    'error' => [
+        'bad_request' => 'Hatalı İstek!',
+        'bad_request_sub_text' => 'Bu sayfa isteğinizi işleyemedi.',
+        'unauthorized' => 'Yetkisiz!',
+        'unauthorized_sub_text' => 'Bu sayfaya erişim izniniz yok.',
+        'forbidden' => 'Yasaklandı!',
+        'forbidden_sub_text' => 'Bu sayfaya erişim izniniz yok.',
+        'not_found' => 'Bulunamadı!',
+        'not_found_sub_text' => 'Aradığınız sayfa bulunamadı.',
+        'method_not_allowed' => 'Methoda izin verilmez!',
+        'method_not_allowed_sub_text' => 'Bu sayfa istekte bulunduğunuz method için izne sahip değil.',
+        'too_many_requests' => 'Çok fazla istek!',
+        'too_many_requests_sub_text' => 'Bu sayfaya çok fazla istekte bulundunuz. <br> Lütfen bekleyin:',
+        'internal_server_error' => 'Sunucu Hatası!',
+        'internal_server_error_sub_text' => 'Bu sayfa isteğinizi işleyemedi.',
+        'service_unavailable' => 'Servis Kullanılamaz!',
+        'service_unavailable_sub_text' => 'Bu sayfa şu anda kullanılamıyor.',
+    ],
     'auth' => [
         'login' => 'Giriş Yap',
         'login_desc' => 'Hesabınıza giriş yapın',
@@ -35,5 +53,7 @@ return [
     'base' => [
         'toggle_theme' => 'Renk Modunu Değiştir',
         'copyright' => 'Telif Hakkı',
+        'home' => 'Anasayfa',
+        'back_to_home' => 'Ana Sayfaya Dön',
     ],
 ];
