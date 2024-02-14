@@ -1,3 +1,4 @@
+NProgress.start();
 class KalipsoXJS {
   // version
   version = "1.0.0";
@@ -92,6 +93,10 @@ class KalipsoXJS {
         this.changeColorScheme("light");
       }
     }
+
+    setTimeout(() => {
+      NProgress.done();
+    }, 1000);
   }
 
   changeColorScheme(color = "light") {
