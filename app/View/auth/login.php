@@ -8,10 +8,10 @@
         <div class="card card-md">
             <div class="card-body">
                 <h2 class="h2 text-center mb-4"><?php echo $Helper::lang('auth.login_desc'); ?></h2>
-                <form action="<?php echo $Helper::base('auth/login'); ?>" method="get" autocomplete="off" novalidate>
+                <form data-kx-form action="<?php echo $Helper::base('auth/login'); ?>" method="post" autocomplete="off" novalidate>
                     <div class="mb-3">
                         <label class="form-label"><?php echo $Helper::lang('auth.email_or_username'); ?></label>
-                        <input type="email" class="form-control" placeholder="email@example.com" autocomplete="off">
+                        <input type="text" require name="username" class="form-control" placeholder="email@example.com" autocomplete="off">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">
@@ -21,7 +21,7 @@
                             </span>
                         </label>
                         <div class="input-group input-group-flat">
-                            <input type="password" class="form-control" autocomplete="off">
+                            <input type="password" require name="password" class="form-control" autocomplete="off">
                             <span class="input-group-text">
                                 <a data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
                                     <i class="ti ti-eye"></i>
@@ -31,7 +31,7 @@
                     </div>
                     <div class="mb-2">
                         <label class="form-check">
-                            <input type="checkbox" class="form-check-input" />
+                            <input type="checkbox" name="remember_me" class="form-check-input" />
                             <span class="form-check-label"><?php echo $Helper::lang('auth.remember_me'); ?></span>
                         </label>
                     </div>
