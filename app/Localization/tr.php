@@ -49,6 +49,9 @@ return [
         'remember_me' => 'Beni Hatırla',
         'recovery_account' => 'Hesabı Kurtar',
         'dont_have_account_yet' => 'Henüz bir hesabınız yok mu?',
+        'you_have_already_account' => 'Zaten bir hesabınız var mı?',
+        'username' => 'Kullanıcı Adı',
+        'email' => 'E-posta',
     ],
     'base' => [
         'toggle_theme' => 'Renk Modunu Değiştir',

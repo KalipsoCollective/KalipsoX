@@ -49,6 +49,9 @@ return [
         'remember_me' => 'Remember Me',
         'recovery_account' => 'Recovery Account',
         'dont_have_account_yet' => 'Don\'t have an account yet?',
+        'you_have_already_account' => 'Already have an account?',
+        'username' => 'Username',
+        'email' => 'E-mail',
     ],
     'base' => [
         'toggle_theme' => 'Toggle Theme',
