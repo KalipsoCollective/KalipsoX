@@ -4,7 +4,6 @@ class KalipsoXJS {
 
   constructor() {
     this.init();
-
     return this;
   }
 
@@ -50,6 +49,33 @@ class KalipsoXJS {
               break;
           }
         }
+      }
+    });
+
+    document.addEventListener("submit", (e) => {
+      let el = e.target;
+      if (el.hasAttribute("data-kx-form")) {
+        e.preventDefault();
+        const form = el;
+        const url = form.getAttribute("action");
+        const method = form.getAttribute("method");
+        const data = new FormData(form);
+        const headers = new Headers();
+        headers.append("X-Requested-With", "XMLHttpRequest");
+        headers.append("Accept", "application/json");
+        fetch(url, {
+          method: method,
+          body: data,
+          headers: headers,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          })
+          .catch((error) => {
+            this.notify("An error occurred!", "error");
+            console.error("Error:", error);
+          });
       }
     });
 
@@ -103,6 +129,19 @@ class KalipsoXJS {
       parent = parent.parentElement;
     }
     return null;
+  }
+
+  notify(message, type = "info") {
+    Toastify({
+      text: message,
+      close: true,
+      duration: 300000,
+      gravity: "top",
+      position: "right",
+      stopOnFocus: true,
+      className: "toastn " + type,
+      escapeMarkup: false,
+    }).showToast();
   }
 }
 
