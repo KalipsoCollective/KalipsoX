@@ -1,7 +1,9 @@
 @charset "UTF-8";
 
-:root {
-  --tblr-font-sans-serif: "Inter";
+:root,
+[data-bs-theme="light"],
+[data-bs-theme="dark"] {
+  --tblr-font-sans-serif: "Inter" !important;
 }
 
 @font-face {
@@ -87,4 +89,25 @@ button {
 
 .empty-header {
   color: var(--tblr-dark-text-emphasis);
+}
+
+.toastn {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12),
+    0 10px 36px -4px rgb(70 70 70 / 4%);
+}
+
+.toastn.error {
+  background: #7d3939;
+  color: #efdcdc;
+  box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12),
+    0 10px 36px -4px rgb(125 57 57 / 53%);
+}
+
+.toastn.success {
+  background: #6a8b22;
+  color: #cedfa9;
+  box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12),
+    0 10px 36px -4px rgb(106 139 34 / 48%);
 }
