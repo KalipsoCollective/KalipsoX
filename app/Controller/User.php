@@ -36,7 +36,10 @@ final class User
 
     public function register(Request $request, Response $response)
     {
-        return $response->json(['register' => 'register']);
+        return $response->render('auth/register', [
+            'title' => Helper::lang('auth.register'),
+            'description' => Helper::lang('auth.register_desc'),
+        ], 'layout');
     }
 
     public function recovery(Request $request, Response $response)
