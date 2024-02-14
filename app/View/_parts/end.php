@@ -1,3 +1,5 @@
+    <script src="<?php echo $Helper::assets('libs/jquery/jquery.min.js'); ?>"></script>
+    <script src="<?php echo $Helper::assets('libs/jquery-pjax/jquery.pjax.min.js'); ?>"></script>
     <script src="<?php echo $Helper::assets('libs/tabler/tabler.min.js'); ?>"></script>
     <script src="<?php echo $Helper::assets('libs/nprogress/nprogress.min.js'); ?>"></script>
     <script src="<?php echo $Helper::assets('libs/toastify/toastify.min.js'); ?>"></script>
