@@ -18,6 +18,24 @@ return [
         'tr' => 'Turkish',
         'en' => 'English',
     ],
+    'error' => [
+        'bad_request' => 'Bad Request!',
+        'bad_request_sub_text' => 'This page could not process your request.',
+        'unauthorized' => 'Unauthorized!',
+        'unauthorized_sub_text' => 'You do not have permission to access this page.',
+        'forbidden' => 'Forbidden!',
+        'forbidden_sub_text' => 'You do not have permission to access this page.',
+        'not_found' => 'Not found!',
+        'not_found_sub_text' => 'The page you are looking for was not found.',
+        'method_not_allowed' => 'Method not allowed!',
+        'method_not_allowed_sub_text' => 'This page does not have permission for the method you requested.',
+        'too_many_requests' => 'Too many requests!',
+        'too_many_requests_sub_text' => 'You have made too many requests to this page. <br> Please wait:',
+        'internal_server_error' => 'Internal Server Error!',
+        'internal_server_error_sub_text' => 'This page could not process your request.',
+        'service_unavailable' => 'Service Unavailable!',
+        'service_unavailable_sub_text' => 'This page is currently unavailable.',
+    ],
     'auth' => [
         'login' => 'Login',
         'login_desc' => 'Login to your account',
@@ -35,5 +53,7 @@ return [
     'base' => [
         'toggle_theme' => 'Toggle Theme',
         'copyright' => 'Copyright',
+        'home' => 'Home',
+        'back_to_home' => 'Back to Home',
     ],
 ];
