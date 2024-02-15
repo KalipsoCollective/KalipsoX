@@ -8,10 +8,10 @@
         <div class="card card-md">
             <div class="card-body">
                 <h2 class="h2 text-center mb-4"><?php echo $Helper::lang('auth.login_desc'); ?></h2>
-                <form data-kx-form action="<?php echo $Helper::base('auth/login'); ?>" method="post" autocomplete="off" novalidate>
+                <form data-kx-form action="<?php echo $Helper::base('auth/login'); ?>" method="post">
                     <div class="mb-3">
                         <label class="form-label"><?php echo $Helper::lang('auth.email_or_username'); ?></label>
-                        <input type="text" require name="username" class="form-control" placeholder="email@example.com" autocomplete="off">
+                        <input type="text" required name="username" class="form-control" placeholder="email@example.com">
                     </div>
                     <div class="mb-2">
                         <label class="form-label">
@@ -21,7 +21,7 @@
                             </span>
                         </label>
                         <div class="input-group input-group-flat">
-                            <input type="password" require name="password" class="form-control" autocomplete="off">
+                            <input type="password" required name="password" class="form-control">
                             <span class="input-group-text">
                                 <a data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
                                     <i class="ti ti-eye"></i>
@@ -36,7 +36,10 @@
                         </label>
                     </div>
                     <div class="form-footer">
-                        <button type="submit" class="btn btn-primary w-100"><?php echo $Helper::lang('auth.login'); ?></button>
+                        <button type="submit" class="btn btn-primary w-100">
+                            <div class="btn-loader spinner-border spinner-border-sm text-light" role="status"></div>
+                            <span class="btn-text"><?php echo $Helper::lang('auth.login'); ?></span>
+                        </button>
                     </div>
                 </form>
             </div>
