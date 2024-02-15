@@ -53,6 +53,9 @@ return [
         'username' => 'Username',
         'email' => 'E-mail',
     ],
+    'form' => [
+        'fill_all_fields' => 'Please fill in all fields.',
+    ],
     'base' => [
         'toggle_theme' => 'Toggle Theme',
         'copyright' => 'Copyright',

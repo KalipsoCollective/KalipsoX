@@ -53,6 +53,9 @@ return [
         'username' => 'Kullanıcı Adı',
         'email' => 'E-posta',
     ],
+    'form' => [
+        'fill_all_fields' => 'Lütfen tüm alanları doldurunuz.',
+    ],
     'base' => [
         'toggle_theme' => 'Renk Modunu Değiştir',
         'copyright' => 'Telif Hakkı',
