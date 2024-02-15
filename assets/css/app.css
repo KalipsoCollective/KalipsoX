@@ -4,6 +4,7 @@
 [data-bs-theme="light"],
 [data-bs-theme="dark"] {
   --tblr-font-sans-serif: "Inter" !important;
+  --tblr-btn-disabled-border-color: #ffffff42 !important;
 }
 
 @font-face {
@@ -51,6 +52,10 @@ body {
   font-family: var(--tblr-font-sans-serif);
   font-feature-settings: "cv03", "cv04", "cv11";
 }
+
+html * {
+  transition: 0.1s ease-out;
+}  
 
 .kx-auth .navbar-brand-image {
   height: 6rem;
@@ -110,4 +115,21 @@ button {
   color: #cedfa9;
   box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12),
     0 10px 36px -4px rgb(106 139 34 / 48%);
+}
+
+.btn :is(.btn-loader, .btn-text) {
+  transition: 0.2s ease-out;
+}
+
+.btn .btn-loader {
+  opacity: 0;
+  position: absolute;
+}
+
+.btn.loading .btn-loader {
+  opacity: 1;
+}
+
+.btn.loading .btn-text {
+  opacity: 0;
 }
