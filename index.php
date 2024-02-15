@@ -14,6 +14,10 @@ use KX\Core\Response;
 
 define('KX_VERSION', 'alpha');
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 try {
 
     $app = (new KX\Core\Factory)->setup();
@@ -49,9 +53,9 @@ try {
      * Route group
      **/
     $app->routeGroup(['GET', '/auth', 'User@account', 'Auth@isLogged'], [
-        ['GET', '/login', 'User@login'],
-        ['GET', '/register', 'User@register'],
-        ['GET', '/recovery', 'User@recovery'],
+        [['POST', 'GET'], '/login', 'User@login'],
+        [['POST', 'GET'], '/register', 'User@register'],
+        [['POST', 'GET'], '/recovery', 'User@recovery'],
         [['POST', 'GET'], '/logout', 'User@logout', ['Auth@isLogged']],
         ['POST', '/:action', 'User@account'],
     ]);
