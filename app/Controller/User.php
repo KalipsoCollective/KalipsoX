@@ -10,13 +10,14 @@ declare(strict_types=1);
 namespace KX\Controller;
 
 use KX\Core\Helper;
-use KX\Core\Model;
 
 
 use KX\Core\Request;
 use KX\Core\Response;
 
-use KX\Model\System;
+use KX\Model\Users;
+
+use KX\Controller\Notification;
 
 final class User
 {
@@ -42,23 +43,21 @@ final class User
     public function register(Request $request, Response $response)
     {
 
-        extract(Helper::input([
-            'username' => 'text',
-            'email' => 'email',
-            'password' => 'text',
-        ], $request->getPostParams()));
-
-        $validation = Helper::validation(
-            [
-                'username' => ['value' => $username, 'pattern' => 'required|min:3|max:20'],
-                'email' => ['value' => $email, 'pattern' => 'required|email'],
-                'password' => ['value' => $password, 'pattern' => 'required|min:6|max:20'],
-            ]
-        );
-        Helper::dump($validation);
-        exit;
-
         if ($request->getRequestMethod() === 'POST' && $request->getHeader('Accept') === 'application/json') {
+
+            $return = [
+                'status' => true,
+                'notify' => [],
+            ];
+
+            if (Helper::config('settings.registration_system', true) !== true) {
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('auth.registration_system_disabled')
+                ];
+                return $response->json($return);
+            }
 
             extract(Helper::input([
                 'username' => 'nulled_text',
@@ -68,15 +67,92 @@ final class User
 
             $validation = Helper::validation(
                 [
-                    'username' => ['value' => $username, 'pattern' => 'required|min:3|max:20'],
+                    'username' => ['value' => $username, 'pattern' => 'required|min:3|max:20|alphanumeric'],
                     'email' => ['value' => $email, 'pattern' => 'required|email'],
                     'password' => ['value' => $password, 'pattern' => 'required|min:6|max:20'],
                 ]
             );
 
-            return $response->json(
-                $validation
-            );
+            if (!empty($validation)) {
+                $return['dom'] = [];
+                foreach ($validation as $field => $messages) {
+                    $return['dom']['[name="' . $field . '"]'] = [
+                        'addClass' => 'is-invalid',
+                    ];
+
+                    $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
+                        'text' => implode(' ', $messages)
+                    ];
+                }
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('form.fill_all_fields')
+                ];
+            } else {
+                // username and email control
+                $userModel = new Users();
+
+                $checkUsername = $userModel->select('id')->where('u_name', $username)->get();
+                $checkEmail = $userModel->select('id')->where('email', $email)->get();
+                if ($checkUsername) {
+                    $return['status'] = false;
+                    $return['dom']['[name="username"]'] = [
+                        'addClass' => 'is-invalid',
+                    ];
+                    $return['dom']['[name="username"] ~ .invalid-feedback'] = [
+                        'text' => Helper::lang('auth.username_already_exists')
+                    ];
+                }
+
+                if ($checkEmail) {
+                    $return['status'] = false;
+                    $return['dom']['[name="email"]'] = [
+                        'addClass' => 'is-invalid',
+                    ];
+                    $return['dom']['[name="email"] ~ .invalid-feedback'] = [
+                        'text' => Helper::lang('auth.email_already_exists')
+                    ];
+                }
+
+                if (!$checkUsername && !$checkEmail) {
+
+                    $row = [
+                        'u_name' => $username,
+                        'email' => $email,
+                        'password' => password_hash($password, PASSWORD_DEFAULT),
+                        'token' => Helper::tokenGenerator(80),
+                        'role_id' => Helper::config('settings.default_user_role') ?? 0,
+                        'created_at' => time(),
+                    ];
+
+                    $insert = $userModel->insert($row);
+                    if (!$insert) {
+                        $return['status'] = false;
+                        $return['notify'][] = [
+                            'type' => 'error',
+                            'message' => Helper::lang('auth.a_problem_has_occurred')
+                        ];
+                    } else {
+
+                        $row['id'] = $insert;
+                        $notificationController = new Notification();
+                        $notificationController->createNotification('welcome', $row);
+
+                        $return['notify'][] = [
+                            'type' => 'success',
+                            'message' => Helper::lang('auth.register_success')
+                        ];
+                        $return['redirect'] = [
+                            'url' => Helper::base('auth/login'),
+                            'time' => 3000,
+                            'direct' => false
+                        ];
+                    }
+                }
+            }
+
+            return $response->json($return);
 
             if (empty($username) || empty($email) || empty($password)) {
                 return $response->json(
