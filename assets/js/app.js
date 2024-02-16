@@ -7,7 +7,7 @@ class KalipsoXJS {
     return this;
   }
 
-  init() {
+  init(firstLoad = true) {
     // Scroll to top
     $("html, body").animate({ scrollTop: 0 }, "slow");
 
@@ -47,7 +47,7 @@ class KalipsoXJS {
     });
 
     // Form submit
-    $("form[data-kx-form]").each((i, form) => {
+    $('form[data-kx-form]:not([data-kx-form="direct"])').each((i, form) => {
       $(form).off("submit");
       $(form).on("submit", async (event) => {
         event.preventDefault();
@@ -73,9 +73,19 @@ class KalipsoXJS {
       window.frontInit();
     }
 
-    setTimeout(() => {
-      NProgress.done();
-    }, 250);
+    // bootstrap tooltips
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+      return new bootstrap.Tooltip(tooltipTriggerEl);
+    });
+
+    if (firstLoad) {
+      setTimeout(() => {
+        NProgress.done();
+      }, 250);
+    }
   }
 
   async sendForm(event) {
@@ -89,6 +99,12 @@ class KalipsoXJS {
       $(submitButton).addClass("disabled loading");
     }
     const form = $(event.target);
+
+    // find all inputs and remove invalid class
+    form.find("input, select, textarea").removeClass("is-invalid is-valid");
+    // find all invalid feedbacks and remove them
+    form.find(".invalid-feedback").text("");
+
     const url = form.attr("action");
     const method = form.attr("method");
     const data = [...new FormData(form[0])].reduce((obj, [key, val]) => {
@@ -214,17 +230,112 @@ class KalipsoXJS {
   }
 
   pullResponse(data) {
-    console.log(data);
-
     if (data && typeof data === "object") {
-      if (typeof data.alerts !== "undefined" && data.alerts.length > 0) {
-        data.alerts.forEach((alert) => {
+      if (typeof data.notify !== "undefined" && data.notify.length > 0) {
+        data.notify.forEach((alert) => {
           this.notify(alert.message, alert.type);
         });
       }
 
-      if (data.redirect) {
-        window.location.href = data.redirect;
+      if (typeof data.dom !== "undefined" && Object.keys(data.dom).length > 0) {
+        for (const [selector, manipulationData] of Object.entries(data.dom)) {
+          if ($(selector)) {
+            for (const [key, value] of Object.entries(manipulationData)) {
+              switch (key) {
+                case "html":
+                  $(selector).html(value);
+                  break;
+                case "text":
+                  $(selector).text(value);
+                  break;
+                case "append":
+                  $(selector).append(value);
+                  break;
+                case "prepend":
+                  $(selector).prepend(value);
+                  break;
+                case "after":
+                  $(selector).after(value);
+                  break;
+                case "before":
+                  $(selector).before(value);
+                  break;
+                case "remove":
+                  $(selector).remove();
+                  break;
+                case "addClass":
+                  $(selector).addClass(value);
+                  break;
+                case "removeClass":
+                  $(selector).removeClass(value);
+                  break;
+                case "toggleClass":
+                  $(selector).toggleClass(value);
+                  break;
+                case "attr":
+                  for (const [attr, val] of Object.entries(value)) {
+                    $(selector).attr(attr, val);
+                  }
+                  break;
+                case "removeAttr":
+                  $(selector).removeAttr(value);
+                  break;
+                case "prop":
+                  for (const [prop, val] of Object.entries(value)) {
+                    $(selector).prop(prop, val);
+                  }
+                  break;
+                case "removeProp":
+                  $(selector).removeProp(value);
+                  break;
+                case "css":
+                  for (const [prop, val] of Object.entries(value)) {
+                    $(selector).css(prop, val);
+                  }
+                  break;
+                case "data":
+                  for (const [prop, val] of Object.entries(value)) {
+                    $(selector).data(prop, val);
+                  }
+                  break;
+                default:
+                  break;
+              }
+            }
+          }
+        }
+      }
+
+      // redirect
+      if (typeof data.redirect !== "undefined") {
+        const url = new URL(data.redirect.url);
+        if (url.hostname !== window.location.hostname) {
+          setTimeout(() => {
+            window.open(data.redirect.url, "_blank").opener = null;
+          }, data.redirect.time || 0);
+        } else {
+          setTimeout(() => {
+            if (data.redirect.url === window.location.href) {
+              if (
+                typeof data.redirect.direct !== "undefined" &&
+                data.redirect.direct === true
+              ) {
+                window.location.reload();
+              } else {
+                $.pjax.reload();
+              }
+            } else {
+              if (
+                typeof data.redirect.direct !== "undefined" &&
+                data.redirect.direct === true
+              ) {
+                window.location.href = data.redirect.url;
+              } else {
+                $.pjax({ url: data.redirect.url, container: "body" });
+              }
+            }
+          }, data.redirect.time || 0);
+        }
       }
     }
   }
@@ -284,25 +395,20 @@ class KalipsoXJS {
   // Initialize
   NProgress.start();
 
-  $(document).pjax('a:not([target="_blank"])', "body");
+  $(document).pjax('a:not([target="_blank"])', "body", {
+    push: false,
+  });
   $(document).on("submit", 'form[data-kx-form="direct"]', function (event) {
     $.pjax.submit(event, "body");
   });
 
-  $(document).on("pjax:popstate", function () {
+  $(document).on("pjax:send", function () {
     NProgress.start();
   });
 
-  $(document).on("pjax:start", function () {
-    NProgress.start();
-  });
-
-  $(document).on("pjax:complete", function () {
-    w.kx.init();
-  });
-
-  $(document).on("pjax:end", function () {
-    w.kx.init();
+  $(document).on("pjax:popstate pjax:complete", function () {
+    NProgress.done();
+    w.kx.init(false);
   });
 
   // Initialize KalipsoXJS
