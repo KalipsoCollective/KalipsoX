@@ -8,7 +8,7 @@ return [
 	'language' => 'tr',
 	'default_user_role' => 1,
 	'log' => true,
-	'maintenance_mode' => false,
+	'maintenance_mode' => true,
 	'maintenance_mode_desc' => '{"tr":"Bak\u0131m modunday\u0131z.","en":"We are under maintenance."}',
 	'mail_send_type' => 'server',
 	'smtp_address' => 'smtp.yandex.com.tr',
@@ -20,6 +20,7 @@ return [
 	'view_cache' => false,
 	'db_cache' => false,
 	'route_cache' => true,
+	'registration_system' => true,
 	'last_updated_at' => 1655275294,
 	'last_updated_by' => 1,
 ];
