@@ -42,6 +42,22 @@ final class User
     public function register(Request $request, Response $response)
     {
 
+        extract(Helper::input([
+            'username' => 'text',
+            'email' => 'email',
+            'password' => 'text',
+        ], $request->getPostParams()));
+
+        $validation = Helper::validation(
+            [
+                'username' => ['value' => $username, 'pattern' => 'required|min:3|max:20'],
+                'email' => ['value' => $email, 'pattern' => 'required|email'],
+                'password' => ['value' => $password, 'pattern' => 'required|min:6|max:20'],
+            ]
+        );
+        Helper::dump($validation);
+        exit;
+
         if ($request->getRequestMethod() === 'POST' && $request->getHeader('Accept') === 'application/json') {
 
             extract(Helper::input([
@@ -49,6 +65,18 @@ final class User
                 'email' => 'nulled_email',
                 'password' => 'nulled_text',
             ], $request->getPostParams()));
+
+            $validation = Helper::validation(
+                [
+                    'username' => ['value' => $username, 'pattern' => 'required|min:3|max:20'],
+                    'email' => ['value' => $email, 'pattern' => 'required|email'],
+                    'password' => ['value' => $password, 'pattern' => 'required|min:6|max:20'],
+                ]
+            );
+
+            return $response->json(
+                $validation
+            );
 
             if (empty($username) || empty($email) || empty($password)) {
                 return $response->json(
