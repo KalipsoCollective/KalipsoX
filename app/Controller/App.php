@@ -16,8 +16,6 @@ use KX\Core\Model;
 use KX\Core\Request;
 use KX\Core\Response;
 
-use KX\Model\System;
-
 final class App
 {
 
