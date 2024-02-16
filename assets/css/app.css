@@ -70,12 +70,12 @@ a:visited {
 
 [data-bs-theme="dark"]
   :is(
-    .form-control:not(.is-valid):not(.is-invalid):focus,
+    .form-control:focus,
     .form-check-input:focus,
     .input-group-flat:focus-within
-      .form-control:not(.is-valid):not(.is-invalid),
+      .form-control,
     .input-group-flat:focus-within
-      .form-control:not(.is-valid):not(.is-invalid)
+      .form-control
       ~ .input-group-text
   ) {
   border-color: #4c75a6 !important;
@@ -143,4 +143,8 @@ button {
 
 .btn.loading .btn-text {
   opacity: 0;
+}
+
+.input-group-flat {
+  max-height: 40px;
 }
