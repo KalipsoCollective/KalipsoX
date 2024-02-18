@@ -29,9 +29,100 @@ final class User
 
     public function login(Request $request, Response $response)
     {
-        if ($request->getRequestMethod() === 'POST') {
+        if ($request->getRequestMethod() === 'POST' && $request->getHeader('Accept') === 'application/json') {
 
-            exit;
+            $return = [
+                'status' => true,
+                'notify' => [],
+            ];
+
+            extract(Helper::input([
+                'username' => 'nulled_text',
+                'password' => 'nulled_text',
+            ], $request->getPostParams()));
+
+            $validation = Helper::validation(
+                [
+                    'username' => ['value' => $username, 'pattern' => 'required|min:3|max:20|alphanumeric'],
+                    'password' => ['value' => $password, 'pattern' => 'required|min:6|max:20'],
+                ]
+            );
+
+            if (!empty($validation)) {
+                $return['dom'] = [];
+                foreach ($validation as $field => $messages) {
+                    $return['dom']['[name="' . $field . '"]'] = [
+                        'addClass' => 'is-invalid',
+                    ];
+
+                    $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
+                        'text' => implode(' ', $messages)
+                    ];
+                }
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('form.fill_all_fields')
+                ];
+            } else {
+
+                // username and email control
+                $userModel = new Users();
+
+                $checkAccount = $userModel
+                    ->select('
+                        id, 
+                        u_name, 
+                        f_name, 
+                        l_name,
+                        email,
+                        password,
+                        role_id,
+                        status
+                    ')
+                    ->where('u_name', $username)
+                    ->orWhere('email', $username)
+                    ->get();
+
+
+                if ($checkAccount) {
+                    if ($checkAccount->status === 'deleted') {
+                        $return['status'] = false;
+                        $return['dom']['[name="username"]'] = [
+                            'addClass' => 'is-invalid',
+                        ];
+                        $return['dom']['[name="username"] ~ .invalid-feedback'] = [
+                            'text' => Helper::lang('auth.your_account_deleted')
+                        ];
+                    } elseif (password_verify($password, $checkAccount->password)) {
+                        $return['notify'][] = [
+                            'type' => 'success',
+                            'message' => Helper::lang('auth.login_success')
+                        ];
+                        $return['redirect'] = [
+                            'url' => Helper::base('user/account'),
+                            'time' => 3000,
+                            'direct' => false
+                        ];
+                    } else {
+                        $return['status'] = false;
+                        $return['dom']['[name="password"]'] = [
+                            'addClass' => 'is-invalid',
+                        ];
+                        $return['dom']['[name="password"] ~ .invalid-feedback'] = [
+                            'text' => Helper::lang('auth.password_incorrect')
+                        ];
+                    }
+                } else {
+                    $return['status'] = false;
+                    $return['notify'][] = [
+                        'type' => 'error',
+                        'message' => Helper::lang('auth.account_not_found')
+                    ];
+                }
+            }
+
+            return $response->json($return);
         }
 
         return $response->render('auth/login', [
@@ -94,6 +185,12 @@ final class User
                 $userModel = new Users();
 
                 $checkUsername = $userModel->select('id')->where('u_name', $username)->get();
+
+                if (!$checkUsername && !empty(Helper::config('UNAVAILABLE_USERNAMES'))) {
+                    $unavailableUsernames = explode(',', (string)Helper::config('UNAVAILABLE_USERNAMES'));
+                    $checkUsername = in_array($username, $unavailableUsernames);
+                }
+
                 $checkEmail = $userModel->select('id')->where('email', $email)->get();
                 if ($checkUsername) {
                     $return['status'] = false;
@@ -153,24 +250,6 @@ final class User
             }
 
             return $response->json($return);
-
-            if (empty($username) || empty($email) || empty($password)) {
-                return $response->json(
-                    [
-                        'alerts' => [
-                            [
-                                'type' => 'error',
-                                'message' => Helper::lang('form.fill_all_fields')
-                            ],
-
-                        ]
-                    ]
-                );
-            }
-
-
-
-            return $response->json(['register' => 'register']);
         }
 
         return $response->render('auth/register', [
