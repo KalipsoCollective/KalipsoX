@@ -57,6 +57,10 @@ return [
         'register_success' => 'Kayıt işlemi başarılı. Giriş sayfasına yönlendiriliyorsunuz...',
         'registration_system_disabled' => 'Kullanıcı kayıt sistemi şu anda devre dışı bırakılmıştır. Lütfen daha sonra tekrar deneyin.',
         'verify_account' => 'Hesabı Doğrula',
+        'your_account_deleted' => 'Üzgünüz, hesabınız silinmiştir.',
+        'password_incorrect' => 'Girdiğiniz şifre yanlış.',
+        'account_not_found' => 'Hesap bulunamadı, lütfen bilgilerinizi kontrol edin.',
+        'login_success' => 'Giriş başarılı, yönlendiriliyorsunuz...',
     ],
     'form' => [
         'fill_all_fields' => 'Lütfen tüm alanları doldurunuz.',
@@ -78,7 +82,7 @@ return [
         'welcome_title' => 'Aramıza Hoş Geldin!',
         'welcome_body' => 'Şimdi hesabını kullanmaya başlayabilirsin.',
         'welcome_email_title' => 'Hesabın Başarıyla Oluşturuldu!',
-        'welcome_email_body' => 'Merhaba :user, <br> Hesabın başarıyla oluşturuldu. Aşağıdaki bağlantı ile hesabını doğrulayabilirsin. <br> <a href=":link_url">:link_text</a>',
+        'welcome_email_body' => 'Merhaba @:user, <br> Hesabın başarıyla oluşturuldu. Aşağıdaki bağlantı ile hesabını doğrulayabilirsin. <br> <a href=":link_url">:link_text</a>',
     ],
     'base' => [
         'toggle_theme' => 'Renk Modunu Değiştir',

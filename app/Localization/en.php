@@ -57,6 +57,10 @@ return [
         'register_success' => 'Registration successful. Redirecting to the login page...',
         'registration_system_disabled' => 'User registration system is currently disabled. Please try again later.',
         'verify_account' => 'Verify Account',
+        'your_account_deleted' => 'Sorry, your account has been deleted.',
+        'password_incorrect' => 'The password you entered is incorrect.',
+        'account_not_found' => 'Account not found. Please check your information and try again.',
+        'login_success' => 'Login successful, redirecting...',
     ],
     'form' => [
         'fill_all_fields' => 'Please fill in all fields.',
@@ -78,7 +82,7 @@ return [
         'welcome_title' => 'Welcome to Our Community!',
         'welcome_body' => 'Welcome to our community. We are happy to see you here.',
         'welcome_email_title' => 'Your Account is Ready!',
-        'welcome_email_body' => 'Hello :user. <br> We are happy to see you here. <br> Please verify your account by clicking the button below. <br> <a href=":link_url">:link_text</a>',
+        'welcome_email_body' => 'Hello @:user. <br> We are happy to see you here. <br> Please verify your account by clicking the button below. <br> <a href=":link_url">:link_text</a>',
     ],
     'base' => [
         'toggle_theme' => 'Toggle Theme',
