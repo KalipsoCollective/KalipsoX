@@ -395,9 +395,7 @@ class KalipsoXJS {
   // Initialize
   NProgress.start();
 
-  $(document).pjax('a:not([target="_blank"])', "body", {
-    push: false,
-  });
+  $(document).pjax('a:not([target="_blank"])', "body");
   $(document).on("submit", 'form[data-kx-form="direct"]', function (event) {
     $.pjax.submit(event, "body");
   });
