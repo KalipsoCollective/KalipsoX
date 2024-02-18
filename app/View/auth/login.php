@@ -12,6 +12,7 @@
                     <div class="mb-3">
                         <label class="form-label"><?php echo $Helper::lang('auth.email_or_username'); ?></label>
                         <input type="text" required name="username" class="form-control" placeholder="email@example.com">
+                        <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-2">
                         <label class="form-label">
@@ -27,9 +28,10 @@
                                     <i class="ti ti-eye"></i>
                                 </a>
                             </span>
+                            <div class="invalid-feedback"></div>
                         </div>
                     </div>
-                    <div class="mb-2">
+                    <div class="mb-2 mt-4">
                         <label class="form-check">
                             <input type="checkbox" name="remember_me" class="form-check-input" />
                             <span class="form-check-label"><?php echo $Helper::lang('auth.remember_me'); ?></span>
