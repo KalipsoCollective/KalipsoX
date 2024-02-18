@@ -19,13 +19,12 @@ return [
                 'parameters' => [],
             ],
             'email' => [
-                'title' => 'notification.welcome_email_title',
-                'body' => 'notification.welcome_email_body',
-                'parameters' => [
+                'title' => Helper::lang('notification.welcome_email_title'),
+                'body' => Helper::lang('notification.welcome_email_body', [
                     'user' => $details['u_name'],
-                    'link_url' => '/auth/verify-account?token=' . $details['token'],
-                    'link_text' => 'auth.verify_account',
-                ]
+                    'link_url' => Helper::base('/auth/verify-account?token=' . $details['token']),
+                    'link_text' => Helper::lang('auth.verify_account'),
+                ]),
             ]
         ];
     },
