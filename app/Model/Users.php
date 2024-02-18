@@ -103,7 +103,7 @@ final class Users extends Model
                 'u_name' => 'root',
                 'email' => 'hello@koalapix.com',
                 'token' => Helper::tokenGenerator(),
-                'password' => password_hash('1234', PASSWORD_DEFAULT),
+                'password' => password_hash('root1234*', PASSWORD_DEFAULT),
                 'f_name' => 'Kalipso',
                 'l_name' => 'Collective',
                 'role_id' => 1,
