@@ -46,7 +46,7 @@ final class Notification
         $insertNotification = $notificationModel->insert([
           'user_id' => $data['id'],
           'type' => $type,
-          'details' => $details['notification'],
+          'details' => json_encode($details['notification']),
           'created_at' => time()
         ]);
       }
@@ -57,7 +57,7 @@ final class Notification
         $insertEmail = $emailModel->insert([
           'user_id' => $data['id'],
           'type' => $type,
-          'details' => $details['email'],
+          'details' => json_encode($details['email']),
           'created_at' => time()
         ]);
       }
