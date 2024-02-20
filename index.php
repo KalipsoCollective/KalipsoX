@@ -53,11 +53,12 @@ try {
      * Route group
      **/
     $app->routeGroup(['GET', '/auth', 'User@account', 'Auth@isLogged'], [
-        [['POST', 'GET'], '/login', 'User@login'],
-        [['POST', 'GET'], '/register', 'User@register'],
-        [['POST', 'GET'], '/recovery', 'User@recovery'],
-        [['POST', 'GET'], '/logout', 'User@logout', ['Auth@isLogged']],
-        ['POST', '/:action', 'User@account'],
+        [['POST', 'GET'], '/register', 'User@register', 'Auth@isNotLogged'],
+        [['POST', 'GET'], '/verify-account', 'User@verifyAccount'],
+        [['POST', 'GET'], '/login', 'User@login', 'Auth@isNotLogged'],
+        [['POST', 'GET'], '/recovery', 'User@recovery', 'Auth@isNotLogged'],
+        [['POST', 'GET'], '/logout', 'User@logout', 'Auth@isLogged'],
+        [['POST', 'GET'], '/logout/:type', 'User@logout', 'Auth@isLogged'],
     ]);
 
     // inital setup and app routes
@@ -65,6 +66,7 @@ try {
         ['GET', '/setup-models', 'App@setupModels'],
         ['GET', '/setup-models-with-seed', 'App@setupModelsWithSeed'],
         ['GET', '/sync-models', 'App@syncModels'],
+        ['GET', '/clear-storage', 'App@clearStorage'],
         ['GET', '/cron', 'App@cronJobs'],
     ]);
 
