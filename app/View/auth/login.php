@@ -31,7 +31,7 @@
                             <div class="invalid-feedback"></div>
                         </div>
                     </div>
-                    <div class="mb-2 mt-4">
+                    <div class="mb-2">
                         <label class="form-check">
                             <input type="checkbox" name="remember_me" class="form-check-input" />
                             <span class="form-check-label"><?php echo $Helper::lang('auth.remember_me'); ?></span>
