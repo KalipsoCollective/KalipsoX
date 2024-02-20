@@ -22,39 +22,68 @@ use KX\Core\Response;
 final class Auth extends Middleware
 {
 
-    public $authToken;
-    public $session;
-
     public function getSession(Request $request, Response $response)
     {
-        if (Helper::config('AUTH_STRATEGY') === 'session') {
-            $authToken = isset($_COOKIE[Helper::config('AUTH_COOKIE_NAME')]) !== false ?
-                $_COOKIE[Helper::config('AUTH_COOKIE_NAME')] :
-                null;
-        } else {
-            $authToken = $request->getHeader('Authorization');
-        }
+        global $kxAuthToken, $kxSession;
 
-        if ($authToken) {
-            $session = new Sessions();
-            $session->where('auth_token', $authToken);
-            $session->grouped(function ($session) {
-                $session
-                    ->orWhere('expire_at', '>', date('Y-m-d H:i:s'))
-                    ->orWhere('expire_at', null);
-            });
-            $session->limit(1);
-            $session = $session->get();
-            if ($session) {
-                $this->authToken = $authToken;
-                $this->session = $session;
-                $this->next([
-                    'authToken' => $authToken,
-                    'session' => $session
-                ]);
+        if ($kxAuthToken && empty($kxSession)) {
+
+            $output = (object)[];
+
+            $sessionModel = new Sessions();
+            $session = $sessionModel
+                ->select('id, user_id, ip, header, expire_at')
+                ->where('auth_token', $kxAuthToken)
+                ->limit(1)
+                ->get();
+
+            if ($session && (empty($session->expire_at) || $session->expire_at > time())) {
+
+                $output->session = $session;
+
+                if ($session->user_id) {
+
+                    $userModel = new Users();
+                    $user = $userModel
+                        ->select('id, u_name, f_name, l_name, email, email, role_id, b_date, status')
+                        ->where('id', $session->user_id)
+                        ->notWhere('status', 'deleted')
+                        ->limit(1)
+                        ->get();
+                    if ($user) {
+                        $output->user = $user;
+
+                        $userRolesModel = new UserRoles();
+                        $userRole = $userRolesModel
+                            ->select('id, name, routes')
+                            ->where('id', $user->role_id)->get();
+                        if ($userRole) {
+                            $output->role = $userRole;
+                            $output->role->routes = explode(',', $userRole->routes);
+                        }
+                    } else {
+                        $sessionModel
+                            ->where('id', $session->id)
+                            ->delete();
+                        return [];
+                    }
+                }
+
+                // add 2 days to expire_at when 5 minutes left
+                if (!empty($session->expire_at) && $session->expire_at - time() < 300) {
+                    $sessionModel
+                        ->where('id', $session->id)
+                        ->update([
+                            'expire_at' => strtotime('+2 days')
+                        ]);
+                }
+
+                $session = $output;
+
+                $kxSession = $session;
                 return [
-                    'authToken' => $authToken,
-                    'session' => $session
+                    'session' => $session,
+                    'authToken' => $kxAuthToken,
                 ];
             }
         }
@@ -66,7 +95,7 @@ final class Auth extends Middleware
     {
         $isLogged = $this->getSession($request, $response);
         if (!empty($isLogged)) {
-            return $this->next();
+            return $this->next($isLogged);
         } else {
             return $this->redirect('/auth/login', 301);
         }
