@@ -16,6 +16,8 @@ use KX\Core\Model;
 use KX\Core\Request;
 use KX\Core\Response;
 
+use KX\Controller\Notification;
+
 final class App
 {
 
@@ -31,6 +33,7 @@ final class App
                 Helper::base(
                     '/kalipso/sync-models'
                 ) => 'Synchronize the database for new column definitions.',
+                Helper::base('/kalipso/clear-storage') => 'Clear the storage folder.',
             ]
         ];
 
@@ -72,9 +75,32 @@ final class App
         return $response->send('<pre>Start your awesome project.</pre>');
     }
 
-    public function cronJobs()
+    public function cronJobs(Request $request, Response $response)
     {
 
+        $return = [
+            'status' => true,
+            'jobs' => [],
+        ];
+
+        $notification = new Notification();
+        $return['jobs']['emails'] = $notification->sendEmails();
+
+
+        return $response->json($return);
         // your cron jobs
+    }
+
+    public function clearStorage(Request $request, Response $response)
+    {
+        $dir = Helper::path('app/Storage');
+        Helper::removeDir($dir);
+        $action = [
+            'status' => true,
+            'message' => 'Storage cleared.'
+        ];
+
+
+        return $response->json($action);
     }
 }
