@@ -144,7 +144,17 @@ button {
 .btn.loading .btn-text {
   opacity: 0;
 }
-
+/*
 .input-group-flat {
   max-height: 40px;
+} */
+
+.input-group-flat:focus-within {
+  box-shadow: none;
+  border-radius: none;
+}
+
+.input-group-flat:focus-within .form-control {
+  box-shadow: 0 0 0 0.25rem rgba(var(--tblr-primary-rgb), .25);
+  border-radius: var(--tblr-border-radius);
 }
