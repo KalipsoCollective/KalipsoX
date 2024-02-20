@@ -37,6 +37,11 @@ final class Emails extends Model
           'nullable' => false,
           'default' => '0',
         ],
+        'email' => [
+          'type' => 'varchar',
+          'length' => 250,
+          'nullable' => true,
+        ],
         'type' => [
           'type' => 'varchar',
           'length' => 250,
@@ -55,7 +60,7 @@ final class Emails extends Model
           'nullable' => true,
         ],
         'status' => [
-          'type' => 'enum(\'pending\',\'uncompleted\',\'completed\')',
+          'type' => 'enum(\'pending\',\'uncompleted\',\'completed\',\'cancelled\')',
           'nullable' => false,
           'default' => 'pending'
         ]
