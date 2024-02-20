@@ -141,7 +141,7 @@ class KalipsoXJS {
         $(submitButton).removeClass("disabled loading");
       }
     }, 500);
-    this.pullResponse(response);
+    this.pullResponse(response, event.target);
   }
 
   async sendRequest(url = null, method = "POST", data = {}) {
@@ -229,7 +229,10 @@ class KalipsoXJS {
     return ret;
   }
 
-  pullResponse(data) {
+  pullResponse(data, form = null) {
+    if (form === null) {
+      form = $("form");
+    }
     if (data && typeof data === "object") {
       if (typeof data.notify !== "undefined" && data.notify.length > 0) {
         data.notify.forEach((alert) => {
@@ -337,6 +340,10 @@ class KalipsoXJS {
           }, data.redirect.time || 0);
         }
       }
+
+      if (typeof data.form_reset !== "undefined" && data.form_reset === true) {
+        $(form).trigger("reset");
+      }
     }
   }
 
@@ -404,7 +411,7 @@ class KalipsoXJS {
     NProgress.start();
   });
 
-  $(document).on("pjax:popstate pjax:complete", function () {
+  $(document).on("pjax:popstate pjax:end", function () {
     NProgress.done();
     w.kx.init(false);
   });
