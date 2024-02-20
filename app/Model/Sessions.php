@@ -34,17 +34,10 @@ final class Sessions extends Model
                 'user_id' => [
                     'type' => 'int'
                 ],
-                'role_id' => [
-                    'type' => 'int'
-                ],
                 'auth_token' => [
                     'type' => 'varchar',
                     'length' => 650,
                     'nullable' => true,
-                ],
-                'data_hash' => [
-                    'type' => 'varchar',
-                    'length' => 120,
                 ],
                 'ip' => [
                     'type' => 'varchar',
@@ -79,10 +72,18 @@ final class Sessions extends Model
                 ],
                 'indexed_fields' => [
                     'type' => 'index',
-                    'columns' => ['user_id', 'role_id', 'data_hash'],
+                    'columns' => ['user_id', 'last_act_on', 'last_act_at', 'created_at', 'expire_at'],
+                ],
+                'indexed_external' => [
+                    'type' => 'index',
+                    'columns' => ['ip', 'header'],
                 ],
                 'fulltext_fields' => [
                     'type' => 'fulltext',
+                    'columns' => ['auth_token'],
+                ],
+                'unique_fields' => [
+                    'type' => 'unique',
                     'columns' => ['auth_token'],
                 ],
             ],
