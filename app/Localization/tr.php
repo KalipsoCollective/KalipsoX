@@ -71,6 +71,8 @@ return [
         'new_password' => 'Yeni Şifre',
         'new_password_confirmation' => 'Yeni Şifre (Tekrar)',
         'password_changed' => 'Şifreniz başarıyla değiştirildi. Giriş sayfasına yönlendiriliyorsunuz...',
+        'account' => 'Hesap',
+        'account_desc' => 'Hesap sayfasına hoş geldiniz, buradan hesabınızla alakalı her türlü işlemi yapabilirsiniz.',
     ],
     'form' => [
         'fill_all_fields' => 'Lütfen tüm alanları doldurunuz.',

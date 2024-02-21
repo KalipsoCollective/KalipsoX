@@ -71,6 +71,8 @@ return [
         'new_password' => 'New Password',
         'new_password_confirmation' => 'New Password (Again)',
         'password_changed' => 'Your password has been successfully changed. Redirecting to the login page...',
+        'account' => 'Account',
+        'account_desc' => 'Welcome to your account page, you can manage your account here.',
     ],
     'form' => [
         'fill_all_fields' => 'Please fill in all fields.',
