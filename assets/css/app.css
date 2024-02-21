@@ -72,11 +72,8 @@ a:visited {
   :is(
     .form-control:focus,
     .form-check-input:focus,
-    .input-group-flat:focus-within
-      .form-control,
-    .input-group-flat:focus-within
-      .form-control
-      ~ .input-group-text
+    .input-group-flat:focus-within .form-control,
+    .input-group-flat:focus-within .form-control ~ .input-group-text
   ) {
   border-color: #4c75a6 !important;
 }
@@ -155,6 +152,10 @@ button {
 }
 
 .input-group-flat:focus-within .form-control {
-  box-shadow: 0 0 0 0.25rem rgba(var(--tblr-primary-rgb), .25);
+  box-shadow: 0 0 0 0.25rem rgba(var(--tblr-primary-rgb), 0.25);
   border-radius: var(--tblr-border-radius);
+}
+
+.dashboard .page-body {
+  min-height: 85vh;
 }
