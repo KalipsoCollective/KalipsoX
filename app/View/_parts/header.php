@@ -16,3 +16,4 @@
 </head>
 
 <body <?php if (isset($layout['bodyClass']) !== false) echo 'class="' . $layout['bodyClass'] . '"'; ?>>
+    <?php if (isset($layout['beforeBody']) !== false) echo $layout['beforeBody']; ?>
