@@ -26,10 +26,11 @@ final class User
 
     public function account(Request $request, Response $response)
     {
-        // middleware parameters
-        $authToken = $request->getMiddlewareParams();
-        Helper::dump($authToken, true);
-        return $response->json(['account' => 'account']);
+        return $response->render('auth/account', [
+            'title' => Helper::lang('auth.account'),
+            'description' => Helper::lang('auth.account_desc'),
+            'auth' => $request->getMiddlewareParams(),
+        ], 'layout');
     }
 
     public function login(Request $request, Response $response)
@@ -160,7 +161,7 @@ final class User
         return $response->render('auth/login', [
             'title' => Helper::lang('auth.login'),
             'description' => Helper::lang('auth.login_desc'),
-        ], 'layout');
+        ], 'auth');
     }
 
     public function register(Request $request, Response $response)
@@ -287,7 +288,7 @@ final class User
         return $response->render('auth/register', [
             'title' => Helper::lang('auth.register'),
             'description' => Helper::lang('auth.register_desc'),
-        ], 'layout');
+        ], 'auth');
     }
 
     public function verifyAccount(Request $request, Response $response)
@@ -351,7 +352,7 @@ final class User
             'title' => Helper::lang('auth.verify_account'),
             'description' => Helper::lang('auth.verify_account_desc'),
             'alert' => $alert,
-        ], 'layout');
+        ], 'auth');
     }
 
     public function recovery(Request $request, Response $response)
@@ -531,7 +532,7 @@ final class User
             'description' => Helper::lang('auth.recovery_desc'),
             'step' => $step,
             'token' => $request->getParam('token'),
-        ], 'layout');
+        ], 'auth');
     }
 
     public function logout(Request $request, Response $response)
