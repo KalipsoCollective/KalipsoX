@@ -11,7 +11,7 @@ return [
     ],
     'variables' => [
         'bodyClass' => 'dashboard layout-fluid',
-        'afterBody' => '</div>',
-        'beforeBody' => '<div class="page">'
+        'afterBody' => '<div class="page">',
+        'beforeBodyClose' => '</div>'
     ]
 ];
