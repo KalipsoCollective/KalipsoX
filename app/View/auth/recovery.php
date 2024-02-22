@@ -60,8 +60,8 @@
                             </div>
                             <div class="form-footer">
                                 <button type="submit" class="btn btn-primary w-100">
-                                    <div class="btn-loader
-                                    spinner-border spinner-border-sm text-light" role="status"></div>
+                                    <span class="btn-loader
+                                    spinner-border spinner-border-sm text-light" role="status"></span>
                                     <span class="btn-text"><?php echo $Helper::lang('base.reset'); ?></span>
                                 </button>
                             </div>
