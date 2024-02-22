@@ -33,13 +33,13 @@
                     </div>
                     <div class="mb-2">
                         <label class="form-check">
-                            <input type="checkbox" name="remember_me" class="form-check-input" />
+                            <input type="checkbox" name="remember_me" class="form-check-input">
                             <span class="form-check-label"><?php echo $Helper::lang('auth.remember_me'); ?></span>
                         </label>
                     </div>
                     <div class="form-footer">
                         <button type="submit" class="btn btn-primary w-100">
-                            <div class="btn-loader spinner-border spinner-border-sm text-light" role="status"></div>
+                            <span class="btn-loader spinner-border spinner-border-sm text-light" role="status"></span>
                             <span class="btn-text"><?php echo $Helper::lang('auth.login'); ?></span>
                         </button>
                     </div>
