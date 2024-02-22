@@ -129,7 +129,7 @@ final class User
                             $return['redirect'] = [
                                 'url' => Helper::base('auth'),
                                 'time' => 2000,
-                                'direct' => false
+                                'direct' => true
                             ];
                         } else {
                             $return['notify'][] = [
