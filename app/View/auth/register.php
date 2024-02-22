@@ -47,7 +47,10 @@
               </div>
             </div>
             <div class="form-footer">
-              <button type="submit" class="btn btn-primary w-100"><?php echo $Helper::lang('auth.register'); ?></button>
+              <button type="submit" class="btn btn-primary w-100">
+                <span class="btn-loader spinner-border spinner-border-sm text-light" role="status"></span>
+                <span class="btn-text"><?php echo $Helper::lang('auth.register'); ?></span>
+              </button>
             </div>
           </form>
         <?php } ?>
