@@ -5,7 +5,7 @@
     <title><?php echo $title; ?></title>
     <?php
     if (isset($description) !== false) {
-        echo '<meta name="description" content="' . $description . '" />' . PHP_EOL;
+        echo '<meta name="description" content="' . $description . '">' . PHP_EOL;
     }   ?>
     <link href="<?php echo $Helper::assets('libs/tabler/tabler.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('libs/nprogress/nprogress.min.css'); ?>" rel="stylesheet">
@@ -16,4 +16,4 @@
 </head>
 
 <body <?php if (isset($layout['bodyClass']) !== false) echo 'class="' . $layout['bodyClass'] . '"'; ?>>
-    <?php if (isset($layout['beforeBody']) !== false) echo $layout['beforeBody']; ?>
+    <?php if (isset($layout['afterBody']) !== false) echo $layout['afterBody']; ?>
