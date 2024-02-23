@@ -73,6 +73,8 @@ return [
         'password_changed' => 'Your password has been successfully changed. Redirecting to the login page...',
         'account' => 'Account',
         'account_desc' => 'Welcome to your account page, you can manage your account here.',
+        'logout' => 'Logout',
+        'sessions' => 'Sessions',
     ],
     'form' => [
         'fill_all_fields' => 'Please fill in all fields.',
@@ -115,5 +117,7 @@ return [
         'back_to_home' => 'Back to Home',
         'sorry' => 'Sorry...',
         'reset' => 'Reset',
+        'show_notifications' => 'Show Notifications',
+        'notifications' => 'Notifications',
     ],
 ];
