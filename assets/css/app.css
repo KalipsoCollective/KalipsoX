@@ -159,3 +159,18 @@ button {
 .dashboard .page-body {
   min-height: 85vh;
 }
+
+.dropdown-menu {
+  padding: 0.3rem;
+}
+
+.dropdown-menu .dropdown-item {
+  border-radius: 0.2rem;
+}
+
+.dropdown-menu .dropdown-divider {
+  --tblr-dropdown-divider-margin-y: 0.2rem;
+}
+.dropdown-menu .dropdown-item+.dropdown-item {
+  margin-top: 0.2rem;
+}
