@@ -73,6 +73,8 @@ return [
         'password_changed' => 'Şifreniz başarıyla değiştirildi. Giriş sayfasına yönlendiriliyorsunuz...',
         'account' => 'Hesap',
         'account_desc' => 'Hesap sayfasına hoş geldiniz, buradan hesabınızla alakalı her türlü işlemi yapabilirsiniz.',
+        'logout' => 'Çıkış Yap',
+        'sessions' => 'Oturumlar',
     ],
     'form' => [
         'fill_all_fields' => 'Lütfen tüm alanları doldurunuz.',
@@ -115,5 +117,7 @@ return [
         'back_to_home' => 'Ana Sayfaya Dön',
         'sorry' => 'Üzgünüz...',
         'reset' => 'Sıfırla',
+        'show_notifications' => 'Bildirimleri Göster',
+        'notifications' => 'Bildirimler',
     ],
 ];
