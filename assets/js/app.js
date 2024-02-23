@@ -357,13 +357,11 @@ class KalipsoXJS {
       document.documentElement.classList.add("dark");
     }
 
-    if (document.querySelector('[data-kx-action="toggle_theme"] i.ti')) {
-      document
-        .querySelector('[data-kx-action="toggle_theme"] i')
-        .setAttribute("class", "ti");
-      document
-        .querySelector('[data-kx-action="toggle_theme"] i')
-        .classList.add(color === "dark" ? "ti-sun" : "ti-moon");
+    if ($('[data-kx-action="toggle_theme"] i.ti')) {
+      $('[data-kx-action="toggle_theme"] i.ti').removeClass("ti-moon ti-sun");
+      $('[data-kx-action="toggle_theme"] i.ti').addClass(
+        color === "dark" ? "ti-sun" : "ti-moon"
+      );
     }
   }
 
