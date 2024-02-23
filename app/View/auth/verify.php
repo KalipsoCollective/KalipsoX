@@ -19,8 +19,9 @@
                 <?php } ?>
             </div>
         </div>
-        <p class="text-center text-secondary my-1 small">
-            <?php echo $Helper::lang('base.copyright') . ' © ' . date('Y') . ' - ' . $Helper::config('settings.name'); ?>
-        </p>
+        <?php
+        $section = 'verify';
+        $layout = require $Helper::path('app/View/_parts/auth_footer.php');
+        echo $layout; ?>
     </div>
 </div>
