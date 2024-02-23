@@ -71,15 +71,9 @@
                 }   ?>
             </div>
         </div>
-        <p class="text-secondary mt-3 mb-0 d-flex justify-content-center align-items-center">
-            <span class="me-1"><?php echo $Helper::lang('auth.dont_have_account_yet'); ?></span>
-            <a class="me-1" href="<?php echo $Helper::base('auth/register'); ?>" tabindex="-1"><?php echo $Helper::lang('auth.register'); ?>.</a>
-            <button class="btn btn-sm btn-ghost-primary" data-kx-action="toggle_theme" data-bs-toggle="tooltip" title="<?php echo $Helper::lang('base.toggle_theme'); ?>" tabindex="-1">
-                <i class="ti ti-sun"></i>
-            </button>
-        </p>
-        <p class="text-center text-secondary my-1 small">
-            <?php echo $Helper::lang('base.copyright') . ' © ' . date('Y') . ' - ' . $Helper::config('settings.name'); ?>
-        </p>
+        <?php
+        $section = 'recovery';
+        $layout = require $Helper::path('app/View/_parts/auth_footer.php');
+        echo $layout; ?>
     </div>
 </div>
