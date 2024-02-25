@@ -98,13 +98,19 @@
         </div>
     </div>
 </div>
-<?php $Helper::dump($Helper::sessionData('user')); ?>
+<?php $userInfo = $Helper::sessionData('user'); ?>
 <div class="nav-item dropdown ms-2">
     <a href="#" class="nav-link d-flex lh-1 text-reset p-0" data-bs-toggle="dropdown" aria-label="Open user menu">
-        <span class="avatar avatar-sm" style="background-image: url(./static/avatars/000m.jpg)"></span>
+        <span class="avatar avatar-sm">
+            <?php // style="background-image: url(./static/avatars/000m.jpg)" 
+            ?>
+            <?php echo $Helper::firstLetters($userInfo->name); ?>
+        </span>
         <div class="d-none d-xl-block ps-2">
-            <div>Paweł Kuna</div>
-            <div class="mt-1 small text-secondary">UI Designer</div>
+            <div>
+                <?php echo $userInfo->name; ?>
+            </div>
+            <div class="mt-1 small text-secondary"><?php echo $userInfo->email; ?></div>
         </div>
     </a>
     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" data-bs-theme="dark">
