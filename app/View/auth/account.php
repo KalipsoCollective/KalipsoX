@@ -1,140 +1,125 @@
 <div class="page-body">
     <div class="container-xl">
-        <div class="row row-deck row-cards">
-            <div class="col-sm-6 col-lg-3">
-                <div class="card">
+        <div class="card">
+            <div class="row g-0">
+                <div class="col-12 col-md-3 border-end">
                     <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="subheader">Sales</div>
-                            <div class="ms-auto lh-1">
-                                <div class="dropdown">
-                                    <a class="dropdown-toggle text-secondary" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last 7 days</a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item active" href="#">Last 7 days</a>
-                                        <a class="dropdown-item" href="#">Last 30 days</a>
-                                        <a class="dropdown-item" href="#">Last 3 months</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="h1 mb-3">75%</div>
-                        <div class="d-flex mb-2">
-                            <div>Conversion rate</div>
-                            <div class="ms-auto">
-                                <span class="text-green d-inline-flex align-items-center lh-1">
-                                    7% <!-- Download SVG icon from http://tabler-icons.io/i/trending-up -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M3 17l6 -6l4 4l8 -8" />
-                                        <path d="M14 7l7 0l0 7" />
-                                    </svg>
-                                </span>
-                            </div>
-                        </div>
-                        <div class="progress progress-sm">
-                            <div class="progress-bar bg-primary" style="width: 75%" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" aria-label="75% Complete">
-                                <span class="visually-hidden">75% Complete</span>
-                            </div>
+                        <?php /*<h4 class="subheader">Business settings</h4> */ ?>
+                        <div class="list-group list-group-transparent">
+                            <?php
+                            if ($Helper::authorization('auth')) {
+                            ?>
+                                <a href="<?php echo $Helper::base('auth'); ?>" class="list-group-item list-group-item-action d-flex align-items-center<?php echo $Helper::currentPage('auth'); ?>">
+                                    <?php echo $Helper::lang('auth.account'); ?>
+                                </a>
+                            <?php
+                            }
+
+                            if ($Helper::authorization('auth/notifications')) {
+                            ?>
+                                <a href="<?php echo $Helper::base('auth/notifications'); ?>" class="list-group-item list-group-item-action d-flex align-items-center<?php echo $Helper::currentPage('auth/notifications'); ?>">
+                                    <?php echo $Helper::lang('base.notifications'); ?>
+                                </a>
+                            <?php
+                            }
+
+                            if ($Helper::authorization('auth/sessions')) {
+                            ?>
+                                <a href="<?php echo $Helper::base('auth/sessions'); ?>" class="list-group-item list-group-item-action d-flex align-items-center<?php echo $Helper::currentPage('auth/sessions'); ?>">
+                                    <?php echo $Helper::lang('auth.sessions'); ?>
+                                </a>
+                            <?php
+                            } ?>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="subheader">Revenue</div>
-                            <div class="ms-auto lh-1">
-                                <div class="dropdown">
-                                    <a class="dropdown-toggle text-secondary" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last 7 days</a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item active" href="#">Last 7 days</a>
-                                        <a class="dropdown-item" href="#">Last 30 days</a>
-                                        <a class="dropdown-item" href="#">Last 3 months</a>
+                <div class="col-12 col-md-9 d-flex flex-column">
+                    <?php
+                    switch ($section) {
+                        case 'notifications':
+                            echo 'n';
+                            break;
+                        case 'sessions':
+                            echo 's';
+                            break;
+                        default:
+                    ?>
+                            <div class="card-body">
+                                <h3 class="card-title"><?php echo $Helper::lang('base.settings'); ?></h3>
+                                <?php
+                                $Helper::dump($userInfo);
+                                /*
+                                <div class="row align-items-center">
+                                    <div class="col-auto"><span class="avatar avatar-xl" style="background-image: url(./static/avatars/000m.jpg)"></span>
+                                    </div>
+                                    <div class="col-auto"><a href="#" class="btn">
+                                            Change avatar
+                                        </a></div>
+                                    <div class="col-auto"><a href="#" class="btn btn-ghost-danger">
+                                            Delete avatar
+                                        </a></div>
+                                </div> */ ?>
+                                <div class="row g-3">
+                                    <div class="col-md">
+                                        <div class="form-label"><?php echo $Helper::lang('auth.username'); ?></div>
+                                        <input type="text" class="form-control" value="<?php echo $userInfo->u_name; ?>" readonly>
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-label"><?php echo $Helper::lang('auth.first_name'); ?></div>
+                                        <input type="text" class="form-control" value="<?php echo $userInfo->f_name; ?>" name="first_name">
+                                    </div>
+                                    <div class="col-md">
+                                        <div class="form-label"><?php echo $Helper::lang('auth.last_name'); ?></div>
+                                        <input type="text" class="form-control" value="<?php echo $userInfo->l_name; ?>" name="last_name">
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-baseline">
-                            <div class="h1 mb-0 me-2">$4,300</div>
-                            <div class="me-auto">
-                                <span class="text-green d-inline-flex align-items-center lh-1">
-                                    8% <!-- Download SVG icon from http://tabler-icons.io/i/trending-up -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M3 17l6 -6l4 4l8 -8" />
-                                        <path d="M14 7l7 0l0 7" />
-                                    </svg>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="chart-revenue-bg" class="chart-sm"></div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="subheader">New clients</div>
-                            <div class="ms-auto lh-1">
-                                <div class="dropdown">
-                                    <a class="dropdown-toggle text-secondary" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last 7 days</a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item active" href="#">Last 7 days</a>
-                                        <a class="dropdown-item" href="#">Last 30 days</a>
-                                        <a class="dropdown-item" href="#">Last 3 months</a>
+                                <div class="row g-3 mt-2">
+                                    <div class="col-md">
+                                        <div class="form-label"><?php echo $Helper::lang('auth.birthdate'); ?></div>
+                                        <input id="dpicker" type="text" class="form-control" value="<?php echo $userInfo->b_date; ?>" name="birthdate">
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="d-flex align-items-baseline">
-                            <div class="h1 mb-3 me-2">6,782</div>
-                            <div class="me-auto">
-                                <span class="text-yellow d-inline-flex align-items-center lh-1">
-                                    0% <!-- Download SVG icon from http://tabler-icons.io/i/minus -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M5 12l14 0" />
-                                    </svg>
-                                </span>
-                            </div>
-                        </div>
-                        <div id="chart-new-clients" class="chart-sm"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-sm-6 col-lg-3">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex align-items-center">
-                            <div class="subheader">Active users</div>
-                            <div class="ms-auto lh-1">
-                                <div class="dropdown">
-                                    <a class="dropdown-toggle text-secondary" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Last 7 days</a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item active" href="#">Last 7 days</a>
-                                        <a class="dropdown-item" href="#">Last 30 days</a>
-                                        <a class="dropdown-item" href="#">Last 3 months</a>
+                                <h3 class="card-title mt-4"><?php echo $Helper::lang('auth.email'); ?></h3>
+                                <p class="card-subtitle"><?php echo $Helper::lang('auth.email_change_info'); ?></p>
+                                <div>
+                                    <div class="row g-2">
+                                        <div class="col-auto">
+                                            <input type="email" class="form-control w-auto" value="<?php echo $userInfo->email; ?>">
+                                        </div>
                                     </div>
                                 </div>
+                                <h3 class="card-title mt-4">Password</h3>
+                                <p class="card-subtitle">You can set a permanent password if you don want to use temporary login codes.</p>
+                                <div>
+                                    <a href="#" class="btn">
+                                        Set new password
+                                    </a>
+                                </div>
+                                <h3 class="card-title mt-4">Public profile</h3>
+                                <p class="card-subtitle">Making your profile public means that anyone on the Dashkit network will be able to find
+                                    you.</p>
+                                <div>
+                                    <label class="form-check form-switch form-switch-lg">
+                                        <input class="form-check-input" type="checkbox">
+                                        <span class="form-check-label form-check-label-on">Youe currently visible</span>
+                                        <span class="form-check-label form-check-label-off">Youe
+                                            currently invisible</span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                        <div class="d-flex align-items-baseline">
-                            <div class="h1 mb-3 me-2">2,986</div>
-                            <div class="me-auto">
-                                <span class="text-green d-inline-flex align-items-center lh-1">
-                                    4% <!-- Download SVG icon from http://tabler-icons.io/i/trending-up -->
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="icon ms-1" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                        <path d="M3 17l6 -6l4 4l8 -8" />
-                                        <path d="M14 7l7 0l0 7" />
-                                    </svg>
-                                </span>
+                            <div class="card-footer bg-transparent mt-auto">
+                                <div class="btn-list justify-content-end">
+                                    <a href="#" class="btn">
+                                        Cancel
+                                    </a>
+                                    <a href="#" class="btn btn-primary">
+                                        Submit
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                        <div id="chart-active-users" class="chart-sm"></div>
-                    </div>
+                    <?php
+                            break;
+                    }   ?>
                 </div>
             </div>
         </div>
