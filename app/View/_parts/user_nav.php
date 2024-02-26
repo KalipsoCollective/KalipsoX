@@ -114,10 +114,33 @@
         </div>
     </a>
     <div class="dropdown-menu dropdown-menu-end dropdown-menu-arrow" data-bs-theme="dark">
-        <a href="<?php echo $Helper::base('auth'); ?>" class="dropdown-item"><?php echo $Helper::lang('auth.account'); ?></a>
-        <a href="<?php echo $Helper::base('auth/notifications'); ?>" class="dropdown-item"><?php echo $Helper::lang('base.notifications'); ?></a>
+        <?php if ($Helper::authorization('auth')) {
+        ?>
+            <a href="<?php echo $Helper::base('auth'); ?>" class="dropdown-item<?php echo $Helper::currentPage('auth'); ?>">
+                <i class="ti ti-user icon dropdown-item-icon"></i> <?php echo $Helper::lang('auth.account'); ?>
+            </a>
+        <?php
+        }
+        if ($Helper::authorization('auth/notifications')) {
+        ?>
+            <a href="<?php echo $Helper::base('auth/notifications'); ?>" class="dropdown-item<?php echo $Helper::currentPage('auth/notifications'); ?>">
+                <i class="ti ti-bell icon dropdown-item-icon"></i> <?php echo $Helper::lang('base.notifications'); ?>
+                <span class="badge bg-danger text-primary-fg ms-auto">12</span>
+            </a>
+        <?php
+        }
+        ?>
         <div class="dropdown-divider"></div>
-        <a href="<?php echo $Helper::base('auth/sessions'); ?>" class="dropdown-item"><?php echo $Helper::lang('auth.sessions'); ?></a>
-        <a href="<?php echo $Helper::base('auth/logout'); ?>" class="dropdown-item"><?php echo $Helper::lang('auth.logout'); ?></a>
+        <?php
+        if ($Helper::authorization('auth/sessions')) {
+        ?>
+            <a href="<?php echo $Helper::base('auth/sessions'); ?>" class="dropdown-item<?php echo $Helper::currentPage('auth/sessions'); ?>">
+                <i class="ti ti-device-tablet-star icon dropdown-item-icon"></i> <?php echo $Helper::lang('auth.sessions'); ?>
+            </a>
+        <?php
+        } ?>
+        <a href="<?php echo $Helper::base('auth/logout'); ?>" class="dropdown-item">
+            <i class="ti ti-power icon dropdown-item-icon"></i> <?php echo $Helper::lang('auth.logout'); ?>
+        </a>
     </div>
 </div>
