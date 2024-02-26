@@ -46,6 +46,10 @@ class KalipsoXJS {
       }
     });
 
+    const picker = new Litepicker({
+      element: document.getElementById("dpicker"),
+    });
+
     // Form submit
     $('form[data-kx-form]:not([data-kx-form="direct"])').each((i, form) => {
       $(form).off("submit");
