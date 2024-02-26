@@ -29,6 +29,33 @@ final class User
         return $response->render('auth/account', [
             'title' => Helper::lang('auth.account'),
             'description' => Helper::lang('auth.account_desc'),
+            'headTitle' => Helper::lang('auth.account'),
+            'headSubtitle' => Helper::lang('base.home'),
+            'section' => 'account',
+            'auth' => $request->getMiddlewareParams(),
+        ], 'layout');
+    }
+
+    public function notifications(Request $request, Response $response)
+    {
+        return $response->render('auth/account', [
+            'title' => Helper::lang('base.notifications'),
+            'description' => Helper::lang('base.notifications_desc'),
+            'headTitle' => Helper::lang('auth.account'),
+            'headSubtitle' => Helper::lang('base.notifications'),
+            'section' => 'notifications',
+            'auth' => $request->getMiddlewareParams(),
+        ], 'layout');
+    }
+
+    public function sessions(Request $request, Response $response)
+    {
+        return $response->render('auth/account', [
+            'title' => Helper::lang('auth.sessions'),
+            'description' => Helper::lang('auth.sessions_desc'),
+            'headTitle' => Helper::lang('auth.account'),
+            'headSubtitle' => Helper::lang('auth.sessions'),
+            'section' => 'sessions',
             'auth' => $request->getMiddlewareParams(),
         ], 'layout');
     }
@@ -108,18 +135,34 @@ final class User
                         ];
                     } elseif (password_verify($password, $checkAccount->password)) {
 
-                        // save session
+                        // check session
                         $sessionModel = new Sessions();
-                        $saveSession = $sessionModel->insert([
-                            'user_id' => $checkAccount->id,
-                            'auth_token' => $kxAuthToken,
-                            'ip' => Helper::getIp(),
-                            'header' => Helper::getUserAgent(),
-                            'last_act_on' => $request->getUri(),
-                            'last_act_at' => time(),
-                            'created_at' => time(),
-                            'expire_at' => $remember_me ? null : strtotime('+2 day'),
-                        ]);
+                        $checkSession = $sessionModel
+                            ->select('id')
+                            ->where('user_id', $checkAccount->id)
+                            ->where('auth_token', $kxAuthToken)
+                            ->get();
+
+                        if ($checkSession) {
+                            $saveSession = $sessionModel
+                                ->where('id', $checkSession->id)
+                                ->update([
+                                    'last_act_on' => $request->getUri(),
+                                    'last_act_at' => time(),
+                                    'expire_at' => $remember_me ? null : strtotime('+2 day'),
+                                ]);
+                        } else {
+                            $saveSession = $sessionModel->insert([
+                                'user_id' => $checkAccount->id,
+                                'auth_token' => $kxAuthToken,
+                                'ip' => Helper::getIp(),
+                                'header' => Helper::getUserAgent(),
+                                'last_act_on' => $request->getUri(),
+                                'last_act_at' => time(),
+                                'created_at' => time(),
+                                'expire_at' => $remember_me ? null : strtotime('+2 day'),
+                            ]);
+                        }
 
                         if ($saveSession) {
                             $return['notify'][] = [
