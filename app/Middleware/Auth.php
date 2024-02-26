@@ -32,7 +32,7 @@ final class Auth extends Middleware
 
             $sessionModel = new Sessions();
             $session = $sessionModel
-                ->select('id, user_id, ip, header, expire_at')
+                ->select('id, user_id, ip, header, last_act_on, last_act_at, expire_at')
                 ->where('auth_token', $kxAuthToken)
                 ->limit(1)
                 ->get();
@@ -69,14 +69,33 @@ final class Auth extends Middleware
                     }
                 }
 
+                $updateSession = [
+                    'last_act_at' => time(),
+                ];
+
+                // update last act on if changed
+                if ($session->last_act_on !== $request->getUri()) {
+                    $updateSession['last_act_on'] = $request->getUri();
+                }
+
                 // add 2 days to expire_at when 5 minutes left
                 if (!empty($session->expire_at) && $session->expire_at - time() < 300) {
-                    $sessionModel
-                        ->where('id', $session->id)
-                        ->update([
-                            'expire_at' => strtotime('+2 days')
-                        ]);
+                    $updateSession['expire_at'] = strtotime('+2 days');
                 }
+
+                // update ip and header if changed
+                if ($session->ip !== Helper::getIp()) {
+                    $updateSession['ip'] = Helper::getIp();
+                }
+
+                if ($session->header !== Helper::getUserAgent()) {
+                    $updateSession['header'] = Helper::getUserAgent();
+                }
+
+                // update if something changed
+                $sessionModel
+                    ->where('id', $session->id)
+                    ->update($updateSession);
 
                 $session = $output;
 
@@ -96,6 +115,27 @@ final class Auth extends Middleware
         $isLogged = $this->getSession($request, $response);
         if (!empty($isLogged)) {
             return $this->next($isLogged);
+        } else {
+            return $this->redirect('/auth/login', 301);
+        }
+    }
+
+    public function isAuthorized(Request $request, Response $response, $instance)
+    {
+        $isLogged = $this->getSession($request, $response);
+        $route = $request->getRouteDetails();
+        $route = isset($route->route) === false ? $request->getUri() : $route->route;
+
+        if (!empty($isLogged)) {
+            if (isset($isLogged['session']->role) === false) {
+                return $this->redirect('/auth/login', 301);
+            } else {
+                if (Helper::authorization($route)) {
+                    return $this->next();
+                } else {
+                    return $this->redirect('/auth/login', 301);
+                }
+            }
         } else {
             return $this->redirect('/auth/login', 301);
         }
