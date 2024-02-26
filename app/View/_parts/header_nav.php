@@ -16,15 +16,16 @@
         <div class="container-xl">
             <div class="row g-2 align-items-center">
                 <div class="col">
-                    <!-- Page pre-title -->
-                    <div class="page-pretitle">
-                        Overview
-                    </div>
-                    <h2 class="page-title">
-                        Navbar overlap layout
-                    </h2>
+                    <?php
+                    if (isset($headTitle) !== false) {
+                        echo '<div class="page-pretitle">' . $headTitle . '</div>';
+                    }
+
+                    if (isset($headSubtitle) !== false) {
+                        echo '<div class="page-title">' . $headSubtitle . '</div>';
+                    }   ?>
                 </div>
-                <!-- Page title actions -->
+                <?php /*
                 <div class="col-auto ms-auto d-print-none">
                     <div class="btn-list">
                         <span class="d-none d-sm-inline">
@@ -50,7 +51,7 @@
                             </svg>
                         </a>
                     </div>
-                </div>
+                </div> */ ?>
             </div>
         </div>
     </div>
