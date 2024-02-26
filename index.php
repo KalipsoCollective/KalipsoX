@@ -52,13 +52,21 @@ try {
     /**
      * Route group
      **/
-    $app->routeGroup(['GET', '/auth', 'User@account', 'Auth@isLogged'], [
+    $app->routeGroup(['GET', '/auth', 'User@account', 'Auth@isAuthorized'], [
         [['POST', 'GET'], '/register', 'User@register', 'Auth@isNotLogged'],
         [['POST', 'GET'], '/verify-account', 'User@verifyAccount'],
         [['POST', 'GET'], '/login', 'User@login', 'Auth@isNotLogged'],
         [['POST', 'GET'], '/recovery', 'User@recovery', 'Auth@isNotLogged'],
+        [['POST', 'GET'], '/notifications', 'User@notifications', 'Auth@isAuthorized'],
+        [['POST', 'GET'], '/sessions', 'User@sessions', 'Auth@isAuthorized'],
         [['POST', 'GET'], '/logout', 'User@logout', 'Auth@isLogged'],
         [['POST', 'GET'], '/logout/:type', 'User@logout', 'Auth@isLogged'],
+    ]);
+
+    $app->routeGroup(['GET', '/dashboard', 'Panel@dashboard', 'Auth@isAuthorized'], [
+        [['POST', 'GET'], '/settings', 'Panel@settings', 'Auth@isAuthorized'],
+        [['POST', 'GET'], '/users', 'Panel@users', 'Auth@isAuthorized'],
+        [['POST', 'GET'], '/user-roles', 'Panel@userRoles', 'Auth@isAuthorized'],
     ]);
 
     // inital setup and app routes
