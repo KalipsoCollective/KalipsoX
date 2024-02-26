@@ -13,5 +13,6 @@ return [
         'bodyClass' => 'dashboard layout-fluid',
         'afterBody' => '<div class="page">',
         'beforeBodyClose' => '</div>'
-    ]
+    ],
+    'ajaxLayout' => ['_parts/sidebar', '_parts/header_nav', 'x', '_parts/footer']
 ];
