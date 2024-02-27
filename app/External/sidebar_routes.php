@@ -4,6 +4,7 @@ return [
   'dashboard' => [
     'icon' => 'ti ti-layout-dashboard',
     'link' => '/dashboard',
+    // 'badge' => '<span class="badge badge-sm bg-green-lt text-uppercase ms-auto">New</span>'
   ],
   'users' => [
     'icon' => 'ti ti-users',
