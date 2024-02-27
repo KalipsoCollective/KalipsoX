@@ -199,4 +199,95 @@ final class Notification
         }
         return true;
     }
+
+    public function getNotifications($userId, $limit = 20, $page = 1)
+    {
+        $notificationModel = new Notifications();
+        $notifications = $notificationModel
+            ->where('user_id', $userId)
+            ->grouped(function ($q) {
+                $q->where('status', 'active')
+                    ->orWhere('status', 'viewed');
+            })
+            ->pagination($limit, $page)
+            ->orderBy('created_at', 'DESC')
+            ->getAll();
+
+        return $notifications;
+    }
+
+    public function getUnreadNotificationCount($userId)
+    {
+        $notificationModel = new Notifications();
+        $notifications = $notificationModel->count('id', 'total')
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->get()->total;
+
+        return (int)$notifications;
+    }
+
+    public function getNotificationList($userId)
+    {
+
+        $limit = 20;
+        $return = '';
+
+        $notifications = $this->getNotifications($userId, $limit, 1);
+
+        if (!empty($notifications)) {
+            $return = '<div class="list-group list-group-flush list-group-hoverable">';
+            foreach ($notifications as $notification) {
+
+                $notification->details = json_decode($notification->details);
+                $return .= '
+                <div class="list-group-item notification-' . $notification->id . '">
+                    <div class="row align-items-center">
+                        <div class="col-auto"><span class="status-dot d-block' . ($notification->status === 'active' ? ' status-dot-animated bg-green' : '') . '"></span></div>
+                        <div class="col text-truncate">
+                            <a href="javascript:;" ' . ($notification->status === 'active' ? 'data-kx-action="' . Helper::base('auth/notifications/view/' . $notification->id) . '" ' : '') . 'class="text-body d-block">
+                                ' . Helper::lang($notification->details->title) . '
+                            </a>
+                            <div class="d-block text-secondary text-truncate mt-n1">
+                                ' . Helper::lang($notification->details->body) . '
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <a href="javascript:;" data-kx-again data-kx-action="' . Helper::base('auth/notifications/delete/' . $notification->id) . '" class="list-group-item-actions">
+                                <i class="ti ti-trash icon"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>';
+            }
+            $return .= '</div>';
+        } else {
+            $return = '
+            <div class="card-body">
+                <p class="text-center text-muted">' . Helper::lang('base.no_notifications') . '</p>
+            </div>';
+        }
+
+        return $return;
+    }
+
+    public function getNotification($id)
+    {
+        $notificationModel = new Notifications();
+        $notification = $notificationModel
+            ->where('id', $id)
+            ->get();
+
+        return $notification;
+    }
+
+    public function updateNotification($id, $data)
+    {
+        $notificationModel = new Notifications();
+        $notification = $notificationModel
+            ->where('id', $id)
+            ->update($data);
+
+        return $notification;
+    }
 }
