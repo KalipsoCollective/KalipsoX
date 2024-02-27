@@ -138,6 +138,13 @@ button {
     0 10px 36px -4px rgb(125 57 57 / 53%);
 }
 
+.toastn.warning {
+  background: #d19508;
+  color: #fcf2dd;
+  box-shadow: 0 3px 6px -1px rgb(209 149 8 / 0.12%),
+    0 10px 36px -4px rgb(209 149 8 / 53%);
+}
+
 .toastn.success {
   background: #6a8b22;
   color: #cedfa9;
@@ -210,6 +217,37 @@ button {
 
 .navbar-vertical .navbar-collapse .nav-item.active:after {
   transition: 0.2s ease-out;
+}
+
+.navbar-vertical .navbar-nav .nav-link .badge {
+  position: relative;
+  transform: none;
+  top: initial;
+  right: initial;
+}
+
+.notification-card {
+  min-width: 25vw;
+}
+
+.list-group-hoverable .list-group-item-actions {
+  --tblr-text-opacity: 1;
+  color: rgba(var(--tblr-muted-rgb), var(--tblr-text-opacity)) !important;
+  transition: 0.2s ease-out;
+}
+
+.list-group-hoverable .list-group-item-actions:hover {
+  color: var(--tblr-danger-darken) !important;
+}
+
+.notification-count {
+  font-size: 75%;
+}
+
+.notification-list {
+  max-height: 40vh;
+  overflow: hidden;
+  overflow-y: auto;
 }
 
 @media (min-width: 992px) {
