@@ -69,14 +69,17 @@ final class Auth extends Middleware
                     }
                 }
 
-                $updateSession = [
-                    'last_act_at' => time(),
-                ];
+                $updateSession = [];
+                // disabled for heartbeat (keep session alive)
+                if ($request->getUri() !== '/auth/heartbeat') {
+                    $updateSession['last_act_at'] = time();
 
-                // update last act on if changed
-                if ($session->last_act_on !== $request->getUri()) {
-                    $updateSession['last_act_on'] = $request->getUri();
+                    // update last act on if changed
+                    if ($session->last_act_on !== $request->getUri()) {
+                        $updateSession['last_act_on'] = $request->getUri();
+                    }
                 }
+
 
                 // add 2 days to expire_at when 5 minutes left
                 if (!empty($session->expire_at) && $session->expire_at - time() < 300) {
@@ -92,10 +95,11 @@ final class Auth extends Middleware
                     $updateSession['header'] = Helper::getUserAgent();
                 }
 
-                // update if something changed
-                $sessionModel
-                    ->where('id', $session->id)
-                    ->update($updateSession);
+                if (!empty($updateSession)) {
+                    $sessionModel
+                        ->where('id', $session->id)
+                        ->update($updateSession);
+                }
 
                 $session = $output;
 
