@@ -26,6 +26,162 @@ final class User
 
     public function account(Request $request, Response $response)
     {
+
+        global $kxAuthToken, $kxSession;
+
+        if ($request->getRequestMethod() === 'POST' && $request->getHeader('Accept') === 'application/json' && !empty($kxAuthToken)) {
+
+            $return = [
+                'status' => true,
+                'notify' => [],
+            ];
+
+            extract(Helper::input([
+                'first_name' => 'nulled_text',
+                'last_name' => 'nulled_text',
+                'email' => 'email',
+                'birthdate' => 'nulled_text',
+                'password' => 'nulled_text',
+                'password_again' => 'nulled_text',
+            ], $request->getPostParams()));
+
+            if (!empty($birthdate)) {
+                $birthdate = (string)strtotime($birthdate);
+            }
+
+            $v = [
+                'first_name' => ['value' => $first_name, 'pattern' => 'required|min:2|max:50'],
+                'last_name' => ['value' => $last_name, 'pattern' => 'required|min:2|max:50'],
+                'email' => ['value' => $email, 'pattern' => 'required|email'],
+                'password' => ['value' => $password, 'pattern' => 'min:6|max:20'],
+                'password_again' => ['value' => $password_again, 'pattern' => 'min:6|max:20|match:' . $password],
+            ];
+
+            if (empty($password)) {
+                unset($v['password']);
+                unset($v['password_again']);
+            }
+
+            $validation = Helper::validation($v);
+
+            if (!empty($validation)) {
+                $return['dom'] = [];
+                foreach ($validation as $field => $messages) {
+                    $return['dom']['[name="' . $field . '"]'] = [
+                        'addClass' => 'is-invalid',
+                    ];
+
+                    $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
+                        'text' => implode(' ', $messages)
+                    ];
+                }
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('form.fill_all_fields')
+                ];
+            } else {
+
+                $userModel = new Users();
+                $currentData = Helper::sessionData('user');
+
+                if ($currentData) {
+                    if ($currentData->status === 'deleted') {
+                        $return['status'] = false;
+                        $return['notify'][] = [
+                            'type' => 'error',
+                            'message' => Helper::lang('auth.your_account_deleted')
+                        ];
+                    } else {
+
+                        $newData = [];
+                        $emailUpdated = false;
+
+                        if ($currentData->f_name !== $first_name) {
+                            $newData['f_name'] = $first_name;
+                        }
+
+                        if ($currentData->l_name !== $last_name) {
+                            $newData['l_name'] = $last_name;
+                        }
+
+                        if ($currentData->email !== $email) {
+                            $newData['email'] = $email;
+                            $emailUpdated = true;
+
+                            // check other email
+                            $checkEmail = $userModel->select('id')->where('email', $email)->get();
+                            if ($checkEmail) {
+                                $return['status'] = false;
+                                $return['dom']['[name="email"]'] = [
+                                    'addClass' => 'is-invalid',
+                                ];
+                                $return['dom']['[name="email"] ~ .invalid-feedback'] = [
+                                    'text' => Helper::lang('auth.email_already_exists')
+                                ];
+                                return $response->json($return);
+                            }
+                        }
+
+                        if (!empty($birthdate) && $birthdate !== $currentData->b_date) {
+                            $newData['b_date'] = $birthdate;
+                        }
+
+                        if (!empty($password)) {
+                            $newData['password'] = password_hash($password, PASSWORD_DEFAULT);
+                        }
+
+                        if (!empty($newData)) {
+
+                            if ($emailUpdated) {
+                                $newData['status'] = 'passive';
+                                $newData['token'] = Helper::tokenGenerator(80);
+                            }
+
+                            $update = $userModel->where('id', $currentData->id)->update($newData);
+                            if ($update) {
+
+                                if ($emailUpdated) {
+                                    $notificationController = new Notification();
+                                    $notificationController->createNotification('email_change', [
+                                        'id' => $currentData->id,
+                                        'u_name' => $currentData->u_name,
+                                        'email' => $email,
+                                        'token' => $newData['token'],
+                                    ]);
+                                }
+                                $return['notify'][] = [
+                                    'type' => 'success',
+                                    'message' => Helper::lang('auth.account_updated')
+                                ];
+                            } else {
+                                $return['notify'][] = [
+                                    'type' => 'error',
+                                    'message' => Helper::lang('auth.a_problem_has_occurred')
+                                ];
+                            }
+                        } else {
+                            $return['notify'][] = [
+                                'type' => 'warning',
+                                'message' => Helper::lang('base.nothing_changed')
+                            ];
+                        }
+
+                        return $response->json($return);
+                    }
+                } else {
+                    $return['status'] = false;
+                    $return['notify'][] = [
+                        'type' => 'error',
+                        'message' => Helper::lang('auth.account_not_found')
+                    ];
+                }
+            }
+
+            return $response->json($return);
+        }
+
+
         return $response->render('auth/account', [
             'title' => Helper::lang('auth.account'),
             'description' => Helper::lang('auth.account_desc'),
@@ -36,14 +192,140 @@ final class User
         ], 'layout');
     }
 
+    public function heartbeat(Request $request, Response $response)
+    {
+        $return = [
+            'status' => true,
+            'message' => 'OK',
+            // 'heart_beat_stop' => true
+        ];
+
+        if ($request->getRequestMethod() === 'POST' && $request->getHeader('Accept') === 'application/json') {
+            if (empty(Helper::sessionData('user'))) {
+                $return['status'] = false;
+                $return['message'] = Helper::lang('auth.session_expired');
+                $return['redirect'] = [
+                    'url' => Helper::base('auth/login'),
+                    'time' => 3000,
+                    'direct' => true
+                ];
+            } else {
+                // check notifications
+                $notificationController = new Notification();
+                $notificationCount = $notificationController->getUnreadNotificationCount(
+                    Helper::sessionData('user')->id
+                );
+
+                $return['dom'] = [
+                    '.notification-count' => [
+                        'text' => $notificationCount > 99 ? '99+' : $notificationCount,
+                        'removeClass' => $notificationCount > 0 ? 'd-none' : '',
+                        'addClass' => $notificationCount > 0 ? '' : 'd-none',
+                    ],
+                    '.notification-dot' => [
+                        'removeClass' => $notificationCount > 0 ? 'd-none' : '',
+                        'addClass' => $notificationCount > 0 ? '' : 'd-none',
+                    ],
+                    '.notification-list' => [
+                        'html' => $notificationController->getNotificationList(
+                            Helper::sessionData('user')->id
+                        )
+                    ],
+                ];
+            }
+        }
+
+
+
+        return $response->json($return);
+    }
+
+    public function notificationAction(Request $request, Response $response)
+    {
+        $return = [
+            'status' => true,
+            'notify' => [],
+        ];
+
+        extract(Helper::input([
+            'action' => 'nulled_text',
+            'id' => 'nulled_text',
+        ], $request->getRouteDetails()->attributes));
+
+        if (!empty($action) && !empty($id)) {
+
+            $notificationController = new Notification();
+            $notification = $notificationController->getNotification($id);
+
+            if ($notification && $notification->user_id == Helper::sessionData('user')->id) {
+                $update = false;
+                switch ($action) {
+                    case 'view':
+                        $update = $notificationController->updateNotification($id, [
+                            'status' => 'viewed',
+                            'viewed_at' => time(),
+                        ]);
+                        break;
+                    case 'delete':
+                        $update = $notificationController->updateNotification($id, [
+                            'status' => 'deleted',
+                            'deleted_at' => time(),
+                        ]);
+                        break;
+                }
+
+                if ($update) {
+                    $return['dom'] = [
+                        '.notification-' . $id => [
+                            'remove' => true
+                        ],
+                        '.notification-list' => [
+                            'html' => $notificationController->getNotificationList(
+                                Helper::sessionData('user')->id
+                            )
+                        ],
+                    ];
+                } else {
+                    $return['status'] = false;
+                    $return['notify'][] = [
+                        'type' => 'error',
+                        'message' => Helper::lang('auth.a_problem_has_occurred')
+                    ];
+                }
+            } else {
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('auth.notification_not_found')
+                ];
+            }
+        } else {
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('auth.notification_not_found')
+            ];
+        }
+
+        if ($return['status']) {
+            $return['heart_beat_direct'] = true;
+        }
+
+        return $response->json($return);
+    }
+
     public function notifications(Request $request, Response $response)
     {
+        $notificationController = new Notification();
         return $response->render('auth/account', [
             'title' => Helper::lang('base.notifications'),
             'description' => Helper::lang('base.notifications_desc'),
             'headTitle' => Helper::lang('auth.account'),
             'headSubtitle' => Helper::lang('base.notifications'),
             'section' => 'notifications',
+            'notificationList' => $notificationController->getNotificationList(
+                Helper::sessionData('user')->id
+            ),
             'auth' => $request->getMiddlewareParams(),
         ], 'layout');
     }
