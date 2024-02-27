@@ -7,7 +7,9 @@
     if (isset($description) !== false) {
         echo '<meta name="description" content="' . $description . '">' . PHP_EOL;
     }   ?>
+    <link href="<?php echo $Helper::assets('libs/flatpickr/flatpickr.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('libs/tabler/tabler.min.css'); ?>" rel="stylesheet">
+    <link href="<?php echo $Helper::assets('libs/tabler/tabler.vendors.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('libs/nprogress/nprogress.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('libs/tabler-icons/tabler-icons.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('libs/toastify/toastify.min.css'); ?>" rel="stylesheet">
