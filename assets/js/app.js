@@ -1,6 +1,20 @@
+String.prototype.hashCode = function () {
+  var hash = 0,
+    i,
+    chr;
+  if (this.length === 0) return hash;
+  for (i = 0; i < this.length; i++) {
+    chr = this.charCodeAt(i);
+    hash = (hash << 5) - hash + chr;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return hash;
+};
+
 class KalipsoXJS {
   // version
   version = "1.0.0";
+  lang = "en";
 
   constructor() {
     this.init();
@@ -11,11 +25,38 @@ class KalipsoXJS {
     // Scroll to top
     $("html, body").animate({ scrollTop: 0 }, "slow");
 
+    this.dateTime = luxon.DateTime;
+
+    console.log("KalipsoXJS v" + this.version + " initialized!");
+
+    this.lang = document.documentElement.lang;
+
     // Event listeners
     $(document).off("click", "[data-kx-action]");
-    $(document).on("click", "[data-kx-action]", (e) => {
+    $(document).on("click", "[data-kx-action]", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
       const el = e.target;
       const action = el.getAttribute("data-kx-action");
+
+      if (el.getAttribute("data-kx-again") !== null) {
+        if (el.getAttribute("data-kx-again") !== "waiting") {
+          el.setAttribute("data-kx-again", "waiting");
+          el.querySelector("i.ti").classList.value = el
+            .querySelector("i.ti")
+            .classList.value.replace("ti-", "ti--");
+          el.querySelector("i.ti").classList.add("ti-question-mark");
+          setTimeout(() => {
+            el.setAttribute("data-kx-again", "");
+            el.querySelector("i.ti").classList.value = el
+              .querySelector("i.ti")
+              .classList.value.replace("ti--", "ti-");
+            el.querySelector("i.ti").classList.remove("ti-question-mark");
+          }, 3000);
+          return;
+        }
+      }
+
       switch (action) {
         case "toggle_theme":
           const newTheme =
@@ -41,14 +82,34 @@ class KalipsoXJS {
             }
           }
           break;
+
+        case "set_new_password":
+          $('[data-kx-action="set_new_password"]').addClass("d-none");
+          $(".set-new-password").removeClass("d-none");
+          break;
         default:
+          // direct send request
+          const data = el.getAttribute("data-kx-body")
+            ? JSON.parse(el.getAttribute("data-kx-body"))
+            : {};
+          const res = await this.sendRequest(action, "POST", data);
+          this.pullResponse(res);
           break;
       }
     });
 
-    const picker = new Litepicker({
-      element: document.getElementById("dpicker"),
+    const dateBirthPicker = flatpickr(".date-birth", {
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "F j, Y",
+      minDate: this.dateTime.local().minus({ years: 75 }).toISODate(),
+      maxDate: this.dateTime.local().minus({ years: 15 }).toISODate(),
+      locale: this.lang,
     });
+
+    if ($("body").hasClass("dashboard")) {
+      this.startHeartbeat();
+    }
 
     // Form submit
     $('form[data-kx-form]:not([data-kx-form="direct"])').each((i, form) => {
@@ -148,8 +209,15 @@ class KalipsoXJS {
     this.pullResponse(response, event.target);
   }
 
-  async sendRequest(url = null, method = "POST", data = {}) {
-    NProgress.inc();
+  async sendRequest(
+    url = null,
+    method = "POST",
+    data = {},
+    progressBar = true
+  ) {
+    if (progressBar) {
+      NProgress.inc();
+    }
     url = url ?? window.location.href;
 
     method = method ?? "POST";
@@ -229,7 +297,9 @@ class KalipsoXJS {
           "error"
         );
       });
-    NProgress.done();
+    if (progressBar) {
+      NProgress.done();
+    }
     return ret;
   }
 
@@ -238,22 +308,30 @@ class KalipsoXJS {
       form = $("form");
     }
     if (data && typeof data === "object") {
+      // notify
       if (typeof data.notify !== "undefined" && data.notify.length > 0) {
         data.notify.forEach((alert) => {
           this.notify(alert.message, alert.type);
         });
       }
 
+      // dom manipulation
       if (typeof data.dom !== "undefined" && Object.keys(data.dom).length > 0) {
         for (const [selector, manipulationData] of Object.entries(data.dom)) {
           if ($(selector)) {
             for (const [key, value] of Object.entries(manipulationData)) {
               switch (key) {
                 case "html":
-                  $(selector).html(value);
+                  let currentHtml = $(selector).html();
+                  if (currentHtml !== value) {
+                    $(selector).html(value);
+                  }
                   break;
                 case "text":
-                  $(selector).text(value);
+                  let currentText = $(selector).text();
+                  if (currentText !== value) {
+                    $(selector).text(value);
+                  }
                   break;
                 case "append":
                   $(selector).append(value);
@@ -271,10 +349,14 @@ class KalipsoXJS {
                   $(selector).remove();
                   break;
                 case "addClass":
-                  $(selector).addClass(value);
+                  if (!$(selector).hasClass(value)) {
+                    $(selector).addClass(value);
+                  }
                   break;
                 case "removeClass":
-                  $(selector).removeClass(value);
+                  if ($(selector).hasClass(value)) {
+                    $(selector).removeClass(value);
+                  }
                   break;
                 case "toggleClass":
                   $(selector).toggleClass(value);
@@ -345,8 +427,25 @@ class KalipsoXJS {
         }
       }
 
+      // form reset
       if (typeof data.form_reset !== "undefined" && data.form_reset === true) {
         $(form).trigger("reset");
+      }
+
+      // form validation
+      if (
+        typeof data.heart_beat_stop !== "undefined" &&
+        data.heart_beat_stop === true
+      ) {
+        clearInterval(window.kxHeartbeat);
+      }
+
+      // heart beat direct
+      if (
+        typeof data.heart_beat_direct !== "undefined" &&
+        data.heart_beat_direct
+      ) {
+        this.heartBeat();
       }
     }
   }
@@ -398,13 +497,38 @@ class KalipsoXJS {
       escapeMarkup: false,
     }).showToast();
   }
+
+  async heartBeat() {
+    const response = await this.sendRequest(
+      "/auth/heartbeat",
+      "POST",
+      {},
+      false
+    );
+    if (response && typeof response === "object") {
+      this.pullResponse(response);
+      if (response.heartBeatStop) {
+        clearInterval(window.kxHeartbeat);
+      }
+    }
+  }
+
+  async startHeartbeat() {
+    const heartbeat = () => {
+      this.heartBeat();
+    };
+    this.heartBeat();
+    if (window.kxHeartbeat === undefined) {
+      window.kxHeartbeat = setInterval(heartbeat, 5000);
+    }
+  }
 }
 
 (function (w) {
   // Initialize
   NProgress.start();
 
-  $(document).pjax('a:not([target="_blank"])', "body");
+  $(document).pjax('a:not([target="_blank"]):not([data-direct])', "body");
   $(document).on("submit", 'form[data-kx-form="direct"]', function (event) {
     $.pjax.submit(event, "body");
   });
