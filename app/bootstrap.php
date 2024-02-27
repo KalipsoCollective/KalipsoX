@@ -1,22 +1,16 @@
 <?php
 
 /**
- * Basic constants
- **/
-define('KX_START', microtime(true)); // We use it for the exec. time recorded in the log.
-define('KX_ROOT',  rtrim($_SERVER["DOCUMENT_ROOT"], '/').'/');
-
-/**
  * Shutdown function registration
  **/
-register_shutdown_function( function() {
+register_shutdown_function(function () {
     KX\Core\Exception::fatalHandler();
 });
 
 /**
  * Error handler set
  **/
-set_error_handler( function($level, $error, $file, $line) {
+set_error_handler(function ($level, $error, $file, $line) {
     if (0 === error_reporting()) {
         return false;
     }
@@ -26,7 +20,7 @@ set_error_handler( function($level, $error, $file, $line) {
 /**
  * Exception handler set
  **/
-set_exception_handler( function($e) {
+set_exception_handler(function ($e) {
     KX\Core\Exception::exceptionHandler($e);
 });
 
