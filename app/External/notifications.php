@@ -85,34 +85,24 @@ return [
             ]
         ];
     },
-    /*
-    // Emal Change -> Again Verify
-    'email_change' => function ($hook, $external = null) {
+    'email_change' => function ($details) {
 
-        $title = Helper::lang('notification.email_change_email_title');
-        $name = (empty($external['first_name']) ? $external['user_name'] : $external['first_name']);
-        $link = '<a href="' . $hook->container->url('/') . '?verify-account=' . $external['token'] . '">
-            ' . Helper::lang('base.verify_email') . '
-        </a>';
-        $body = str_replace(
-            ['[USER]', '[VERIFY_LINK]', '[CHANGES]'],
-            [$name, $link, $external['changes']],
-            (string) Helper::lang('notification.email_change_email_body')
-        );
-
-        $email = $hook->addEmail([
-            'title' => $title,
-            'body' => $body,
-            'recipient' => $external['user_name'],
-            'recipient_email' => $external['email'],
-            'recipient_id' => $external['id'],
-            'token' => $external['token']
-        ]);
-
-        if ($email)
-            return true;
-        else
-            return null;
-    }, */
+        return [
+            'notification' => [
+                'title' => 'notification.email_change_title',
+                'body' => 'notification.email_change_body',
+                'url' => null,
+                'parameters' => [],
+            ],
+            'email' => [
+                'title' => Helper::lang('notification.email_change_email_title'),
+                'body' => Helper::lang('notification.email_change_email_body', [
+                    'user' => $details['u_name'],
+                    'link_url' => Helper::base('/auth/verify-account?token=' . $details['token']),
+                    'link_text' => Helper::lang('auth.verify_account'),
+                ]),
+            ]
+        ];
+    },
 
 ];
