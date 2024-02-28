@@ -229,13 +229,11 @@ final class User
                     '.notification-list' => [
                         'html' => $notificationController->getNotificationList(
                             Helper::sessionData('user')->id
-                        )
+                        )['list']
                     ],
                 ];
             }
         }
-
-
 
         return $response->json($return);
     }
@@ -279,7 +277,7 @@ final class User
                         '.notification-list' => [
                             'html' => $notificationController->getNotificationList(
                                 Helper::sessionData('user')->id
-                            )
+                            )['list']
                         ],
                     ];
 
@@ -323,32 +321,84 @@ final class User
 
     public function notifications(Request $request, Response $response)
     {
-        $page = $request->getParam('page') ?? 1;
 
+        $page = $request->getParam('page') ?? 1;
         $notificationController = new Notification();
+
+        if ($request->getRequestMethod() === 'POST' && $request->getHeader('Accept') === 'application/json') {
+
+            $notificationList = $notificationController->getNotificationList(
+                Helper::sessionData('user')->id,
+                $page,
+                false,
+                false
+            );
+
+            $return = [
+                'status' => true,
+            ];
+
+            if (!empty($notificationList['notifications'])) {
+                $return['dom'] = [
+                    '.page-wrapper .list-group-notification' => [
+                        'append' => $notificationList['list']
+                    ],
+                    '.page-wrapper .more-notifications a' => [
+                        'attr' => [
+                            'data-kx-action' => Helper::base('auth/notifications?page=' . ($page + 1))
+                        ]
+                    ],
+                ];
+            } else {
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'warning',
+                    'message' => Helper::lang('base.no_more_notifications')
+                ];
+                $return['dom'] = [
+                    '.page-wrapper .card-footer' => [
+                        'remove' => true
+                    ],
+                ];
+            }
+
+            return $response->json($return);
+        } else {
+
+            $notificationList = $notificationController->getNotificationList(
+                Helper::sessionData('user')->id,
+                $page,
+                false
+            );
+        }
+
         return $response->render('auth/account', [
             'title' => Helper::lang('base.notifications'),
             'description' => Helper::lang('base.notifications_desc'),
             'headTitle' => Helper::lang('auth.account'),
             'headSubtitle' => Helper::lang('base.notifications'),
             'section' => 'notifications',
-            'notificationList' => $notificationController->getNotificationList(
-                Helper::sessionData('user')->id,
-                $page,
-                false
-            ),
+            'notificationList' => $notificationList['list'],
+            'notifications' => $notificationList['notifications'],
             'auth' => $request->getMiddlewareParams(),
         ], 'layout');
     }
 
     public function sessions(Request $request, Response $response)
     {
+        $sessionModel = new Sessions();
+        $sessions = $sessionModel
+            ->where('user_id', Helper::sessionData('user')->id)
+            ->orderBy('last_act_on', 'desc')
+            ->getAll();
+
         return $response->render('auth/account', [
             'title' => Helper::lang('auth.sessions'),
             'description' => Helper::lang('auth.sessions_desc'),
             'headTitle' => Helper::lang('auth.account'),
             'headSubtitle' => Helper::lang('auth.sessions'),
             'section' => 'sessions',
+            'sessions' => $sessions,
             'auth' => $request->getMiddlewareParams(),
         ], 'layout');
     }
@@ -875,7 +925,10 @@ final class User
     {
         global $kxAuthToken, $kxSession;
 
-        $type = $request->getParam('type') ?? null;
+        $redirect = false;
+        $type = isset($request->getRouteDetails()->attributes['type']) !== false ?
+            $request->getRouteDetails()->attributes['type'] :
+            null;
         if ($type === 'all') {
             $sessionModel = new Sessions();
             $sessionModel
@@ -894,7 +947,41 @@ final class User
                 ->where('user_id', $kxSession->user->id)
                 ->delete();
         }
-        $currentUrl = $request->getUri();
-        return $response->redirect($currentUrl, 302)->runRedirection();
+
+        $checkThisSession = $sessionModel
+            ->select('id')
+            ->where('auth_token', $kxAuthToken)
+            ->where('user_id', $kxSession->user->id)
+            ->get();
+
+        if (!$checkThisSession) {
+            $redirect = true;
+        }
+
+        if ($request->getRequestMethod() === 'POST' && $request->getHeader('Accept') === 'application/json') {
+            $return = [
+                'status' => true,
+            ];
+            if ($redirect) {
+                $return['redirect'] = [
+                    'url' => Helper::base('auth/login'),
+                    'time' => 500,
+                    'direct' => true
+                ];
+            }
+
+            if (is_numeric($type) && $return['status']) {
+                $return['dom'] = [
+                    '.sessions-' . $type => [
+                        'remove' => true,
+                    ],
+                ];
+            }
+
+            return $response->json($return);
+        } else {
+            $currentUrl = $request->getUri();
+            return $response->redirect($currentUrl, 302)->runRedirection();
+        }
     }
 }
