@@ -15,7 +15,8 @@
             <?php $routes = require $Helper::path('app/External/sidebar_routes.php');
             if (!empty($routes)) {
 
-                echo '<ul class="navbar-nav pt-lg-3">';
+                echo '
+                <ul class="navbar-nav">';
                 // 3-level sidebar menu
                 $subLinks = '';
                 foreach ($routes as $name => $details) { // Level 1
