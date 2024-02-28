@@ -276,15 +276,22 @@ final class User
 
                 if ($update) {
                     $return['dom'] = [
-                        '.notification-' . $id => [
-                            'remove' => true
-                        ],
                         '.notification-list' => [
                             'html' => $notificationController->getNotificationList(
                                 Helper::sessionData('user')->id
                             )
                         ],
                     ];
+
+                    if ($action === 'delete') {
+                        $return['dom']['.notification-' . $id] = [
+                            'remove' => true,
+                        ];
+                    } elseif ($action === 'view') {
+                        $return['dom']['.notification-' . $id . ' .status-dot'] = [
+                            'removeClass' => 'status-dot-animated bg-green',
+                        ];
+                    }
                 } else {
                     $return['status'] = false;
                     $return['notify'][] = [
@@ -316,6 +323,8 @@ final class User
 
     public function notifications(Request $request, Response $response)
     {
+        $page = $request->getParam('page') ?? 1;
+
         $notificationController = new Notification();
         return $response->render('auth/account', [
             'title' => Helper::lang('base.notifications'),
@@ -324,7 +333,9 @@ final class User
             'headSubtitle' => Helper::lang('base.notifications'),
             'section' => 'notifications',
             'notificationList' => $notificationController->getNotificationList(
-                Helper::sessionData('user')->id
+                Helper::sessionData('user')->id,
+                $page,
+                false
             ),
             'auth' => $request->getMiddlewareParams(),
         ], 'layout');
