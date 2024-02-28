@@ -2,6 +2,11 @@
     <script src="<?php echo $Helper::assets('libs/tabler/tabler.min.js'); ?>"></script>
     <script src="<?php echo $Helper::assets('libs/jquery/jquery.min.js'); ?>"></script>
     <script src="<?php echo $Helper::assets('libs/jquery-pjax/jquery.pjax.min.js'); ?>"></script>
+    <script src="<?php echo $Helper::assets('libs/jquery-timeago/jquery.timeago.min.js'); ?>"></script>
+    <?php global $kxLang;
+    if ($kxLang === 'tr') { ?>
+        <script src="<?php echo $Helper::assets('libs/jquery-timeago/locale/tr.min.js'); ?>"></script>
+    <?php } ?>
     <script src="<?php echo $Helper::assets('libs/flatpickr/flatpickr.min.js'); ?>"></script>
     <script src="<?php echo $Helper::assets('libs/flatpickr/locale/tr.min.js'); ?>"></script>
     <script src="<?php echo $Helper::assets('libs/luxon/luxon.min.js'); ?>"></script>
