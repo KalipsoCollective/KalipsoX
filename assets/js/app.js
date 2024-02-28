@@ -107,6 +107,8 @@ class KalipsoXJS {
       locale: this.lang,
     });
 
+    $("time.timeago").timeago();
+
     if ($("body").hasClass("dashboard")) {
       this.startHeartbeat();
     }
@@ -303,6 +305,13 @@ class KalipsoXJS {
     return ret;
   }
 
+  checkHtmlStringsEqual(str1, str2) {
+    var $div1 = $("<div>").html(str1);
+    var $div2 = $("<div>").html(str2);
+
+    return $div1.text() === $div2.text();
+  }
+
   pullResponse(data, form = null) {
     if (form === null) {
       form = $("form");
@@ -323,7 +332,7 @@ class KalipsoXJS {
               switch (key) {
                 case "html":
                   let currentHtml = $(selector).html();
-                  if (currentHtml !== value) {
+                  if (!this.checkHtmlStringsEqual(currentHtml, value)) {
                     $(selector).html(value);
                   }
                   break;
@@ -393,6 +402,7 @@ class KalipsoXJS {
             }
           }
         }
+        $("time.timeago").timeago();
       }
 
       // redirect
