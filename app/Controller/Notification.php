@@ -227,17 +227,17 @@ final class Notification
         return (int)$notifications;
     }
 
-    public function getNotificationList($userId, $mini = true)
+    public function getNotificationList($userId, $page = 1, $mini = true, $withParent = true)
     {
 
-        $limit = 20;
-        $page = 1;
+        $limit = $mini ? 15 : 20;
         $return = '';
 
         $notifications = $this->getNotifications($userId, $limit, $page);
+        // $notifications = [];
 
         if (!empty($notifications)) {
-            $return = '<div class="list-group list-group-flush list-group-hoverable list-group-notification">';
+            $return = $withParent ? '<div class="list-group list-group-flush list-group-hoverable list-group-notification">' : '';
             foreach ($notifications as $notification) {
 
                 $notification->details = json_decode($notification->details);
@@ -262,15 +262,18 @@ final class Notification
                     </div>
                 </div>';
             }
-            $return .= '</div>';
+            $return .= $withParent ? '</div>' : '';
         } else {
             $return = '
             <div class="card-body">
-                <p class="text-center text-muted">' . Helper::lang('base.no_notifications') . '</p>
+                <p class="text-center text-muted h-100 d-flex align-items-center justify-content-center">' . Helper::lang('base.no_notifications') . '</p>
             </div>';
         }
 
-        return $return;
+        return [
+            'list' => $return,
+            'notifications' => $notifications
+        ];
     }
 
     public function getNotification($id)
