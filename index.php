@@ -72,6 +72,7 @@ try {
         [['POST', 'GET'], '/settings', 'Panel@settings', 'Auth@isAuthorized'],
         [['POST', 'GET'], '/users', 'Panel@users', 'Auth@isAuthorized'],
         [['POST', 'GET'], '/user-roles', 'Panel@userRoles', 'Auth@isAuthorized'],
+        [['POST', 'GET'], '/data/:table', 'Panel@tableData', 'Auth@isAuthorized'],
     ]);
 
     // inital setup and app routes
