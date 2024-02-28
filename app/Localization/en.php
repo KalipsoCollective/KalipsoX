@@ -83,6 +83,8 @@ return [
         'birthdate' => 'Birthdate',
         'password_change_desc' => 'You can change your password anytime.',
         'set_new_password' => 'Set New Password',
+        'sessions_delete_all' => 'Close All Sessions',
+        'role' => 'Role',
     ],
     'form' => [
         'fill_all_fields' => 'Please fill in all fields.',
@@ -146,5 +148,12 @@ return [
         'nothing_changed' => 'Nothing changed.',
         'see_all' => 'See All',
         'no_notifications' => 'You have no notifications yet.',
+        'more' => 'More',
+        'no_more_data' => 'No more data.',
+        'no_more_notifications' => 'No more notifications.',
+        'status' => 'Status',
+        'created_at' => 'Created At',
+        'updated_at' => 'Updated At',
+        'actions' => 'Actions',
     ],
 ];

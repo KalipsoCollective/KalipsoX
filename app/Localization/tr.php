@@ -83,6 +83,8 @@ return [
         'birthdate' => 'Doğum Tarihi',
         'password_change_desc' => 'Şifrenizi istediğiniz zaman değiştirebilirsiniz.',
         'set_new_password' => 'Yeni Şifre Belirle',
+        'sessions_delete_all' => 'Tüm Oturumları Kapat',
+        'role' => 'Rol',
     ],
     'form' => [
         'fill_all_fields' => 'Lütfen tüm alanları doldurunuz.',
@@ -146,5 +148,12 @@ return [
         'nothing_changed' => 'Değişiklik yapılmadı.',
         'see_all' => 'Hepsini Gör',
         'no_notifications' => 'Henüz bildiriminiz yok.',
+        'more' => 'Daha Fazla',
+        'no_more_data' => 'Daha fazla veri yok.',
+        'no_more_notifications' => 'Daha fazla bildirim yok.',
+        'status' => 'Durum',
+        'created_at' => 'Oluşturulma Tarihi',
+        'updated_at' => 'Güncellenme Tarihi',
+        'actions' => 'İşlemler',
     ],
 ];
