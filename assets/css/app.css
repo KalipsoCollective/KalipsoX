@@ -20,7 +20,8 @@
   font-family: "Inter";
   font-style: normal;
   font-weight: 400;
-  src: url("../fonts/inter/inter-v12-latin_latin-ext-regular.woff2") format("woff2");
+  src: url("../fonts/inter/inter-v12-latin_latin-ext-regular.woff2")
+    format("woff2");
 }
 
 @font-face {
@@ -91,23 +92,30 @@ a:visited {
   text-decoration: none !important;
 }
 
-[data-bs-theme="dark"] :is(.form-control:not(.form-control-flush):focus,
-  .form-check-input:focus,
-  .input-group-flat:focus-within .form-control:not(.form-control-flush),
-  .input-group-flat:focus-within .form-control:not(.form-control-flush) ~ .input-group-text) {
+[data-bs-theme="dark"]
+  :is(
+    .form-control:not(.form-control-flush):focus,
+    .form-check-input:focus,
+    .input-group-flat:focus-within .form-control:not(.form-control-flush),
+    .input-group-flat:focus-within
+      .form-control:not(.form-control-flush)
+      ~ .input-group-text
+  ) {
   border-color: #4c75a6 !important;
 }
 
-.form-control.is-valid:not(.form-control-flush):not(:focus)~.input-group-text {
+.form-control.is-valid:not(.form-control-flush):not(:focus)
+  ~ .input-group-text {
   border-color: var(--tblr-form-valid-border-color) !important;
 }
 
-.form-control.is-invalid:not(.form-control-flush):not(:focus)~.input-group-text {
+.form-control.is-invalid:not(.form-control-flush):not(:focus)
+  ~ .input-group-text {
   border-color: var(--tblr-form-invalid-border-color) !important;
 }
 
-a>*,
-button>* {
+a > *,
+button > * {
   pointer-events: none;
 }
 
@@ -199,7 +207,7 @@ button {
   --tblr-dropdown-divider-margin-y: 0.2rem;
 }
 
-.dropdown-menu .dropdown-item+.dropdown-item {
+.dropdown-menu .dropdown-item + .dropdown-item {
   margin-top: 0.2rem;
 }
 
@@ -248,6 +256,11 @@ button {
   max-height: 40vh;
   overflow: hidden;
   overflow-y: auto;
+}
+
+.timeago {
+  letter-spacing: 0;
+  font-size: 70%;
 }
 
 @media (min-width: 992px) {
