@@ -148,6 +148,11 @@ class KalipsoXJS {
       return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
+    // datatables
+    if ($.fn.DataTable) {
+      this.prepareDatatables();
+    }
+
     if (firstLoad) {
       setTimeout(() => {
         NProgress.done();
@@ -531,6 +536,119 @@ class KalipsoXJS {
     if (window.kxHeartbeat === undefined) {
       window.kxHeartbeat = setInterval(heartbeat, 5000);
     }
+  }
+
+  prepareDatatables() {
+    $.fn.dataTable.ext.errMode = "none";
+
+    if (window.kxTables === undefined) {
+      window.kxTables = {};
+    }
+
+    $("[data-kx-table]").each((i, table) => {
+      const tableKey = table.getAttribute("data-kx-table");
+      if (window.kxTables[tableKey]) {
+        window.kxTables[tableKey].destroy();
+      }
+      const options = {
+        processing: true,
+        serverSide: true,
+        // responsive: true,
+        deferRender: true,
+        stateSave: true,
+        stateDuration: 0,
+        stateLoadParams: function (settings, data) {
+          for (let i = 0; i < data.columns.length; i++) {
+            if (typeof data.columns[i].search !== "undefined") {
+              let colSearchVal = data.columns[i].search.search;
+              if (colSearchVal !== "") {
+                $("input, select", $("#" + settings.sTableId + " tfoot th")[i])
+                  .val(colSearchVal)
+                  .change();
+              }
+            }
+          }
+        },
+        dom:
+          "<'row'<'col-sm-6'l><'col-sm-6 text-right'B>>" +
+          "<'row'<'col-sm-12'<'table-responsive'tr>>>" +
+          "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        buttons: [
+          "colvis",
+          {
+            extend: "copyHtml5",
+            charset: "utf-8",
+            exportOptions: {
+              columns: ":visible",
+            },
+          },
+          {
+            extend: "excelHtml5",
+            charset: "utf-8",
+            exportOptions: {
+              columns: ":visible",
+            },
+          },
+          {
+            extend: "csvHtml5",
+            charset: "utf-8",
+            exportOptions: {
+              columns: ":visible",
+            },
+          },
+        ],
+        lengthMenu: [
+          [10, 25, 50, 100, -1],
+          [10, 25, 50, 100, "All"],
+        ],
+        ajax: {
+          url: table.getAttribute("data-kx-url"),
+          type: "POST",
+        },
+        /*
+        language: {
+          url: "/assets/vendor/datatables/" + this.lang + ".json",
+          buttons: {
+            colvis: "Change columns",
+            copy: "Copy",
+            copyTitle: "Copied to clipboard",
+            copySuccess: {
+              _: "%d rows copied",
+              1: "1 row copied",
+            },
+            print: "Print",
+          },
+        }, */
+        autoWidth: false,
+        columns: JSON.parse(table.getAttribute("data-kx-columns")),
+        order: JSON.parse(table.getAttribute("data-kx-order")),
+        initComplete: function () {
+          this.api()
+            .columns()
+            .every(function () {
+              var that = this;
+              var column = this;
+
+              $("input", this.footer()).on("keyup change clear", function () {
+                if (that.search() !== this.value) {
+                  that.search(this.value).draw();
+                }
+              });
+
+              $("select", this.footer()).on("change clear", function () {
+                if (that.search() !== this.value) {
+                  if (this.value === "") {
+                    that.search(this.value).draw();
+                  } else {
+                    that.search(this.value, true, false).draw();
+                  }
+                }
+              });
+            });
+        },
+      };
+      window.kxTables[tableKey] = $(table).DataTable(options);
+    });
   }
 }
 
