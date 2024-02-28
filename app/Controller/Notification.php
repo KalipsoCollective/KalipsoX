@@ -227,16 +227,17 @@ final class Notification
         return (int)$notifications;
     }
 
-    public function getNotificationList($userId)
+    public function getNotificationList($userId, $mini = true)
     {
 
         $limit = 20;
+        $page = 1;
         $return = '';
 
-        $notifications = $this->getNotifications($userId, $limit, 1);
+        $notifications = $this->getNotifications($userId, $limit, $page);
 
         if (!empty($notifications)) {
-            $return = '<div class="list-group list-group-flush list-group-hoverable">';
+            $return = '<div class="list-group list-group-flush list-group-hoverable list-group-notification">';
             foreach ($notifications as $notification) {
 
                 $notification->details = json_decode($notification->details);
@@ -244,11 +245,12 @@ final class Notification
                 <div class="list-group-item notification-' . $notification->id . '">
                     <div class="row align-items-center">
                         <div class="col-auto"><span class="status-dot d-block' . ($notification->status === 'active' ? ' status-dot-animated bg-green' : '') . '"></span></div>
-                        <div class="col text-truncate">
-                            <a href="javascript:;" ' . ($notification->status === 'active' ? 'data-kx-action="' . Helper::base('auth/notifications/view/' . $notification->id) . '" ' : '') . 'class="text-body d-block">
+                        <div class="col' . ($mini ? '  text-truncate' : '') . '">
+                            <a href="javascript:;" ' . ($notification->status === 'active' ? 'data-kx-action="' . Helper::base('auth/notifications/view/' . $notification->id) . '" ' : '') . 'class="text-body d-inline-block">
                                 ' . Helper::lang($notification->details->title) . '
                             </a>
-                            <div class="d-block text-secondary text-truncate mt-n1">
+                            <time class="ms-2 timeago badge badge-outline text-blue" datetime="' . date('c', (int)$notification->created_at) . '">' . date('d.m H:i', (int)$notification->created_at) . '</time>
+                            <div class="d-block text-secondary mt-n1' . ($mini ? '  text-truncate' : '') . '" title="' . Helper::lang($notification->details->body) . '">
                                 ' . Helper::lang($notification->details->body) . '
                             </div>
                         </div>
