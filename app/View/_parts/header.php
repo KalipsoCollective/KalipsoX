@@ -12,6 +12,7 @@
     <link href="<?php echo $Helper::assets('libs/tabler/tabler.vendors.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('libs/nprogress/nprogress.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('libs/tabler-icons/tabler-icons.min.css'); ?>" rel="stylesheet">
+    <link href="<?php echo $Helper::assets('libs/datatables/datatables.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('libs/toastify/toastify.min.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('css/style.css'); ?>" rel="stylesheet">
     <link href="<?php echo $Helper::assets('css/app.css'); ?>" rel="stylesheet">
