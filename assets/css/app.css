@@ -261,6 +261,49 @@ button {
   font-size: 70%;
 }
 
+.dt-container tfoot {
+  display: table-header-group;
+}
+
+.navbar-overlap:after {
+  height: 8.9rem;
+}
+
+.dt-buttons,
+.dt-paging {
+  display: flex;
+  flex-direction: row;
+  align-content: center;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0.8rem;
+  height: 100%;
+}
+
+.dt-length,
+.dt-info {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.8rem;
+  height: 100%;
+}
+
+.dt-info {
+  opacity: 0.5;
+}
+
+@media (max-width: 576px) {
+  .dt-buttons,
+  .dt-paging,
+  .dt-length,
+  .dt-info {
+    justify-content: center
+  }
+}
+
 @media (min-width: 992px) {
   .navbar-overlap.navbar-vertical:after {
     display: none;
