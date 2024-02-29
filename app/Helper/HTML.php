@@ -24,6 +24,7 @@ class HTML
             $columns = [];
 
             $thead = '';
+            $theadSearch = '';
             foreach ($tableDetails['columns'] as $tKey => $column) {
                 $thead .= '<th>' . $column['name'] . '</th>';
                 $columns[] = [
@@ -32,6 +33,24 @@ class HTML
                     'searchable' => $column['searchable'],
                     'orderable' => $column['orderable'],
                 ];
+
+
+                if ($column['searchable']) {
+                    $theadSearch .= '<th class="p-1">';
+                    if ($column['type'] === 'select') {
+                        $theadSearch .= '<select class="form-select form-select-sm">
+                            <option value="">' . Helper::lang('base.all') . '</option>';
+                        foreach ($column['options'] as $oKey => $option) {
+                            $theadSearch .= '<option value="' . $oKey . '">' . $option . '</option>';
+                        }
+                        $theadSearch .= '</select>';
+                    } else {
+                        $theadSearch .= '<input type="text" class="form-control form-control-sm">';
+                    }
+                    $theadSearch .= '</th>';
+                } else {
+                    $theadSearch .= '<th></th>';
+                }
             }
 
             $return = '
@@ -41,10 +60,19 @@ class HTML
                         ' . $thead . '
                     </tr>
                 </thead>
+                <tfoot>
+                    <tr>
+                        ' . $theadSearch . '
+                    </tr>
+                </tfoot>
                 <tbody>
                 </tbody>
             </table>
             ';
+
+            if (isset($tableDetails['modal']) !== false) {
+                $return .= $tableDetails['modal']();
+            }
         }
 
         return $return;
