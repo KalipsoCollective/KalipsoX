@@ -63,7 +63,7 @@ final class UserRoles extends Model
         $this->setBulkData([
             [
                 'name' => 'admin',
-                'routes' => 'dashboard,dashboard.settings,dashboard.users,dashboard.user_roles,dashboard.data.:table',
+                'routes' => 'dashboard,dashboard.settings,dashboard.users,dashboard.user_roles,dashboard.data.:table,dashboard.users.add,dashboard.users.edit.:id,dashboard.users.delete.:id,dashboard.user_roles.add,dashboard.user_roles.edit.:id,dashboard.user_roles.delete.:id',
             ],
         ]);
 
