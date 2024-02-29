@@ -17,7 +17,7 @@ return [
 	'smtp_email_password' => 'password',
 	'smtp_secure' => 'tls',
 	'view_cache' => false,
-	'db_cache' => false,
+	'db_cache' => true,
 	'route_cache' => false,
 	'registration_system' => true,
 	'last_updated_at' => 1655275294,
