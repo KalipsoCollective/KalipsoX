@@ -15,6 +15,37 @@ class KalipsoXJS {
   // version
   version = "1.0.0";
   lang = "en";
+  langDefinitions = {
+    en: {
+      buttons: {
+        colvis: "Change columns",
+        copy: "Copy",
+        copyTitle: "Copied to clipboard",
+        copySuccess: {
+          _: "%d rows copied",
+          1: "1 row copied",
+        },
+        print: "Print",
+      },
+      export: "Export",
+      all: "All",
+    },
+    tr: {
+      buttons: {
+        colvis: "Sütunları değiştir",
+        copy: "Kopyala",
+        copyTitle: "Panoya kopyalandı",
+        copySuccess: {
+          _: "%d satır kopyalandı",
+          1: "1 satır kopyalandı",
+        },
+        print: "Yazdır",
+      },
+      export: "Dışa Aktar",
+      all: "Hepsi",
+    },
+  };
+  heartBeatInterval = 30000;
 
   constructor() {
     this.init();
@@ -442,8 +473,28 @@ class KalipsoXJS {
         }
       }
 
+      // modal hide
+      if (typeof data.modal_hide !== "undefined" && data.modal_hide) {
+        $(data.modal_hide).modal("hide");
+      }
+
+      // table reload
+      if (
+        typeof data.table_reload !== "undefined" &&
+        data.table_reload &&
+        window.kxTables
+      ) {
+        if (window.kxTables[data.table_reload]) {
+          window.kxTables[data.table_reload].ajax.reload();
+        }
+      }
+
       // form reset
-      if (typeof data.form_reset !== "undefined" && data.form_reset === true) {
+      if (
+        typeof data.form_reset !== "undefined" &&
+        data.form_reset === true &&
+        form
+      ) {
         $(form).trigger("reset");
       }
 
@@ -534,7 +585,7 @@ class KalipsoXJS {
     };
     this.heartBeat();
     if (window.kxHeartbeat === undefined) {
-      window.kxHeartbeat = setInterval(heartbeat, 5000);
+      window.kxHeartbeat = setInterval(heartbeat, this.heartBeatInterval);
     }
   }
 
@@ -569,56 +620,59 @@ class KalipsoXJS {
             }
           }
         },
+        /*
         dom:
-          "<'row'<'col-sm-6'l><'col-sm-6 text-right'B>>" +
+          "<'row'<'col-sm-6'l><'col-sm-6 text-right'B>f>" +
           "<'row'<'col-sm-12'<'table-responsive'tr>>>" +
           "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+        */
+        dom: "<'row'<'col-sm-6'l><'col-sm-6'B>><'row'<'col-12'<'table-responsive'tr>>> <'row'<'col-md-5'i><'col-md-7'p>>",
         buttons: [
-          "colvis",
           {
-            extend: "copyHtml5",
-            charset: "utf-8",
-            exportOptions: {
-              columns: ":visible",
-            },
+            extend: "colvis",
+            className: "btn-sm btn-primary",
           },
           {
-            extend: "excelHtml5",
-            charset: "utf-8",
-            exportOptions: {
-              columns: ":visible",
-            },
-          },
-          {
-            extend: "csvHtml5",
-            charset: "utf-8",
-            exportOptions: {
-              columns: ":visible",
-            },
+            extend: "collection",
+            text: this.langDefinitions[this.lang].export,
+            className: "btn-sm btn-primary",
+            buttons: [
+              {
+                extend: "copyHtml5",
+                charset: "utf-8",
+                exportOptions: {
+                  columns: ":visible",
+                },
+              },
+              {
+                extend: "excelHtml5",
+                charset: "utf-8",
+                exportOptions: {
+                  columns: ":visible",
+                },
+              },
+              {
+                extend: "csvHtml5",
+                charset: "utf-8",
+                exportOptions: {
+                  columns: ":visible",
+                },
+              },
+              {
+                extend: "print",
+              },
+            ],
           },
         ],
         lengthMenu: [
           [10, 25, 50, 100, -1],
-          [10, 25, 50, 100, "All"],
+          [10, 25, 50, 100, this.langDefinitions[this.lang].all],
         ],
         ajax: {
           url: table.getAttribute("data-kx-url"),
           type: "POST",
         },
-        /*
-        language: {
-          url: "/assets/vendor/datatables/" + this.lang + ".json",
-          buttons: {
-            colvis: "Change columns",
-            copy: "Copy",
-            copyTitle: "Copied to clipboard",
-            copySuccess: {
-              _: "%d rows copied",
-              1: "1 row copied",
-            },
-            print: "Print",
-          },
-        }, */
+        language: {},
         autoWidth: false,
         columns: JSON.parse(table.getAttribute("data-kx-columns")),
         order: JSON.parse(table.getAttribute("data-kx-order")),
@@ -627,14 +681,11 @@ class KalipsoXJS {
             .columns()
             .every(function () {
               var that = this;
-              var column = this;
-
               $("input", this.footer()).on("keyup change clear", function () {
                 if (that.search() !== this.value) {
                   that.search(this.value).draw();
                 }
               });
-
               $("select", this.footer()).on("change clear", function () {
                 if (that.search() !== this.value) {
                   if (this.value === "") {
@@ -645,8 +696,16 @@ class KalipsoXJS {
                 }
               });
             });
+
+          $("[data-bs-toggle='tooltip']").tooltip();
         },
       };
+      if (this.langDefinitions[this.lang]) {
+        options.language.buttons = this.langDefinitions[this.lang].buttons;
+        if (this.lang === "tr") {
+          options.language.url = "/assets/libs/datatables/locale/tr.json";
+        }
+      }
       window.kxTables[tableKey] = $(table).DataTable(options);
     });
   }
