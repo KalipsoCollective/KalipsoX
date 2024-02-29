@@ -89,7 +89,7 @@ final class Notification
                 // time check - 6 hours
                 if ((time() - $email->created_at) > 60 * 60 * 6) {
                     $emailList[$email->id] = [
-                        'uncompleted'
+                        'status' => 'uncompleted'
                     ];
                     continue;
                 }
@@ -100,6 +100,7 @@ final class Notification
                     ->where('id', $email->user_id)
                     ->notWhere('status', 'deleted')
                     ->get();
+
                 if (!empty($user)) {
                     $details = json_decode($email->details);
                     $sendList[$email->id] = [
@@ -130,12 +131,17 @@ final class Notification
                         'status' => 'completed',
                         'email' => $emailDetails['email'],
                     ];
+                } else {
+                    $emailList[$id] = [
+                        'status' => 'uncompleted'
+                    ];
                 }
             }
         }
 
         if (!empty($emailList)) {
             foreach ($emailList as $id => $up) {
+
                 $up['updated_at'] = time();
                 $emailModel
                     ->where('id', $id)
