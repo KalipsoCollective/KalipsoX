@@ -71,6 +71,9 @@ try {
     $app->routeGroup(['GET', '/dashboard', 'Panel@dashboard', 'Auth@isAuthorized'], [
         [['POST', 'GET'], '/settings', 'Panel@settings', 'Auth@isAuthorized'],
         [['POST', 'GET'], '/users', 'Panel@users', 'Auth@isAuthorized'],
+        [['POST'], '/users/add', 'Panel@userAdd', 'Auth@isAuthorized'],
+        [['POST'], '/users/edit/:id', 'Panel@userEdit', 'Auth@isAuthorized'],
+        [['POST'], '/users/delete/:id', 'Panel@userDelete', 'Auth@isAuthorized'],
         [['POST', 'GET'], '/user-roles', 'Panel@userRoles', 'Auth@isAuthorized'],
         [['POST', 'GET'], '/data/:table', 'Panel@tableData', 'Auth@isAuthorized'],
     ]);
