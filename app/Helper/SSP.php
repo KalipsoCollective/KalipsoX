@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace KX\Helper;
 
 use PDO;
+use PDOException;
 
 /*
  * Helper functions for building a DataTables server-side processing SQL query
@@ -448,6 +449,7 @@ class SSP
             $sql = $bindings;
         }
 
+        /** @var PDO $db */
         $stmt = $db->prepare($sql);
         //echo $sql;
 
@@ -619,7 +621,7 @@ class SSP
 		 */
 
         return array(
-            "draw"            => intval($request['draw']),
+            "draw"            => isset($request['draw']) !== false ? intval($request['draw']) : 0,
             "recordsTotal"    => intval($recordsTotal),
             "recordsFiltered" => intval($recordsFiltered),
             "data"            => self::data_output($columns, $data)
