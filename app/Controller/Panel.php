@@ -19,6 +19,7 @@ use KX\Core\Response;
 use KX\Controller\Notification;
 
 use KX\Helper\SSP;
+use KX\Model\Users;
 
 final class Panel
 {
@@ -79,23 +80,183 @@ final class Panel
             $i = 0;
             foreach ($tableDetails['columns'] as $tKey => $column) {
                 if ($tKey === 'actions') {
-                    continue;
+                    $tKey = 'id';
                 }
-                $columns[] = [
+
+                $col = [
                     'db' => $tKey,
                     'dt' => $i,
                 ];
+                if (isset($column['formatter']) !== false) {
+                    $col['formatter'] = $column['formatter'];
+                }
+                $columns[] = $col;
                 $i++;
             }
 
-            $sqlSelect = '(
-                SELECT *, role_id as role FROM users
-            ) as result';
+            if (isset($tableDetails['external_columns']) !== false) {
+                foreach ($tableDetails['external_columns'] as $column) {
+                    $columns[] = [
+                        'db' => $column,
+                        'dt' => $i,
+                    ];
+                    $i++;
+                }
+            }
+
+            $sqlSelect = isset($tableDetails['sql']) !== false ? $tableDetails['sql'] : '';
 
             $model = new Model();
-            $ssp = SSP::simple_extend($_POST, $model->pdo, 'id', $columns, $sqlSelect);
+            $ssp = SSP::simple_extend(
+                $request->getRequestMethod() === 'POST' ? $_POST : $_GET,
+                $model->pdo,
+                isset($tableDetails['primaryKey']) !== false ? $tableDetails['primaryKey'] : 'id',
+                $columns,
+                $sqlSelect
+            );
 
             return $response->json($ssp);
         }
+    }
+
+    public function userAdd(Request $request, Response $response)
+    {
+        $return = [
+            'status' => true,
+            'notify' => [],
+        ];
+
+        extract(Helper::input([
+            'u_name' => 'nulled_text',
+            'f_name' => 'nulled_text',
+            'l_name' => 'nulled_text',
+            'email' => 'nulled_text',
+            'password' => 'nulled_text',
+            'role_id' => 'int',
+            'status' => 'nulled_text',
+        ], $request->getParams()));
+
+        $validation = Helper::validation([
+            'u_name' => [
+                'value' => $u_name,
+                'pattern' => 'required|min:2|max:50|alphanumeric',
+            ],
+            'f_name' => [
+                'value' => $f_name,
+                'pattern' => 'required|min:2|max:50|alpha',
+            ],
+            'l_name' => [
+                'value' => $l_name,
+                'pattern' => 'required|min:2|max:50|alpha',
+            ],
+            'email' => [
+                'value' => $email,
+                'pattern' => 'required|email',
+            ],
+            'password' => [
+                'value' => $password,
+                'pattern' => 'required|min:6|max:50',
+            ],
+            'role_id' => [
+                'value' => $role_id,
+                'pattern' => 'required|numeric',
+            ],
+            'status' => [
+                'value' => $status,
+                'pattern' => 'required|in:active,passive,deleted',
+            ]
+        ]);
+
+        if (!empty($validation)) {
+            $return['dom'] = [];
+            foreach ($validation as $field => $messages) {
+                $return['dom']['[name="' . $field . '"]'] = [
+                    'addClass' => 'is-invalid',
+                ];
+
+                $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
+                    'text' => implode(' ', $messages)
+                ];
+            }
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('form.fill_all_fields')
+            ];
+        } else {
+            $model = new Users();
+            $checkEmail = $model->select('id')
+                ->where('email', $email)
+                ->get();
+
+            if (!empty($checkEmail)) {
+                $return['status'] = false;
+                $return['dom'] = [
+                    '[name="email"]' => [
+                        'addClass' => 'is-invalid',
+                    ],
+                    '[name="email"] ~ .invalid-feedback' => [
+                        'text' => Helper::lang('auth.email_already_exists')
+                    ]
+                ];
+            } else {
+
+                $checkUsername = $model->select('id')
+                    ->where('u_name', $u_name)
+                    ->get();
+
+                if (!empty($checkUsername)) {
+                    $return['status'] = false;
+                    $return['dom'] = [
+                        '[name="u_name"]' => [
+                            'addClass' => 'is-invalid',
+                        ],
+                        '[name="u_name"] ~ .invalid-feedback' => [
+                            'text' => Helper::lang('auth.username_already_exists')
+                        ]
+                    ];
+                } else {
+                    $password = password_hash($password, PASSWORD_DEFAULT);
+                    $data = ([
+                        'u_name' => $u_name,
+                        'f_name' => $f_name,
+                        'l_name' => $l_name,
+                        'email' => $email,
+                        'password' => $password,
+                        'role_id' => $role_id,
+                        'status' => $status,
+                        'token' => Helper::tokenGenerator(80)
+                    ]);
+
+                    $insert = $model->insert($data);
+
+                    if ($insert) {
+
+                        if ($status === 'passive') {
+                            $data['id'] = $insert;
+                            $notificationController = new Notification();
+                            $notificationController->createNotification('welcome', $data);
+                        }
+
+                        $return['notify'][] = [
+                            'type' => 'success',
+                            'message' => Helper::lang('base.record_successfully_added')
+                        ];
+
+                        $return['form_reset'] = true;
+                        $return['modal_hide'] = '#addUserModal';
+                        $return['table_reload'] = 'users';
+                    } else {
+                        $return['status'] = false;
+                        $return['notify'][] = [
+                            'type' => 'error',
+                            'message' => Helper::lang('auth.a_problem_has_occurred')
+                        ];
+                    }
+                }
+            }
+        }
+
+        return $response->json($return);
     }
 }
