@@ -12,6 +12,8 @@ require __DIR__ . '/vendor/autoload.php';
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
+ini_set('log_errors', 'On');
+ini_set('error_log', KX\Core\Helper::path('app/Storage'));
 error_reporting(E_ALL);
 
 use KX\Core\Request;
@@ -22,8 +24,6 @@ define('KX_VERSION', 'alpha');
 try {
 
     $app = (new KX\Core\Factory)->setup();
-    ini_set('log_errors', 'On');
-    ini_set('error_log', KX\Core\Helper::path('app/Storage'));
 
     // $app->response->setLayout('layout'); // set global layout
     // $app->setLayout('layout');
