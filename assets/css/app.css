@@ -295,6 +295,12 @@ button {
   opacity: 0.5;
 }
 
+[disabled] {
+  opacity: var(--tblr-btn-disabled-opacity);
+  pointer-events: none;
+}
+
+
 @media (max-width: 576px) {
   .dt-buttons,
   .dt-paging,
