@@ -4,7 +4,11 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="h1 navbar-brand navbar-horizontal pe-0 pe-md-3 d-lg-none">
-            <a href="<?php echo $Helper::base('/'); ?>">
+            <a href="<?php
+
+                        use KX\Core\Helper;
+
+                        echo $Helper::base('/'); ?>">
                 <?php echo $Helper::config('settings.name'); ?>
             </a>
         </div>
@@ -76,6 +80,11 @@
                         }
                     }
 
+                    if (isset($details['link']) === false && empty($subLinks2)) {
+                        continue;
+                    }
+
+
                     $subLinks .= !empty($subLinks2) ? '<li class="nav-item dropdown' . ($level2Active ? ' active' : '') . '">
                         <a class="nav-link dropdown-toggle' . ($level2Active ? ' show' : '') . '" href="javascript:;" data-bs-toggle="dropdown" data-bs-auto-close="false" role="button" aria-expanded="false">
                             ' . (isset($details['icon']) !== false ? '<span class="nav-link-icon d-md-none d-lg-inline-block ' . $details['icon'] . '">
@@ -86,8 +95,8 @@
                             ' . (isset($details['badge']) !== false ? $details['badge'] : '') . '
                         </a>
                         <div class="dropdown-menu' . ($level2Active ? ' show' : '') . '"><div class="dropdown-menu-columns">
-                            <div class="dropdown-menu-column">' . $subLinks2 . '</div></div></div>' : '<li class="nav-item' . ($Helper::currentPage($details['link'], '', true) ? ' active' : '') . '">
-                        <a class="nav-link" href="' . $Helper::base($details['link']) . '">
+                            <div class="dropdown-menu-column">' . $subLinks2 . '</div></div></div>' : '<li class="nav-item' . (isset($details['link']) && $Helper::currentPage($details['link'], '', true) ? ' active' : '') . '">
+                        <a class="nav-link" href="' . (isset($details['link']) ? $Helper::base($details['link']) : 'javascript:;') . '">
                         ' . (isset($details['icon']) !== false ? '<span class="nav-link-icon d-md-none d-lg-inline-block ' . $details['icon'] . '">
                             </span>' : '') . '    
                         <span class="nav-link-title">
