@@ -17,9 +17,11 @@ use KX\Core\Request;
 use KX\Core\Response;
 
 use KX\Controller\Notification;
-
+use KX\Helper\HTML;
 use KX\Helper\SSP;
+use KX\Model\Sessions;
 use KX\Model\Users;
+use KX\Model\UserRoles;
 
 final class Panel
 {
@@ -39,6 +41,7 @@ final class Panel
             'title' => Helper::lang('base.settings'),
             'description' => Helper::lang('base.settings_desc'),
             'auth' => $request->getMiddlewareParams(),
+            'settingsCard' => HTML::settingsCard(),
         ], 'layout');
     }
 
@@ -136,7 +139,7 @@ final class Panel
             'status' => 'nulled_text',
         ], $request->getParams()));
 
-        $validation = Helper::validation([
+        Helper::validation([
             'u_name' => [
                 'value' => $u_name,
                 'pattern' => 'required|min:2|max:50|alphanumeric',
@@ -165,87 +168,474 @@ final class Panel
                 'value' => $status,
                 'pattern' => 'required|in:active,passive,deleted',
             ]
-        ]);
+        ], $response);
 
-        if (!empty($validation)) {
-            $return['dom'] = [];
-            foreach ($validation as $field => $messages) {
-                $return['dom']['[name="' . $field . '"]'] = [
-                    'addClass' => 'is-invalid',
-                ];
+        $model = new Users();
+        $checkEmail = $model->select('id')
+            ->where('email', $email)
+            ->get();
 
-                $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
-                    'text' => implode(' ', $messages)
-                ];
-            }
+        if (!empty($checkEmail)) {
             $return['status'] = false;
-            $return['notify'][] = [
-                'type' => 'error',
-                'message' => Helper::lang('form.fill_all_fields')
+            $return['dom'] = [
+                '[name="email"]' => [
+                    'addClass' => 'is-invalid',
+                ],
+                '[name="email"] ~ .invalid-feedback' => [
+                    'text' => Helper::lang('auth.email_already_exists')
+                ]
             ];
         } else {
-            $model = new Users();
-            $checkEmail = $model->select('id')
-                ->where('email', $email)
+
+            $checkUsername = $model->select('id')
+                ->where('u_name', $u_name)
                 ->get();
 
-            if (!empty($checkEmail)) {
+            if (!empty($checkUsername)) {
                 $return['status'] = false;
                 $return['dom'] = [
-                    '[name="email"]' => [
+                    '[name="u_name"]' => [
                         'addClass' => 'is-invalid',
                     ],
-                    '[name="email"] ~ .invalid-feedback' => [
-                        'text' => Helper::lang('auth.email_already_exists')
+                    '[name="u_name"] ~ .invalid-feedback' => [
+                        'text' => Helper::lang('auth.username_already_exists')
                     ]
                 ];
             } else {
+                $password = password_hash($password, PASSWORD_DEFAULT);
+                $data = ([
+                    'u_name' => $u_name,
+                    'f_name' => $f_name,
+                    'l_name' => $l_name,
+                    'email' => $email,
+                    'password' => $password,
+                    'role_id' => $role_id,
+                    'status' => $status,
+                    'token' => Helper::tokenGenerator(80)
+                ]);
 
-                $checkUsername = $model->select('id')
-                    ->where('u_name', $u_name)
+                $insert = $model->insert($data);
+
+                if ($insert) {
+
+                    if ($status === 'passive') {
+                        $data['id'] = $insert;
+                        $notificationController = new Notification();
+                        $notificationController->createNotification('welcome', $data);
+                    }
+
+                    $return['notify'][] = [
+                        'type' => 'success',
+                        'message' => Helper::lang('base.record_successfully_added')
+                    ];
+
+                    $return['form_reset'] = true;
+                    $return['modal_hide'] = '#addUserModal';
+                    $return['table_reload'] = 'users';
+                } else {
+                    $return['status'] = false;
+                    $return['notify'][] = [
+                        'type' => 'error',
+                        'message' => Helper::lang('auth.a_problem_has_occurred')
+                    ];
+                }
+            }
+        }
+
+        return $response->json($return);
+    }
+
+    public function userEdit(Request $request, Response $response)
+    {
+
+        global $kxVariables;
+        $return = [
+            'status' => true,
+            'notify' => [],
+        ];
+
+        extract(Helper::input([
+            'u_name' => 'nulled_text',
+            'f_name' => 'nulled_text',
+            'l_name' => 'nulled_text',
+            'email' => 'nulled_text',
+            'role_id' => 'int',
+            'status' => 'nulled_text',
+            'password' => 'nulled_text',
+        ], $request->getParams()));
+
+        extract(Helper::input([
+            'id' => 'int',
+        ], $request->getRouteDetails()->attributes));
+
+        $getUser = (new Users())->select('
+                id,
+                u_name,
+                f_name,
+                l_name,
+                email,
+                role_id,
+                status
+            ')
+            ->where('id', $id)
+            ->get();
+
+        if (empty($getUser)) {
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('auth.user_not_found')
+            ];
+        } else {
+
+            if (empty($u_name) || empty($email) || empty($role_id) || empty($status)) { // prepare form
+
+                $formContent = $kxVariables['datatables']['tables']['users']['modal']($getUser, true);
+
+                $return['status'] = true;
+                $return['dom'] = [
+                    '#editUserModalContent' => [
+                        'html' => $formContent
+                    ]
+                ];
+                $return['modal_show'] = '#editUserModal';
+            } else {
+
+                $v = [
+                    'u_name' => [
+                        'value' => $u_name,
+                        'pattern' => 'required|min:2|max:50|alphanumeric',
+                    ],
+                    'f_name' => [
+                        'value' => $f_name,
+                        'pattern' => 'required|min:2|max:50|alpha',
+                    ],
+                    'l_name' => [
+                        'value' => $l_name,
+                        'pattern' => 'required|min:2|max:50|alpha',
+                    ],
+                    'email' => [
+                        'value' => $email,
+                        'pattern' => 'required|email',
+                    ],
+                    'role_id' => [
+                        'value' => $role_id,
+                        'pattern' => 'required|numeric',
+                    ],
+                    'status' => [
+                        'value' => $status,
+                        'pattern' => 'required|in:active,passive,deleted',
+                    ],
+                    'password' => [
+                        'value' => $password,
+                        'pattern' => 'min:6|max:50',
+                    ],
+                ];
+                if (empty($password)) {
+                    unset($v['password']);
+                }
+
+                Helper::validation($v, $response);
+
+
+                $model = new Users();
+                $checkEmail = $model->select('id')
+                    ->where('email', $email)
+                    ->notWhere('id', $id)
                     ->get();
 
-                if (!empty($checkUsername)) {
+                if (!empty($checkEmail)) {
                     $return['status'] = false;
                     $return['dom'] = [
-                        '[name="u_name"]' => [
+                        '[name="email"]' => [
                             'addClass' => 'is-invalid',
                         ],
-                        '[name="u_name"] ~ .invalid-feedback' => [
-                            'text' => Helper::lang('auth.username_already_exists')
+                        '[name="email"] ~ .invalid-feedback' => [
+                            'text' => Helper::lang('auth.email_already_exists')
                         ]
                     ];
                 } else {
-                    $password = password_hash($password, PASSWORD_DEFAULT);
-                    $data = ([
-                        'u_name' => $u_name,
-                        'f_name' => $f_name,
-                        'l_name' => $l_name,
-                        'email' => $email,
-                        'password' => $password,
-                        'role_id' => $role_id,
-                        'status' => $status,
-                        'token' => Helper::tokenGenerator(80)
-                    ]);
 
-                    $insert = $model->insert($data);
+                    $checkUsername = $model->select('id')
+                        ->where('u_name', $u_name)
+                        ->notWhere('id', $id)
+                        ->get();
 
-                    if ($insert) {
+                    if (!empty($checkUsername)) {
+                        $return['status'] = false;
+                        $return['dom'] = [
+                            '[name="u_name"]' => [
+                                'addClass' => 'is-invalid',
+                            ],
+                            '[name="u_name"] ~ .invalid-feedback' => [
+                                'text' => Helper::lang('auth.username_already_exists')
+                            ]
+                        ];
+                    } else {
+                        $data = ([
+                            'u_name' => $u_name,
+                            'f_name' => $f_name,
+                            'l_name' => $l_name,
+                            'email' => $email,
+                            'role_id' => $role_id,
+                            'status' => $status,
+                        ]);
 
-                        if ($status === 'passive') {
-                            $data['id'] = $insert;
-                            $notificationController = new Notification();
-                            $notificationController->createNotification('welcome', $data);
+                        if (!empty($password)) {
+                            $password = password_hash($password, PASSWORD_DEFAULT);
+                            $data['password'] = $password;
                         }
 
+                        $update = $model
+                            ->where('id', $id)
+                            ->update($data, $id);
+
+                        if ($update) {
+                            $return['notify'][] = [
+                                'type' => 'success',
+                                'message' => Helper::lang('base.record_successfully_updated')
+                            ];
+
+                            $return['form_reset'] = true;
+                            $return['modal_hide'] = '#editUserModal';
+                            $return['table_reload'] = 'users';
+                        } else {
+                            $return['status'] = false;
+                            $return['notify'][] = [
+                                'type' => 'error',
+                                'message' => Helper::lang('auth.a_problem_has_occurred')
+                            ];
+                        }
+                    }
+                }
+            }
+        }
+
+        return $response->json($return);
+    }
+
+    public function userDelete(Request $request, Response $response)
+    {
+        $return = [
+            'status' => true,
+            'notify' => [],
+        ];
+
+        extract(Helper::input([
+            'id' => 'int',
+        ], $request->getRouteDetails()->attributes));
+
+        if ($id === Helper::sessionData('user', 'id')) {
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('auth.you_cannot_delete_yourself')
+            ];
+            return $response->json($return);
+        }
+
+        $model = new Users();
+        $delete = $model
+            ->where('id', $id)
+            ->update(['status' => 'deleted']);
+
+        if ($delete) {
+
+            $sessionModel = new Sessions();
+            $sessionModel
+                ->where('user_id', $id)
+                ->delete();
+
+            $return['notify'][] = [
+                'type' => 'success',
+                'message' => Helper::lang('base.record_successfully_deleted')
+            ];
+            $return['table_reload'] = 'users';
+        } else {
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('auth.a_problem_has_occurred')
+            ];
+        }
+
+        return $response->json($return);
+    }
+
+    public function userRoleAdd(Request $request, Response $response)
+    {
+        $return = [
+            'status' => true,
+            'notify' => [],
+        ];
+
+        extract(Helper::input([
+            'name' => 'nulled_text',
+            'routes' => 'nulled_text',
+        ], $request->getParams()));
+
+        Helper::validation([
+            'name' => [
+                'value' => $name,
+                'pattern' => 'required|min:2|max:50|alphanumeric',
+            ],
+        ], $response);
+
+        if (empty($routes)) {
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('auth.please_select_at_least_one_route')
+            ];
+            return $response->json($return);
+        } else {
+            $routes = is_array($routes) ? implode(',', $routes) : $routes;
+        }
+
+        $model = new UserRoles();
+        $checkName = $model->select('id')
+            ->where('name', $name)
+            ->get();
+
+        if (!empty($checkName)) {
+            $return['status'] = false;
+            $return['dom'] = [
+                '[name="name"]' => [
+                    'addClass' => 'is-invalid',
+                ],
+                '[name="name"] ~ .invalid-feedback' => [
+                    'text' => Helper::lang('auth.role_name_already_exists')
+                ]
+            ];
+        } else {
+            $data = ([
+                'name' => $name,
+                'routes' => $routes,
+            ]);
+
+            $insert = $model->insert($data);
+
+            if ($insert) {
+                $return['notify'][] = [
+                    'type' => 'success',
+                    'message' => Helper::lang('base.record_successfully_added')
+                ];
+
+                $return['form_reset'] = true;
+                $return['modal_hide'] = '#addUserRoleModal';
+                $return['table_reload'] = 'user-roles';
+            } else {
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('auth.a_problem_has_occurred')
+                ];
+            }
+        }
+
+        return $response->json($return);
+    }
+
+    public function userRoleEdit(Request $request, Response $response)
+    {
+        global $kxVariables;
+        $return = [
+            'status' => true,
+            'notify' => [],
+        ];
+
+        extract(Helper::input([
+            'name' => 'nulled_text',
+            'routes' => 'nulled_text',
+            'role_id' => 'int',
+        ], $request->getParams()));
+
+        extract(Helper::input([
+            'id' => 'int',
+        ], $request->getRouteDetails()->attributes));
+
+        $getUserRole = (new UserRoles())->select('
+                id,
+                name,
+                routes,
+                (SELECT COUNT(id) FROM users WHERE role_id = user_roles.id) as user_count
+            ')
+            ->where('id', $id)
+            ->get();
+
+        if (empty($getUserRole)) {
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('auth.role_not_found')
+            ];
+        } else {
+
+            if (empty($name) || empty($routes)) { // prepare form
+
+                $formContent = $kxVariables['datatables']['tables']['user-roles']['modal']($getUserRole, true);
+
+                $return['status'] = true;
+                $return['dom'] = [
+                    '#editUserRoleModalContent' => [
+                        'html' => $formContent
+                    ]
+                ];
+                $return['modal_show'] = '#editUserRoleModal';
+            } else {
+
+                $v = [
+                    'name' => [
+                        'value' => $name,
+                        'pattern' => 'required|min:2|max:50|alphanumeric',
+                    ],
+                ];
+
+                Helper::validation($v, $response);
+
+                $model = new UserRoles();
+                $checkName = $model->select('id')
+                    ->where('name', $name)
+                    ->notWhere('id', $id)
+                    ->get();
+
+                if (!empty($checkName)) {
+                    $return['status'] = false;
+                    $return['dom'] = [
+                        '[name="name"]' => [
+                            'addClass' => 'is-invalid',
+                        ],
+                        '[name="name"] ~ .invalid-feedback' => [
+                            'text' => Helper::lang('auth.role_name_already_exists')
+                        ]
+                    ];
+                } else {
+                    $routes = is_array($routes) ? implode(',', $routes) : $routes;
+                    $data = ([
+                        'name' => $name,
+                        'routes' => $routes,
+                    ]);
+
+                    $update = $model
+                        ->where('id', $id)
+                        ->update($data, $id);
+
+                    if ($update) {
                         $return['notify'][] = [
                             'type' => 'success',
-                            'message' => Helper::lang('base.record_successfully_added')
+                            'message' => Helper::lang('base.record_successfully_updated')
                         ];
 
                         $return['form_reset'] = true;
-                        $return['modal_hide'] = '#addUserModal';
-                        $return['table_reload'] = 'users';
+                        $return['modal_hide'] = '#editUserRoleModal';
+                        $return['table_reload'] = 'user-roles';
+
+                        // transfer users to new role
+                        if ($getUserRole->user_count > 0 && $role_id !== $getUserRole->id && $role_id) {
+                            (new Users())
+                                ->where('role_id', $id)
+                                ->update(['role_id' => $role_id]);
+                        }
                     } else {
                         $return['status'] = false;
                         $return['notify'][] = [
@@ -255,6 +645,39 @@ final class Panel
                     }
                 }
             }
+        }
+
+        return $response->json($return);
+    }
+
+    public function userRoleDelete(Request $request, Response $response)
+    {
+        $return = [
+            'status' => true,
+            'notify' => [],
+        ];
+
+        extract(Helper::input([
+            'id' => 'int',
+        ], $request->getRouteDetails()->attributes));
+
+        $model = new UserRoles();
+        $delete = $model
+            ->where('id', $id)
+            ->delete();
+
+        if ($delete) {
+            $return['notify'][] = [
+                'type' => 'success',
+                'message' => Helper::lang('base.record_successfully_deleted')
+            ];
+            $return['table_reload'] = 'user-roles';
+        } else {
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('auth.a_problem_has_occurred')
+            ];
         }
 
         return $response->json($return);
