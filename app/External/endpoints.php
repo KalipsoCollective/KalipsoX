@@ -12,45 +12,45 @@ return [
         'name' => 'authorization.dashboard',
     ],
     'dashboard.data.:table' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.table_data',
     ],
     'dashboard.settings' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.settings',
     ],
     // Users
     'dashboard.users' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.users',
     ],
     'dashboard.users.add' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.users_add',
     ],
     'dashboard.users.edit.:id' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.users_edit',
     ],
     'dashboard.users.delete.:id' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.users_delete',
     ],
     // User Roles
     'dashboard.user_roles' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.user_roles',
     ],
     'dashboard.user_roles.add' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.user_roles_add',
     ],
     'dashboard.user_roles.edit.:id' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.user_roles_edit',
     ],
     'dashboard.user_roles.delete.:id' => [
-        'default' => true,
+        'default' => false,
         'name' => 'authorization.user_roles_delete',
     ],
 ];
