@@ -62,120 +62,101 @@ final class User
                 unset($v['password_again']);
             }
 
-            $validation = Helper::validation($v);
+            Helper::validation($v, $response);
 
-            if (!empty($validation)) {
-                $return['dom'] = [];
-                foreach ($validation as $field => $messages) {
-                    $return['dom']['[name="' . $field . '"]'] = [
-                        'addClass' => 'is-invalid',
-                    ];
+            $userModel = new Users();
+            $currentData = Helper::sessionData('user');
 
-                    $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
-                        'text' => implode(' ', $messages)
-                    ];
-                }
-                $return['status'] = false;
-                $return['notify'][] = [
-                    'type' => 'error',
-                    'message' => Helper::lang('form.fill_all_fields')
-                ];
-            } else {
-
-                $userModel = new Users();
-                $currentData = Helper::sessionData('user');
-
-                if ($currentData) {
-                    if ($currentData->status === 'deleted') {
-                        $return['status'] = false;
-                        $return['notify'][] = [
-                            'type' => 'error',
-                            'message' => Helper::lang('auth.your_account_deleted')
-                        ];
-                    } else {
-
-                        $newData = [];
-                        $emailUpdated = false;
-
-                        if ($currentData->f_name !== $first_name) {
-                            $newData['f_name'] = $first_name;
-                        }
-
-                        if ($currentData->l_name !== $last_name) {
-                            $newData['l_name'] = $last_name;
-                        }
-
-                        if ($currentData->email !== $email) {
-                            $newData['email'] = $email;
-                            $emailUpdated = true;
-
-                            // check other email
-                            $checkEmail = $userModel->select('id')->where('email', $email)->get();
-                            if ($checkEmail) {
-                                $return['status'] = false;
-                                $return['dom']['[name="email"]'] = [
-                                    'addClass' => 'is-invalid',
-                                ];
-                                $return['dom']['[name="email"] ~ .invalid-feedback'] = [
-                                    'text' => Helper::lang('auth.email_already_exists')
-                                ];
-                                return $response->json($return);
-                            }
-                        }
-
-                        if (!empty($birthdate) && $birthdate !== $currentData->b_date) {
-                            $newData['b_date'] = $birthdate;
-                        }
-
-                        if (!empty($password)) {
-                            $newData['password'] = password_hash($password, PASSWORD_DEFAULT);
-                        }
-
-                        if (!empty($newData)) {
-
-                            if ($emailUpdated) {
-                                $newData['status'] = 'passive';
-                                $newData['token'] = Helper::tokenGenerator(80);
-                            }
-
-                            $update = $userModel->where('id', $currentData->id)->update($newData);
-                            if ($update) {
-
-                                if ($emailUpdated) {
-                                    $notificationController = new Notification();
-                                    $notificationController->createNotification('email_change', [
-                                        'id' => $currentData->id,
-                                        'u_name' => $currentData->u_name,
-                                        'email' => $email,
-                                        'token' => $newData['token'],
-                                    ]);
-                                }
-                                $return['notify'][] = [
-                                    'type' => 'success',
-                                    'message' => Helper::lang('auth.account_updated')
-                                ];
-                            } else {
-                                $return['notify'][] = [
-                                    'type' => 'error',
-                                    'message' => Helper::lang('auth.a_problem_has_occurred')
-                                ];
-                            }
-                        } else {
-                            $return['notify'][] = [
-                                'type' => 'warning',
-                                'message' => Helper::lang('base.nothing_changed')
-                            ];
-                        }
-
-                        return $response->json($return);
-                    }
-                } else {
+            if ($currentData) {
+                if ($currentData->status === 'deleted') {
                     $return['status'] = false;
                     $return['notify'][] = [
                         'type' => 'error',
-                        'message' => Helper::lang('auth.account_not_found')
+                        'message' => Helper::lang('auth.your_account_deleted')
                     ];
+                } else {
+
+                    $newData = [];
+                    $emailUpdated = false;
+
+                    if ($currentData->f_name !== $first_name) {
+                        $newData['f_name'] = $first_name;
+                    }
+
+                    if ($currentData->l_name !== $last_name) {
+                        $newData['l_name'] = $last_name;
+                    }
+
+                    if ($currentData->email !== $email) {
+                        $newData['email'] = $email;
+                        $emailUpdated = true;
+
+                        // check other email
+                        $checkEmail = $userModel->select('id')->where('email', $email)->get();
+                        if ($checkEmail) {
+                            $return['status'] = false;
+                            $return['dom']['[name="email"]'] = [
+                                'addClass' => 'is-invalid',
+                            ];
+                            $return['dom']['[name="email"] ~ .invalid-feedback'] = [
+                                'text' => Helper::lang('auth.email_already_exists')
+                            ];
+                            return $response->json($return);
+                        }
+                    }
+
+                    if (!empty($birthdate) && $birthdate !== $currentData->b_date) {
+                        $newData['b_date'] = $birthdate;
+                    }
+
+                    if (!empty($password)) {
+                        $newData['password'] = password_hash($password, PASSWORD_DEFAULT);
+                    }
+
+                    if (!empty($newData)) {
+
+                        if ($emailUpdated) {
+                            $newData['status'] = 'passive';
+                            $newData['token'] = Helper::tokenGenerator(80);
+                        }
+
+                        $update = $userModel->where('id', $currentData->id)->update($newData);
+                        if ($update) {
+
+                            if ($emailUpdated) {
+                                $notificationController = new Notification();
+                                $notificationController->createNotification('email_change', [
+                                    'id' => $currentData->id,
+                                    'u_name' => $currentData->u_name,
+                                    'email' => $email,
+                                    'token' => $newData['token'],
+                                ]);
+                            }
+                            $return['notify'][] = [
+                                'type' => 'success',
+                                'message' => Helper::lang('auth.account_updated')
+                            ];
+                        } else {
+                            $return['notify'][] = [
+                                'type' => 'error',
+                                'message' => Helper::lang('auth.a_problem_has_occurred')
+                            ];
+                        }
+                    } else {
+                        $return['notify'][] = [
+                            'type' => 'warning',
+                            'message' => Helper::lang('base.nothing_changed')
+                        ];
+                    }
+
+                    return $response->json($return);
                 }
+            } else {
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('auth.account_not_found')
+                ];
             }
 
             return $response->json($return);
@@ -421,36 +402,19 @@ final class User
                 'remember_me' => 'check_as_boolean',
             ], $request->getPostParams()));
 
-            $validation = Helper::validation(
+            Helper::validation(
                 [
                     'username' => ['value' => $username, 'pattern' => 'required|min:3|max:20'],
                     'password' => ['value' => $password, 'pattern' => 'required|min:6|max:20'],
-                ]
+                ],
+                $response
             );
 
-            if (!empty($validation)) {
-                $return['dom'] = [];
-                foreach ($validation as $field => $messages) {
-                    $return['dom']['[name="' . $field . '"]'] = [
-                        'addClass' => 'is-invalid',
-                    ];
-
-                    $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
-                        'text' => implode(' ', $messages)
-                    ];
-                }
-                $return['status'] = false;
-                $return['notify'][] = [
-                    'type' => 'error',
-                    'message' => Helper::lang('form.fill_all_fields')
-                ];
-            } else {
-
-                // username and email control
-                $userModel = new Users();
-                $checkAccount = $userModel
-                    ->table('users as u')
-                    ->select('
+            // username and email control
+            $userModel = new Users();
+            $checkAccount = $userModel
+                ->table('users as u')
+                ->select('
                         u.id, 
                         u.u_name, 
                         u.f_name, 
@@ -462,83 +426,82 @@ final class User
                         r.name as role_name,
                         r.routes as role_routes
                     ')
-                    ->leftJoin('user_roles as r', 'u.role_id', 'r.id')
-                    ->where('u.u_name', $username)
-                    ->orWhere('u.email', $username)
-                    ->get();
+                ->leftJoin('user_roles as r', 'u.role_id', 'r.id')
+                ->where('u.u_name', $username)
+                ->orWhere('u.email', $username)
+                ->get();
 
-                if ($checkAccount) {
-                    if ($checkAccount->status === 'deleted') {
-                        $return['status'] = false;
-                        $return['dom']['[name="username"]'] = [
-                            'addClass' => 'is-invalid',
-                        ];
-                        $return['dom']['[name="username"] ~ .invalid-feedback'] = [
-                            'text' => Helper::lang('auth.your_account_deleted')
-                        ];
-                    } elseif (password_verify($password, $checkAccount->password)) {
+            if ($checkAccount) {
+                if ($checkAccount->status === 'deleted') {
+                    $return['status'] = false;
+                    $return['dom']['[name="username"]'] = [
+                        'addClass' => 'is-invalid',
+                    ];
+                    $return['dom']['[name="username"] ~ .invalid-feedback'] = [
+                        'text' => Helper::lang('auth.your_account_deleted')
+                    ];
+                } elseif (password_verify($password, $checkAccount->password)) {
 
-                        // check session
-                        $sessionModel = new Sessions();
-                        $checkSession = $sessionModel
-                            ->select('id')
-                            ->where('user_id', $checkAccount->id)
-                            ->where('auth_token', $kxAuthToken)
-                            ->get();
+                    // check session
+                    $sessionModel = new Sessions();
+                    $checkSession = $sessionModel
+                        ->select('id')
+                        ->where('user_id', $checkAccount->id)
+                        ->where('auth_token', $kxAuthToken)
+                        ->get();
 
-                        if ($checkSession) {
-                            $saveSession = $sessionModel
-                                ->where('id', $checkSession->id)
-                                ->update([
-                                    'last_act_on' => $request->getUri(),
-                                    'last_act_at' => time(),
-                                    'expire_at' => $remember_me ? null : strtotime('+2 day'),
-                                ]);
-                        } else {
-                            $saveSession = $sessionModel->insert([
-                                'user_id' => $checkAccount->id,
-                                'auth_token' => $kxAuthToken,
-                                'ip' => Helper::getIp(),
-                                'header' => Helper::getUserAgent(),
+                    if ($checkSession) {
+                        $saveSession = $sessionModel
+                            ->where('id', $checkSession->id)
+                            ->update([
                                 'last_act_on' => $request->getUri(),
                                 'last_act_at' => time(),
-                                'created_at' => time(),
                                 'expire_at' => $remember_me ? null : strtotime('+2 day'),
                             ]);
-                        }
-
-                        if ($saveSession) {
-                            $return['notify'][] = [
-                                'type' => 'success',
-                                'message' => Helper::lang('auth.login_success')
-                            ];
-                            $return['redirect'] = [
-                                'url' => Helper::base('auth'),
-                                'time' => 2000,
-                                'direct' => true
-                            ];
-                        } else {
-                            $return['notify'][] = [
-                                'type' => 'error',
-                                'message' => Helper::lang('auth.a_problem_has_occurred')
-                            ];
-                        }
                     } else {
-                        $return['status'] = false;
-                        $return['dom']['[name="password"]'] = [
-                            'addClass' => 'is-invalid',
+                        $saveSession = $sessionModel->insert([
+                            'user_id' => $checkAccount->id,
+                            'auth_token' => $kxAuthToken,
+                            'ip' => Helper::getIp(),
+                            'header' => Helper::getUserAgent(),
+                            'last_act_on' => $request->getUri(),
+                            'last_act_at' => time(),
+                            'created_at' => time(),
+                            'expire_at' => $remember_me ? null : strtotime('+2 day'),
+                        ]);
+                    }
+
+                    if ($saveSession) {
+                        $return['notify'][] = [
+                            'type' => 'success',
+                            'message' => Helper::lang('auth.login_success')
                         ];
-                        $return['dom']['[name="password"] ~ .invalid-feedback'] = [
-                            'text' => Helper::lang('auth.password_incorrect')
+                        $return['redirect'] = [
+                            'url' => Helper::base('auth'),
+                            'time' => 2000,
+                            'direct' => true
+                        ];
+                    } else {
+                        $return['notify'][] = [
+                            'type' => 'error',
+                            'message' => Helper::lang('auth.a_problem_has_occurred')
                         ];
                     }
                 } else {
                     $return['status'] = false;
-                    $return['notify'][] = [
-                        'type' => 'error',
-                        'message' => Helper::lang('auth.account_not_found')
+                    $return['dom']['[name="password"]'] = [
+                        'addClass' => 'is-invalid',
+                    ];
+                    $return['dom']['[name="password"] ~ .invalid-feedback'] = [
+                        'text' => Helper::lang('auth.password_incorrect')
                     ];
                 }
+            } else {
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('auth.account_not_found')
+                ];
             }
 
             return $response->json($return);
@@ -575,96 +538,80 @@ final class User
                 'password' => 'nulled_text',
             ], $request->getPostParams()));
 
-            $validation = Helper::validation(
+            Helper::validation(
                 [
                     'username' => ['value' => $username, 'pattern' => 'required|min:3|max:20|alphanumeric'],
                     'email' => ['value' => $email, 'pattern' => 'required|email'],
                     'password' => ['value' => $password, 'pattern' => 'required|min:6|max:20'],
-                ]
+                ],
+                $response
             );
 
-            if (!empty($validation)) {
-                $return['dom'] = [];
-                foreach ($validation as $field => $messages) {
-                    $return['dom']['[name="' . $field . '"]'] = [
-                        'addClass' => 'is-invalid',
-                    ];
 
-                    $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
-                        'text' => implode(' ', $messages)
-                    ];
-                }
+            // username and email control
+            $userModel = new Users();
+
+            $checkUsername = $userModel->select('id')->where('u_name', $username)->get();
+
+            if (!$checkUsername && !empty(Helper::config('UNAVAILABLE_USERNAMES'))) {
+                $unavailableUsernames = explode(',', (string)Helper::config('UNAVAILABLE_USERNAMES'));
+                $checkUsername = in_array($username, $unavailableUsernames);
+            }
+
+            $checkEmail = $userModel->select('id')->where('email', $email)->get();
+            if ($checkUsername) {
                 $return['status'] = false;
-                $return['notify'][] = [
-                    'type' => 'error',
-                    'message' => Helper::lang('form.fill_all_fields')
+                $return['dom']['[name="username"]'] = [
+                    'addClass' => 'is-invalid',
                 ];
-            } else {
-                // username and email control
-                $userModel = new Users();
+                $return['dom']['[name="username"] ~ .invalid-feedback'] = [
+                    'text' => Helper::lang('auth.username_already_exists')
+                ];
+            }
 
-                $checkUsername = $userModel->select('id')->where('u_name', $username)->get();
+            if ($checkEmail) {
+                $return['status'] = false;
+                $return['dom']['[name="email"]'] = [
+                    'addClass' => 'is-invalid',
+                ];
+                $return['dom']['[name="email"] ~ .invalid-feedback'] = [
+                    'text' => Helper::lang('auth.email_already_exists')
+                ];
+            }
 
-                if (!$checkUsername && !empty(Helper::config('UNAVAILABLE_USERNAMES'))) {
-                    $unavailableUsernames = explode(',', (string)Helper::config('UNAVAILABLE_USERNAMES'));
-                    $checkUsername = in_array($username, $unavailableUsernames);
-                }
+            if (!$checkUsername && !$checkEmail) {
 
-                $checkEmail = $userModel->select('id')->where('email', $email)->get();
-                if ($checkUsername) {
+                $row = [
+                    'u_name' => $username,
+                    'email' => $email,
+                    'password' => password_hash($password, PASSWORD_DEFAULT),
+                    'token' => Helper::tokenGenerator(80),
+                    'role_id' => Helper::config('settings.default_user_role') ?? 0,
+                    'created_at' => time(),
+                ];
+
+                $insert = $userModel->insert($row);
+                if (!$insert) {
                     $return['status'] = false;
-                    $return['dom']['[name="username"]'] = [
-                        'addClass' => 'is-invalid',
+                    $return['notify'][] = [
+                        'type' => 'error',
+                        'message' => Helper::lang('auth.a_problem_has_occurred')
                     ];
-                    $return['dom']['[name="username"] ~ .invalid-feedback'] = [
-                        'text' => Helper::lang('auth.username_already_exists')
+                } else {
+
+                    $row['id'] = $insert;
+                    $notificationController = new Notification();
+                    $notificationController->createNotification('welcome', $row);
+
+                    $return['notify'][] = [
+                        'type' => 'success',
+                        'message' => Helper::lang('auth.register_success')
                     ];
-                }
-
-                if ($checkEmail) {
-                    $return['status'] = false;
-                    $return['dom']['[name="email"]'] = [
-                        'addClass' => 'is-invalid',
+                    $return['redirect'] = [
+                        'url' => Helper::base('auth/login'),
+                        'time' => 2000,
+                        'direct' => false
                     ];
-                    $return['dom']['[name="email"] ~ .invalid-feedback'] = [
-                        'text' => Helper::lang('auth.email_already_exists')
-                    ];
-                }
-
-                if (!$checkUsername && !$checkEmail) {
-
-                    $row = [
-                        'u_name' => $username,
-                        'email' => $email,
-                        'password' => password_hash($password, PASSWORD_DEFAULT),
-                        'token' => Helper::tokenGenerator(80),
-                        'role_id' => Helper::config('settings.default_user_role') ?? 0,
-                        'created_at' => time(),
-                    ];
-
-                    $insert = $userModel->insert($row);
-                    if (!$insert) {
-                        $return['status'] = false;
-                        $return['notify'][] = [
-                            'type' => 'error',
-                            'message' => Helper::lang('auth.a_problem_has_occurred')
-                        ];
-                    } else {
-
-                        $row['id'] = $insert;
-                        $notificationController = new Notification();
-                        $notificationController->createNotification('welcome', $row);
-
-                        $return['notify'][] = [
-                            'type' => 'success',
-                            'message' => Helper::lang('auth.register_success')
-                        ];
-                        $return['redirect'] = [
-                            'url' => Helper::base('auth/login'),
-                            'time' => 2000,
-                            'direct' => false
-                        ];
-                    }
                 }
             }
 
@@ -763,7 +710,7 @@ final class User
                 'password_again' => 'nulled_text',
             ], $request->getPostParams()));
 
-            $validation = Helper::validation(
+            Helper::validation(
                 $step === 'request' ?
                     [
                         'email' => ['value' => $email, 'pattern' => 'required|email'],
@@ -771,144 +718,124 @@ final class User
                     [
                         'password' => ['value' => $password, 'pattern' => 'required|min:6|max:20'],
                         'password_again' => ['value' => $password_again, 'pattern' => 'required|min:6|max:20|match:' . $password],
-                    ]
+                    ],
+                $response
             );
 
-            if (!empty($validation)) {
+            if ($step === 'reset') { // password reset
+                $userModel = new Users();
+                $checkAccount = $userModel
+                    ->select('id, status, u_name, email, token')
+                    ->where('token', $request->getParam('token'))
+                    ->get();
 
-                $return['dom'] = [];
-                foreach ($validation as $field => $messages) {
-                    $return['dom']['[name="' . $field . '"]'] = [
-                        'addClass' => 'is-invalid',
-                    ];
+                if ($checkAccount) {
+                    if ($checkAccount->status === 'deleted') {
+                        $return['status'] = false;
+                        $return['dom']['[name="password"]'] = [
+                            'addClass' => 'is-invalid',
+                        ];
+                        $return['dom']['[name="password"] ~ .invalid-feedback'] = [
+                            'text' => Helper::lang('auth.your_account_deleted')
+                        ];
+                    } else {
+                        $update = $userModel->where('id', $checkAccount->id)->update([
+                            'password' => password_hash($password, PASSWORD_DEFAULT),
+                            'token' => Helper::tokenGenerator(80),
+                        ]);
 
-                    $return['dom']['[name="' . $field . '"] ~ .invalid-feedback'] = [
-                        'text' => implode(' ', $messages)
+                        if ($update) {
+                            $return['status'] = true;
+                            $return['notify'][] = [
+                                'type' => 'success',
+                                'message' => Helper::lang('auth.password_changed')
+                            ];
+                            $return['form_reset'] = true;
+                            $return['redirect'] = [
+                                'url' => Helper::base('auth/login'),
+                                'time' => 3000,
+                                'direct' => false
+                            ];
+
+                            $notificationController = new Notification();
+                            $notificationController->createNotification('recover_success', [
+                                'id' => $checkAccount->id,
+                                'u_name' => $checkAccount->u_name,
+                            ]);
+                        } else {
+                            $return['status'] = false;
+                            $return['notify'][] = [
+                                'type' => 'error',
+                                'message' => Helper::lang('auth.a_problem_has_occurred')
+                            ];
+                        }
+                    }
+                } else {
+                    $return['status'] = false;
+                    $return['notify'][] = [
+                        'type' => 'error',
+                        'message' => Helper::lang('auth.token_not_found')
                     ];
                 }
-                $return['status'] = false;
-                $return['notify'][] = [
-                    'type' => 'error',
-                    'message' => Helper::lang('form.fill_all_fields')
-                ];
-            } else {
+            } else { // recovery request
 
-                if ($step === 'reset') { // password reset
-                    $userModel = new Users();
-                    $checkAccount = $userModel
-                        ->select('id, status, u_name, email, token')
-                        ->where('token', $request->getParam('token'))
-                        ->get();
+                // email control
+                $userModel = new Users();
 
-                    if ($checkAccount) {
-                        if ($checkAccount->status === 'deleted') {
-                            $return['status'] = false;
-                            $return['dom']['[name="password"]'] = [
-                                'addClass' => 'is-invalid',
-                            ];
-                            $return['dom']['[name="password"] ~ .invalid-feedback'] = [
-                                'text' => Helper::lang('auth.your_account_deleted')
-                            ];
-                        } else {
-                            $update = $userModel->where('id', $checkAccount->id)->update([
-                                'password' => password_hash($password, PASSWORD_DEFAULT),
-                                'token' => Helper::tokenGenerator(80),
-                            ]);
-
-                            if ($update) {
-                                $return['status'] = true;
-                                $return['notify'][] = [
-                                    'type' => 'success',
-                                    'message' => Helper::lang('auth.password_changed')
-                                ];
-                                $return['form_reset'] = true;
-                                $return['redirect'] = [
-                                    'url' => Helper::base('auth/login'),
-                                    'time' => 3000,
-                                    'direct' => false
-                                ];
-
-                                $notificationController = new Notification();
-                                $notificationController->createNotification('recover_success', [
-                                    'id' => $checkAccount->id,
-                                    'u_name' => $checkAccount->u_name,
-                                ]);
-                            } else {
-                                $return['status'] = false;
-                                $return['notify'][] = [
-                                    'type' => 'error',
-                                    'message' => Helper::lang('auth.a_problem_has_occurred')
-                                ];
-                            }
-                        }
-                    } else {
-                        $return['status'] = false;
-                        $return['notify'][] = [
-                            'type' => 'error',
-                            'message' => Helper::lang('auth.token_not_found')
-                        ];
-                    }
-                } else { // recovery request
-
-                    // email control
-                    $userModel = new Users();
-
-                    $checkAccount = $userModel
-                        ->select('
+                $checkAccount = $userModel
+                    ->select('
                         id, 
                         u_name, 
                         email,
                         token,
                         status
                     ')
-                        ->where('email', $email)
-                        ->get();
+                    ->where('email', $email)
+                    ->get();
 
 
-                    if ($checkAccount) {
-                        if ($checkAccount->status === 'deleted') {
-                            $return['status'] = false;
-                            $return['dom']['[name="email"]'] = [
-                                'addClass' => 'is-invalid',
-                            ];
-                            $return['dom']['[name="email"] ~ .invalid-feedback'] = [
-                                'text' => Helper::lang('auth.your_account_deleted')
-                            ];
-                        } else {
-
-                            $notificationController = new Notification();
-                            $send = $notificationController->createNotification('recovery_request', [
-                                'id' => $checkAccount->id,
-                                'u_name' => $checkAccount->u_name,
-                                'email' => $checkAccount->email,
-                                'token' => $checkAccount->token,
-                            ]);
-
-                            if ($send) {
-                                $return['status'] = true;
-                                $return['notify'][] = [
-                                    'type' => 'success',
-                                    'message' => Helper::lang('auth.recovery_email_sent')
-                                ];
-                                $return['form_reset'] = true;
-                            } else {
-                                $return['status'] = false;
-                                $return['notify'][] = [
-                                    'type' => 'error',
-                                    'message' => Helper::lang('auth.a_problem_has_occurred')
-                                ];
-                            }
-                        }
-                    } else {
+                if ($checkAccount) {
+                    if ($checkAccount->status === 'deleted') {
                         $return['status'] = false;
-                        $return['notify'][] = [
-                            'type' => 'error',
-                            'message' => Helper::lang('auth.account_not_found')
+                        $return['dom']['[name="email"]'] = [
+                            'addClass' => 'is-invalid',
                         ];
+                        $return['dom']['[name="email"] ~ .invalid-feedback'] = [
+                            'text' => Helper::lang('auth.your_account_deleted')
+                        ];
+                    } else {
+
+                        $notificationController = new Notification();
+                        $send = $notificationController->createNotification('recovery_request', [
+                            'id' => $checkAccount->id,
+                            'u_name' => $checkAccount->u_name,
+                            'email' => $checkAccount->email,
+                            'token' => $checkAccount->token,
+                        ]);
+
+                        if ($send) {
+                            $return['status'] = true;
+                            $return['notify'][] = [
+                                'type' => 'success',
+                                'message' => Helper::lang('auth.recovery_email_sent')
+                            ];
+                            $return['form_reset'] = true;
+                        } else {
+                            $return['status'] = false;
+                            $return['notify'][] = [
+                                'type' => 'error',
+                                'message' => Helper::lang('auth.a_problem_has_occurred')
+                            ];
+                        }
                     }
+                } else {
+                    $return['status'] = false;
+                    $return['notify'][] = [
+                        'type' => 'error',
+                        'message' => Helper::lang('auth.account_not_found')
+                    ];
                 }
             }
-
 
             return $response->json($return);
         }
