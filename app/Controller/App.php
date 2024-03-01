@@ -18,6 +18,8 @@ use KX\Core\Response;
 
 use KX\Controller\Notification;
 
+use KX\Model\Sessions;
+
 final class App
 {
 
@@ -83,9 +85,44 @@ final class App
             'jobs' => [],
         ];
 
+        // emails
         $notification = new Notification();
         $return['jobs']['emails'] = $notification->sendEmails();
 
+        // sessions
+        $sessions = new Sessions();
+
+        $getExpiredSessions = $sessions
+            ->select('id, user_id, auth_token, ip, header')
+            ->grouped(function ($q) {
+                $q
+                    ->orWhere('last_act_at', '<', strtotime('-1 month'))
+                    ->whereNull('expire_at');
+            })
+            ->grouped(function ($q) {
+                $q
+                    ->orWhere('expire_at', '<', strtotime('-2 hours'))
+                    ->whereNotNull('expire_at');
+            })
+            ->getAll();
+
+        $return['jobs']['sessions'] = [
+            'all' => [],
+            'total_deleted' => 0,
+            'total_expired' => 0,
+        ];
+        if (!empty($getExpiredSessions)) {
+            foreach ($getExpiredSessions as $s) {
+
+                $delete = $sessions->where('id', $s->id)->delete();
+                $return['jobs']['sessions']['total_expired']++;
+                if ($delete) {
+                    $return['jobs']['sessions']['total_deleted']++;
+                }
+                $s->deleted = $delete;
+                $return['jobs']['sessions']['all'][$s->id] = $s;
+            }
+        }
 
         return $response->json($return);
         // your cron jobs
