@@ -52,15 +52,43 @@ class KalipsoXJS {
     return this;
   }
 
-  init(firstLoad = true) {
-    // Scroll to top
-    $("html, body").animate({ scrollTop: 0 }, "slow");
+  init(firstLoad = true, pageSync = false) {
+    // color scheme
+    if (localStorage.getItem("kx_theme")) {
+      this.changeColorScheme(localStorage.getItem("kx_theme"));
+    } else {
+      if (
+        window.matchMedia &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches
+      ) {
+        this.changeColorScheme("dark");
+      } else {
+        this.changeColorScheme("light");
+      }
+    }
 
-    this.dateTime = luxon.DateTime;
+    if (firstLoad) {
+      this.dateTime = luxon.DateTime;
+      console.info("KalipsoXJS v" + this.version + " initialized!");
+      this.lang = document.documentElement.lang;
 
-    console.log("KalipsoXJS v" + this.version + " initialized!");
+      // scroll to top
+      $("html, body").animate({ scrollTop: 0 }, "slow");
 
-    this.lang = document.documentElement.lang;
+      // heart beat
+      if ($("body").hasClass("dashboard")) {
+        this.startHeartbeat();
+      }
+
+      // front init
+      if (typeof window.frontInit === "function") {
+        window.frontInit();
+      }
+
+      setTimeout(() => {
+        NProgress.done();
+      }, 250);
+    }
 
     // Event listeners
     $(document).off("click", "[data-kx-action]");
@@ -140,10 +168,6 @@ class KalipsoXJS {
 
     $("time.timeago").timeago();
 
-    if ($("body").hasClass("dashboard")) {
-      this.startHeartbeat();
-    }
-
     // Form submit
     $('form[data-kx-form]:not([data-kx-form="direct"])').each((i, form) => {
       $(form).off("submit");
@@ -153,30 +177,9 @@ class KalipsoXJS {
       });
     });
 
-    // color scheme
-    if (localStorage.getItem("kx_theme")) {
-      this.changeColorScheme(localStorage.getItem("kx_theme"));
-    } else {
-      if (
-        window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-      ) {
-        this.changeColorScheme("dark");
-      } else {
-        this.changeColorScheme("light");
-      }
-    }
-
-    if (typeof window.frontInit === "function") {
-      window.frontInit();
-    }
-
     // bootstrap tooltips
-    var tooltipTriggerList = [].slice.call(
-      document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    );
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-      return new bootstrap.Tooltip(tooltipTriggerEl);
+    $("[data-bs-toggle='tooltip']").each((i, el) => {
+      bootstrap.Tooltip.getOrCreateInstance(el);
     });
 
     // datatables
@@ -184,10 +187,10 @@ class KalipsoXJS {
       this.prepareDatatables();
     }
 
-    if (firstLoad) {
-      setTimeout(() => {
-        NProgress.done();
-      }, 250);
+    if (pageSync) {
+      if ($("body").hasClass("dashboard")) {
+        this.heartBeat();
+      }
     }
   }
 
@@ -368,7 +371,9 @@ class KalipsoXJS {
               switch (key) {
                 case "html":
                   let currentHtml = $(selector).html();
-                  if (!this.checkHtmlStringsEqual(currentHtml, value)) {
+                  if (
+                    currentHtml.replace(/\s/g, "") !== value.replace(/\s/g, "")
+                  ) {
                     $(selector).html(value);
                   }
                   break;
@@ -438,7 +443,6 @@ class KalipsoXJS {
             }
           }
         }
-        $("time.timeago").timeago();
       }
 
       // redirect
@@ -478,6 +482,11 @@ class KalipsoXJS {
         $(data.modal_hide).modal("hide");
       }
 
+      // modal show
+      if (typeof data.modal_show !== "undefined" && data.modal_show) {
+        $(data.modal_show).modal("show");
+      }
+
       // table reload
       if (
         typeof data.table_reload !== "undefined" &&
@@ -514,6 +523,7 @@ class KalipsoXJS {
         this.heartBeat();
       }
     }
+    this.init(false);
   }
 
   changeColorScheme(color = "light") {
@@ -599,7 +609,7 @@ class KalipsoXJS {
     $("[data-kx-table]").each((i, table) => {
       const tableKey = table.getAttribute("data-kx-table");
       if (window.kxTables[tableKey]) {
-        window.kxTables[tableKey].destroy();
+        // window.kxTables[tableKey].draw();
       }
       const options = {
         processing: true,
@@ -696,8 +706,12 @@ class KalipsoXJS {
                 }
               });
             });
-
-          $("[data-bs-toggle='tooltip']").tooltip();
+        },
+        drawCallback: function () {
+          // bootstrap tooltips
+          $("[data-bs-toggle='tooltip']").each((i, el) => {
+            bootstrap.Tooltip.getOrCreateInstance(el);
+          });
         },
       };
       if (this.langDefinitions[this.lang]) {
@@ -726,7 +740,7 @@ class KalipsoXJS {
 
   $(document).on("pjax:popstate pjax:end", function () {
     NProgress.done();
-    w.kx.init(false);
+    w.kx.init(false, true);
   });
 
   // Initialize KalipsoXJS
