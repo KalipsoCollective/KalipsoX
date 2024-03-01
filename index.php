@@ -69,13 +69,19 @@ try {
     ]);
 
     $app->routeGroup(['GET', '/dashboard', 'Panel@dashboard', 'Auth@isAuthorized'], [
+        [['POST', 'GET'], '/data/:table', 'Panel@tableData', 'Auth@isAuthorized'],
         [['POST', 'GET'], '/settings', 'Panel@settings', 'Auth@isAuthorized'],
+        // Users
         [['POST', 'GET'], '/users', 'Panel@users', 'Auth@isAuthorized'],
         [['POST'], '/users/add', 'Panel@userAdd', 'Auth@isAuthorized'],
-        [['POST'], '/users/edit/:id', 'Panel@userEdit', 'Auth@isAuthorized'],
+        [['POST', 'GET'], '/users/edit/:id', 'Panel@userEdit', 'Auth@isAuthorized'],
         [['POST'], '/users/delete/:id', 'Panel@userDelete', 'Auth@isAuthorized'],
+        // User Roles
         [['POST', 'GET'], '/user-roles', 'Panel@userRoles', 'Auth@isAuthorized'],
-        [['POST', 'GET'], '/data/:table', 'Panel@tableData', 'Auth@isAuthorized'],
+        [['POST'], '/user-roles/add', 'Panel@userRoleAdd', 'Auth@isAuthorized'],
+        [['POST', 'GET'], '/user-roles/edit/:id', 'Panel@userRoleEdit', 'Auth@isAuthorized'],
+        [['POST'], '/user-roles/delete/:id', 'Panel@userRoleDelete', 'Auth@isAuthorized'],
+
     ]);
 
     // inital setup and app routes
