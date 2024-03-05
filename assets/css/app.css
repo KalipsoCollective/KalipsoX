@@ -247,9 +247,9 @@ button {
 .notification-list {
   max-height: 40vh;
   min-height: 20vh;
+  max-width: 60vh;
   overflow: hidden;
   overflow-y: auto;
-  display: flex;
 }
 
 .notification-list .card-body {
