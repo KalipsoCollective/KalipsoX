@@ -11,13 +11,11 @@ namespace KX\Controller;
 
 use KX\Core\Helper;
 
-
-use KX\Core\Request;
-use KX\Core\Response;
-
 use KX\Model\Emails;
 use KX\Model\Users;
 use KX\Model\Notifications;
+
+use KX\Helper\HTML;
 
 
 final class Notification
@@ -25,9 +23,9 @@ final class Notification
 
     public function getNotificationHook()
     {
-        $file = Helper::path('app/External/notifications.php');
-        if (file_exists($file)) {
-            return require $file;
+        global $kxVariables;
+        if (isset($kxVariables['notifications']) !== false) {
+            return $kxVariables['notifications'];
         } else {
             return [];
         }
@@ -242,39 +240,7 @@ final class Notification
         $notifications = $this->getNotifications($userId, $limit, $page);
         // $notifications = [];
 
-        if (!empty($notifications)) {
-            $return = $withParent ? '<div class="list-group list-group-flush list-group-hoverable list-group-notification">' : '';
-            foreach ($notifications as $notification) {
-
-                $notification->details = json_decode($notification->details);
-                $return .= '
-                <div class="list-group-item notification-' . $notification->id . '">
-                    <div class="row align-items-center">
-                        <div class="col-auto"><span class="status-dot d-block' . ($notification->status === 'active' ? ' status-dot-animated bg-green' : '') . '"></span></div>
-                        <div class="col' . ($mini ? '  text-truncate' : '') . '">
-                            <a href="javascript:;" ' . ($notification->status === 'active' ? 'data-kx-action="' . Helper::base('auth/notifications/view/' . $notification->id) . '" ' : '') . 'class="text-body d-inline-block">
-                                ' . Helper::lang($notification->details->title) . '
-                            </a>
-                            <time class="ms-2 timeago badge badge-outline text-blue" datetime="' . date('c', (int)$notification->created_at) . '">' . date('d.m H:i', (int)$notification->created_at) . '</time>
-                            <div class="d-block text-secondary mt-n1' . ($mini ? '  text-truncate' : '') . '" title="' . Helper::lang($notification->details->body) . '">
-                                ' . Helper::lang($notification->details->body) . '
-                            </div>
-                        </div>
-                        <div class="col-auto">
-                            <a href="javascript:;" data-kx-again data-kx-action="' . Helper::base('auth/notifications/delete/' . $notification->id) . '" class="list-group-item-actions">
-                                <i class="ti ti-trash icon"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>';
-            }
-            $return .= $withParent ? '</div>' : '';
-        } else {
-            $return = '
-            <div class="card-body">
-                <p class="text-center text-muted h-100 d-flex align-items-center justify-content-center">' . Helper::lang('base.no_notifications') . '</p>
-            </div>';
-        }
+        $return = HTML::notificationList($notifications, $mini, $withParent);
 
         return [
             'list' => $return,
