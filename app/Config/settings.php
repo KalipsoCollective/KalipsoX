@@ -6,7 +6,7 @@ return [
    'contact_email' => 'halillusion@gmail.com',
    'language' => 'en',
    'default_user_role' => 1,
-   'maintenance_mode' => true,
+   'maintenance_mode' => false,
    'maintenance_mode_desc' => '{"en":"We are under maintenance.","tr":"Bak\u0131m modunday\u0131z."}',
    'mail_send_type' => 'smtp',
    'smtp_address' => 'smtp.yandex.com.tr',
@@ -17,6 +17,6 @@ return [
    'db_cache' => false,
    'route_cache' => false,
    'registration_system' => true,
-   'last_updated_at' => 1709559147,
+   'last_updated_at' => 1709613903,
    'last_updated_by' => 1,
 ];
