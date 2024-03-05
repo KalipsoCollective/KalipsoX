@@ -256,7 +256,7 @@ button {
   min-height: 100%;
 }
 
-.timeago {
+.timeago:not(.lite) {
   letter-spacing: 0;
   font-size: 70%;
 }
@@ -300,8 +300,12 @@ button {
   pointer-events: none;
 }
 
+.settings-card .tab-content>.card {
+  border-width: 0 !important;
+}
 
 @media (max-width: 576px) {
+
   .dt-buttons,
   .dt-paging,
   .dt-length,
