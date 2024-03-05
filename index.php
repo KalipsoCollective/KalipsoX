@@ -19,7 +19,7 @@ error_reporting(E_ALL);
 use KX\Core\Request;
 use KX\Core\Response;
 
-define('KX_VERSION', 'alpha');
+define('KX_VERSION', 'v1.0.0');
 
 try {
 
