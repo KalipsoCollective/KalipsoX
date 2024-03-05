@@ -48,6 +48,10 @@ return [
         'user_roles_edit' => 'Edit User Role',
         'user_roles_delete' => 'Delete User Role',
         'table_data' => 'Table Data',
+        'basic' => 'Basic',
+        'advanced' => 'Advanced',
+        'user_module' => 'User Module',
+        'user_roles_module' => 'User Roles Module',
     ],
     'auth' => [
         'login' => 'Login',
@@ -214,5 +218,9 @@ return [
         'db_cache' => 'DB Cache',
         'route_cache' => 'Route Cache',
         'maintenance_mode_desc' => 'Maintenance Mode Message',
+        'trigger_all' => 'Trigger All',
+        'settings_successfully_updated' => 'Settings successfully updated.',
+        'settings_could_not_be_updated' => 'Settings could not be updated.',
+        'last_update' => 'Last Update',
     ],
 ];

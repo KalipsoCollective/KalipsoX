@@ -48,6 +48,10 @@ return [
         'user_roles_edit' => 'Kullanıcı Rolü Düzenle',
         'user_roles_delete' => 'Kullanıcı Rolü Sil',
         'table_data' => 'Tablo Verisi',
+        'basic' => 'Temel',
+        'advanced' => 'Gelişmiş',
+        'user_module' => 'Kullanıcı Modülü',
+        'user_roles_module' => 'Kullanıcı Rolü Modülü',
     ],
     'auth' => [
         'login' => 'Giriş Yap',
@@ -214,5 +218,9 @@ return [
         'db_cache' => 'Veri tabanı Önbelleği',
         'route_cache' => 'Rota Önbelleği',
         'maintenance_mode_desc' => 'Bakım Modu Mesajı',
+        'trigger_all' => 'Hepsini Tetikle',
+        'settings_successfully_updated' => 'Ayarlar başarıyla güncellendi.',
+        'settings_could_not_be_updated' => 'Ayarlar güncellenemedi.',
+        'last_update' => 'Son Güncelleme',
     ],
 ];
