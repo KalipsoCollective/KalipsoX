@@ -173,8 +173,11 @@ final class User
         ], 'layout');
     }
 
-    public function heartbeat(Request $request, Response $response)
+    public function heartbeat(Request $request, Response $response, $instance)
     {
+
+        $instance->setLogRecord(false);
+
         $return = [
             'status' => true,
             'message' => 'OK',
@@ -856,19 +859,17 @@ final class User
         $type = isset($request->getRouteDetails()->attributes['type']) !== false ?
             $request->getRouteDetails()->attributes['type'] :
             null;
+        $sessionModel = new Sessions();
         if ($type === 'all') {
-            $sessionModel = new Sessions();
             $sessionModel
                 ->where('user_id', $kxSession->user->id)
                 ->delete();
         } elseif (is_numeric($type)) {
-            $sessionModel = new Sessions();
             $sessionModel
                 ->where('id', $type)
                 ->where('user_id', $kxSession->user->id)
                 ->delete();
         } else {
-            $sessionModel = new Sessions();
             $sessionModel
                 ->where('auth_token', $kxAuthToken)
                 ->where('user_id', $kxSession->user->id)
