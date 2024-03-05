@@ -47,6 +47,10 @@ try {
         '404' => ['']
     ]);*/
 
+    $app->setMaintenanceMode([
+        '/auth/login',
+    ], 'dashboard.settings');
+
     /**
      * Single route
      **/
