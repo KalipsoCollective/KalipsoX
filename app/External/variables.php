@@ -76,11 +76,16 @@ $endpoints = [
  * ROLE & ROLE GROUPS
  * We use this definition for role definitions for display.
  */
-$_roles = ($baseModel)
-    ->select('id, name')
-    ->table('user_roles')
-    ->cache(60)
-    ->getAll();
+if ($baseModel->pdo->query('SHOW TABLES LIKE "user_roles"')->rowCount()) {
+
+    $_roles = ($baseModel)
+        ->select('id, name')
+        ->table('user_roles')
+        ->cache(60)
+        ->getAll();
+} else {
+    $_roles = [];
+}
 
 $roles = [];
 if (!empty($_roles)) {
