@@ -53,7 +53,7 @@
         <a href="<?php echo $Helper::base('auth/sessions'); ?>" class="dropdown-item<?php echo $Helper::currentPage('auth/sessions'); ?>">
             <i class="ti ti-device-tablet-star icon dropdown-item-icon"></i> <?php echo $Helper::lang('auth.sessions'); ?>
         </a>
-        <a href="<?php echo $Helper::base('auth/logout'); ?>" class="dropdown-item">
+        <a data-kx-action="<?php echo $Helper::base('auth/logout'); ?>" href="javascript:;" class="dropdown-item">
             <i class="ti ti-power icon dropdown-item-icon"></i> <?php echo $Helper::lang('auth.logout'); ?>
         </a>
     </div>
