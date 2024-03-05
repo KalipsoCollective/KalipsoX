@@ -37,6 +37,102 @@ final class Panel
 
     public function settings(Request $request, Response $response)
     {
+
+        if ($request->getRequestMethod() === 'POST' && $request->getHeader('Accept') === 'application/json') {
+
+            global $kxVariables, $kxAvailableLanguages, $kxLang;
+
+            $return = [
+                'status' => true,
+                'notify' => [],
+            ];
+
+            // set up the settings
+            $currSettings = $kxVariables['settings'];
+
+            extract(Helper::input([
+                'settings' => 'nulled_text',
+            ], $request->getParams()));
+
+            // group the settings
+            $currentSettings = [];
+            foreach ($currSettings as $settingName => $settingDetails) {
+                // get current setting
+                $c = Helper::config('settings.' . $settingName, true);
+                if (isset($settingDetails['multilanguage']) !== false && $settingDetails['multilanguage'] === true) {
+                    $c = json_decode((string)$c, true);
+                }
+
+                // update with the new settings
+                if (isset($settings[$settingName]) !== false) {
+                    $currentSettings[$settingName] = $settings[$settingName];
+                } else {
+                    $currentSettings[$settingName] = $c;
+                }
+
+                // fix for switch
+                if ($settingDetails['type'] === 'switch') {
+                    if (in_array($currentSettings[$settingName], ['on', 'off'])) {
+                        $currentSettings[$settingName] = $currentSettings[$settingName] === 'on';
+                    }
+                }
+
+                // fix for multilanguage
+                if (isset($settingDetails['multilanguage']) !== false && $settingDetails['multilanguage'] === true) {
+                    $currentSettings[$settingName] = json_encode($currentSettings[$settingName]);
+                }
+
+                // fix for numeric
+                if (is_numeric($currentSettings[$settingName])) {
+                    $currentSettings[$settingName] = (float)$currentSettings[$settingName];
+                }
+            }
+
+            $currentSettings['last_updated_at'] = time();
+            $currentSettings['last_updated_by'] = Helper::sessionData('user', 'id');
+
+            // save the settings as php string
+            $settingsStr = '<?php ' . PHP_EOL . PHP_EOL . 'return [' . PHP_EOL;
+            foreach ($currentSettings as $settingName => $settingValue) {
+                $settingsStr .= '   \'' . $settingName . '\' => ';
+                if (is_string($settingValue)) {
+                    $settingsStr .= '\'' . str_replace('\'', '\\\'', $settingValue) . '\',' . PHP_EOL;
+                } elseif (is_bool($settingValue)) {
+                    $settingsStr .= ($settingValue ? 'true,' : 'false,') . PHP_EOL;
+                } else {
+                    $settingsStr .= $settingValue . ',' . PHP_EOL;
+                }
+            }
+            $settingsStr .= '];';
+
+            $settingsFile = Helper::path('app/Config/settings.php');
+            $save = file_put_contents($settingsFile, $settingsStr);
+
+            if ($save) {
+                $return['notify'][] = [
+                    'type' => 'success',
+                    'message' => Helper::lang('base.settings_successfully_updated'),
+                ];
+                $return['dom'] = [
+                    '.settings-card .timeago' => [
+                        'attr' => [
+                            'datetime' => date('c', $currentSettings['last_updated_at'])
+                        ]
+                    ]
+                ];
+            } else {
+                $return['status'] = false;
+                $return['notify'][] = [
+                    'type' => 'error',
+                    'message' => Helper::lang('base.settings_could_not_be_updated')
+                ];
+            }
+
+            return $response->json($return);
+        }
+
+
+
         return $response->render('panel/settings', [
             'title' => Helper::lang('base.settings'),
             'description' => Helper::lang('base.settings_desc'),
@@ -63,7 +159,7 @@ final class Panel
         ], 'layout');
     }
 
-    public function tableData(Request $request, Response $response)
+    public function tableData(Request $request, Response $response, $instance)
     {
 
         global $kxVariables;
@@ -71,6 +167,7 @@ final class Panel
         extract(Helper::input([
             'table' => 'nulled_text',
         ], $request->getRouteDetails()->attributes));
+        $instance->setLogRecord(false);
 
         if (empty($table)) {
             return $response->json(['error' => 'Table name is required']);
@@ -290,7 +387,7 @@ final class Panel
 
             if (empty($u_name) || empty($email) || empty($role_id) || empty($status)) { // prepare form
 
-                $formContent = $kxVariables['datatables']['tables']['users']['modal']($getUser, true);
+                $formContent = HTML::adminModalContents('users', $getUser, true);
 
                 $return['status'] = true;
                 $return['dom'] = [
@@ -573,7 +670,8 @@ final class Panel
 
             if (empty($name) || empty($routes)) { // prepare form
 
-                $formContent = $kxVariables['datatables']['tables']['user-roles']['modal']($getUserRole, true);
+                $formContent =
+                    HTML::adminModalContents('user-roles', $getUserRole, true);
 
                 $return['status'] = true;
                 $return['dom'] = [
