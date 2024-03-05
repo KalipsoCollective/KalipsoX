@@ -4,11 +4,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="h1 navbar-brand navbar-horizontal pe-0 pe-md-3 d-lg-none">
-            <a href="<?php
-
-                        use KX\Core\Helper;
-
-                        echo $Helper::base('/'); ?>">
+            <a href="<?php echo $Helper::base('/'); ?>">
                 <?php echo $Helper::config('settings.name'); ?>
             </a>
         </div>
@@ -16,7 +12,9 @@
             <?php require $Helper::path('app/View/_parts/user_nav.php'); ?>
         </div>
         <div class="collapse navbar-collapse" id="sidebar-menu">
-            <?php $routes = require $Helper::path('app/External/sidebar_routes.php');
+            <?php
+            global $kxVariables;
+            $routes = $kxVariables['sidebar_routes'];
             if (!empty($routes)) {
 
                 echo '
