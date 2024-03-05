@@ -88,6 +88,8 @@ class KalipsoXJS {
       setTimeout(() => {
         NProgress.done();
       }, 250);
+
+      $("time.timeago").timeago();
     }
 
     // Event listeners
@@ -131,9 +133,9 @@ class KalipsoXJS {
           }
           break;
         case "show_password":
-          const parent = this.findParent(el, ".input-group");
-          if (parent) {
-            const input = parent.querySelector("input");
+          const inputParent = this.findParent(el, ".input-group");
+          if (inputParent) {
+            const input = inputParent.querySelector("input");
             if (input.type === "password") {
               input.type = "text";
             } else {
@@ -145,6 +147,16 @@ class KalipsoXJS {
         case "set_new_password":
           $('[data-kx-action="set_new_password"]').addClass("d-none");
           $(".set-new-password").removeClass("d-none");
+          break;
+
+        case "switch_trigger":
+          const selector = $(el).attr("data-kx-selector");
+          let switchParent = this.findParent(el, "form");
+          if (selector && switchParent) {
+            $(switchParent)
+              .find(selector)
+              .prop("checked", !$(switchParent).find(selector).prop("checked"));
+          }
           break;
         default:
           // direct send request
@@ -165,8 +177,13 @@ class KalipsoXJS {
       maxDate: this.dateTime.local().minus({ years: 15 }).toISODate(),
       locale: this.lang,
     });
-
-    $("time.timeago").timeago();
+    $("time.timeago").each((i, el) => {
+      if ($(el).timeago) {
+        $(el).timeago("update", $(el).attr("datetime"));
+      } else {
+        $(el).timeago();
+      }
+    });
 
     // Form submit
     $('form[data-kx-form]:not([data-kx-form="direct"])').each((i, form) => {
@@ -328,15 +345,20 @@ class KalipsoXJS {
       })
       .catch((error) => {
         let message = "";
+        console.log("A problem occurred!", error);
+        if (url.includes("auth/heartbeat") && window.kxHeartbeat) {
+          clearInterval(window.kxHeartbeat);
+        }
         if (typeof error.message === "string") {
-          message = error.message;
+          return error.message;
         } else {
           return error;
         }
+        /*
         this.notify(
           "A problem occurred!" + (message === "" ? "" : "(" + message + ")"),
           "error"
-        );
+        ); */
       });
     if (progressBar) {
       NProgress.done();
