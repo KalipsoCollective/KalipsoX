@@ -222,5 +222,6 @@ return [
         'settings_successfully_updated' => 'Ayarlar başarıyla güncellendi.',
         'settings_could_not_be_updated' => 'Ayarlar güncellenemedi.',
         'last_update' => 'Son Güncelleme',
+        'dev_mode_only' => 'Bu sayfa sadece geliştirme modunda çalışır.',
     ],
 ];
