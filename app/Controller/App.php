@@ -44,6 +44,12 @@ final class App
 
     public function setupModels(Request $request, Response $response)
     {
+        if (Helper::config('DEV_MODE', true) === false) {
+            return $response->json([
+                'status' => false,
+                'message' => Helper::lang('base.dev_mode_only')
+            ]);
+        }
         $systemModel = new Model();
         $action = [
             'models' => $systemModel->setupModels()
@@ -54,6 +60,12 @@ final class App
 
     public function setupModelsWithSeed(Request $request, Response $response)
     {
+        if (Helper::config('DEV_MODE', true) === false) {
+            return $response->json([
+                'status' => false,
+                'message' => Helper::lang('base.dev_mode_only')
+            ]);
+        }
         $systemModel = new Model();
         $action = [
             'models' => $systemModel->setupModels(true)
@@ -64,6 +76,12 @@ final class App
 
     public function syncModels(Request $request, Response $response)
     {
+        if (Helper::config('DEV_MODE', true) === false) {
+            return $response->json([
+                'status' => false,
+                'message' => Helper::lang('base.dev_mode_only')
+            ]);
+        }
         $systemModel = new Model();
         $action = [
             'models' => $systemModel->syncModels()
