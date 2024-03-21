@@ -41,7 +41,7 @@ final class Logs extends Model
                     'type' => 'int'
                 ],
                 'auth_token' => [
-                     'type' => 'varchar',
+                    'type' => 'varchar',
                     'length' => 650,
                     'nullable' => true,
                 ],
@@ -56,7 +56,7 @@ final class Logs extends Model
                     'nullable' => true,
                 ],
                 'exec_time' => [
-                    'type' => 'float(5,4)',
+                    'type' => 'float(8,4)',
                     'default' => 0
                 ],
             ],
