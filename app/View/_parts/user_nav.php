@@ -1,3 +1,13 @@
+<div class="nav-item">
+    <a data-kx-action="refresh" data-kx-pjax="true" class="nav-link px-0" data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="<?php echo $Helper::lang('base.refresh'); ?>" title="<?php echo $Helper::lang('base.refresh'); ?>">
+        <i class="ti ti-reload"></i>
+    </a>
+</div>
+<div class="nav-item">
+    <a data-kx-action="fullscreen" class="nav-link px-0" data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="<?php echo $Helper::lang('base.fullscreen'); ?>" title="<?php echo $Helper::lang('base.fullscreen'); ?>">
+        <i class="ti"></i>
+    </a>
+</div>
 <div class="nav-item dropdown">
     <a data-kx-action="toggle_theme" class="nav-link px-0" data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="<?php echo $Helper::lang('base.toggle_theme'); ?>" title="<?php echo $Helper::lang('base.toggle_theme'); ?>">
         <i class="ti"></i>
