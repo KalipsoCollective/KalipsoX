@@ -779,4 +779,57 @@ final class Panel
 
         return $response->json($return);
     }
+
+    public function sessions(Request $request, Response $response)
+    {
+        return $response->render('panel/sessions', [
+            'title' => Helper::lang('base.sessions'),
+            'description' => Helper::lang('base.sessions_desc'),
+            'auth' => $request->getMiddlewareParams(),
+        ], 'layout');
+    }
+
+    public function sessionDelete(Request $request, Response $response, $instance)
+    {
+        global $kxAuthToken;
+        $return = [
+            'status' => true,
+            'notify' => [],
+        ];
+
+        extract(Helper::input([
+            'id' => 'int',
+        ], $request->getRouteDetails()->attributes));
+
+        $delete = new Sessions();
+        $delete = $delete
+            ->where('id', $id)
+            ->notWhere('auth_token', $kxAuthToken)
+            ->delete();
+
+        if ($delete) {
+            $return['notify'][] = [
+                'type' => 'success',
+                'message' => Helper::lang('base.record_successfully_deleted')
+            ];
+            $return['table_reload'] = 'sessions';
+        } else {
+            $return['status'] = false;
+            $return['notify'][] = [
+                'type' => 'error',
+                'message' => Helper::lang('auth.a_problem_has_occurred')
+            ];
+        }
+
+        return $response->json($return);
+    }
+
+    public function logs(Request $request, Response $response)
+    {
+        return $response->render('panel/logs', [
+            'title' => Helper::lang('base.logs'),
+            'description' => Helper::lang('base.logs_desc'),
+            'auth' => $request->getMiddlewareParams(),
+        ], 'layout');
+    }
 }
