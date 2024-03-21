@@ -57,14 +57,17 @@ class KalipsoXJS {
     if (localStorage.getItem("kx_theme")) {
       this.changeColorScheme(localStorage.getItem("kx_theme"));
     } else {
-      if (
-        window.matchMedia &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches
-      ) {
+      if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
         this.changeColorScheme("dark");
       } else {
         this.changeColorScheme("light");
       }
+    }
+
+    if (document.fullscreenElement) {
+      $('[data-kx-action="fullscreen"] i.ti').removeClass("ti-maximize").addClass("ti-minimize");
+    } else {
+      $('[data-kx-action="fullscreen"] i.ti').removeClass("ti-minimize").addClass("ti-maximize");
     }
 
     if (firstLoad) {
@@ -103,15 +106,11 @@ class KalipsoXJS {
       if (el.getAttribute("data-kx-again") !== null) {
         if (el.getAttribute("data-kx-again") !== "waiting") {
           el.setAttribute("data-kx-again", "waiting");
-          el.querySelector("i.ti").classList.value = el
-            .querySelector("i.ti")
-            .classList.value.replace("ti-", "ti--");
+          el.querySelector("i.ti").classList.value = el.querySelector("i.ti").classList.value.replace("ti-", "ti--");
           el.querySelector("i.ti").classList.add("ti-question-mark");
           setTimeout(() => {
             el.setAttribute("data-kx-again", "");
-            el.querySelector("i.ti").classList.value = el
-              .querySelector("i.ti")
-              .classList.value.replace("ti--", "ti-");
+            el.querySelector("i.ti").classList.value = el.querySelector("i.ti").classList.value.replace("ti--", "ti-");
             el.querySelector("i.ti").classList.remove("ti-question-mark");
           }, 3000);
           return;
@@ -120,16 +119,11 @@ class KalipsoXJS {
 
       switch (action) {
         case "toggle_theme":
-          const newTheme =
-            document.body.getAttribute("data-bs-theme") === "light"
-              ? "dark"
-              : "light";
+          const newTheme = document.body.getAttribute("data-bs-theme") === "light" ? "dark" : "light";
           this.changeColorScheme(newTheme);
           if (el.querySelector("i.ti")) {
             el.querySelector("i.ti").setAttribute("class", "ti");
-            el.querySelector("i.ti").classList.add(
-              newTheme === "dark" ? "ti-sun" : "ti-moon"
-            );
+            el.querySelector("i.ti").classList.add(newTheme === "dark" ? "ti-sun" : "ti-moon");
           }
           break;
         case "show_password":
@@ -153,16 +147,29 @@ class KalipsoXJS {
           const selector = $(el).attr("data-kx-selector");
           let switchParent = this.findParent(el, "form");
           if (selector && switchParent) {
-            $(switchParent)
-              .find(selector)
-              .prop("checked", !$(switchParent).find(selector).prop("checked"));
+            $(switchParent).find(selector).prop("checked", !$(switchParent).find(selector).prop("checked"));
+          }
+          break;
+        case "fullscreen":
+          if (document.fullscreenElement) {
+            document.exitFullscreen();
+            $("i", el).removeClass("ti-minimize").addClass("ti-maximize");
+          } else {
+            document.documentElement.requestFullscreen();
+            $("i", el).removeClass("ti-maximize").addClass("ti-minimize");
+          }
+          break;
+        case "refresh":
+          // with pjax
+          if (el.getAttribute("data-kx-pjax") === "true") {
+            $.pjax.reload("body");
+          } else {
+            window.location.reload();
           }
           break;
         default:
           // direct send request
-          const data = el.getAttribute("data-kx-body")
-            ? JSON.parse(el.getAttribute("data-kx-body"))
-            : {};
+          const data = el.getAttribute("data-kx-body") ? JSON.parse(el.getAttribute("data-kx-body")) : {};
           const res = await this.sendRequest(action, "POST", data);
           this.pullResponse(res);
           break;
@@ -213,11 +220,7 @@ class KalipsoXJS {
 
   async sendForm(event) {
     // find submit button
-    const submitButton =
-      event.target.querySelector('button[type="submit"]') ||
-      document.querySelector(
-        '[form="' + event.target.getAttribute("id") + '"]'
-      );
+    const submitButton = event.target.querySelector('button[type="submit"]') || document.querySelector('[form="' + event.target.getAttribute("id") + '"]');
     if (submitButton) {
       $(submitButton).addClass("disabled loading");
     }
@@ -267,12 +270,7 @@ class KalipsoXJS {
     this.pullResponse(response, event.target);
   }
 
-  async sendRequest(
-    url = null,
-    method = "POST",
-    data = {},
-    progressBar = true
-  ) {
+  async sendRequest(url = null, method = "POST", data = {}, progressBar = true) {
     if (progressBar) {
       NProgress.inc();
     }
@@ -299,11 +297,7 @@ class KalipsoXJS {
 
       fetchOptions.headers["Accept"] = "application/json";
 
-      const resursiveFormData = (
-        obj,
-        formData = new FormData(),
-        parentKey = null
-      ) => {
+      const resursiveFormData = (obj, formData = new FormData(), parentKey = null) => {
         for (const key in obj) {
           if (obj.hasOwnProperty(key)) {
             const value = obj[key];
@@ -393,9 +387,7 @@ class KalipsoXJS {
               switch (key) {
                 case "html":
                   let currentHtml = $(selector).html();
-                  if (
-                    currentHtml.replace(/\s/g, "") !== value.replace(/\s/g, "")
-                  ) {
+                  if (currentHtml.replace(/\s/g, "") !== value.replace(/\s/g, "")) {
                     $(selector).html(value);
                   }
                   break;
@@ -477,19 +469,13 @@ class KalipsoXJS {
         } else {
           setTimeout(() => {
             if (data.redirect.url === window.location.href) {
-              if (
-                typeof data.redirect.direct !== "undefined" &&
-                data.redirect.direct === true
-              ) {
+              if (typeof data.redirect.direct !== "undefined" && data.redirect.direct === true) {
                 window.location.reload();
               } else {
                 $.pjax.reload();
               }
             } else {
-              if (
-                typeof data.redirect.direct !== "undefined" &&
-                data.redirect.direct === true
-              ) {
+              if (typeof data.redirect.direct !== "undefined" && data.redirect.direct === true) {
                 window.location.href = data.redirect.url;
               } else {
                 $.pjax({ url: data.redirect.url, container: "body" });
@@ -510,38 +496,24 @@ class KalipsoXJS {
       }
 
       // table reload
-      if (
-        typeof data.table_reload !== "undefined" &&
-        data.table_reload &&
-        window.kxTables
-      ) {
+      if (typeof data.table_reload !== "undefined" && data.table_reload && window.kxTables) {
         if (window.kxTables[data.table_reload]) {
           window.kxTables[data.table_reload].ajax.reload();
         }
       }
 
       // form reset
-      if (
-        typeof data.form_reset !== "undefined" &&
-        data.form_reset === true &&
-        form
-      ) {
+      if (typeof data.form_reset !== "undefined" && data.form_reset === true && form) {
         $(form).trigger("reset");
       }
 
       // form validation
-      if (
-        typeof data.heart_beat_stop !== "undefined" &&
-        data.heart_beat_stop === true
-      ) {
+      if (typeof data.heart_beat_stop !== "undefined" && data.heart_beat_stop === true) {
         clearInterval(window.kxHeartbeat);
       }
 
       // heart beat direct
-      if (
-        typeof data.heart_beat_direct !== "undefined" &&
-        data.heart_beat_direct
-      ) {
+      if (typeof data.heart_beat_direct !== "undefined" && data.heart_beat_direct) {
         this.heartBeat();
       }
     }
@@ -560,9 +532,7 @@ class KalipsoXJS {
 
     if ($('[data-kx-action="toggle_theme"] i.ti')) {
       $('[data-kx-action="toggle_theme"] i.ti').removeClass("ti-moon ti-sun");
-      $('[data-kx-action="toggle_theme"] i.ti').addClass(
-        color === "dark" ? "ti-sun" : "ti-moon"
-      );
+      $('[data-kx-action="toggle_theme"] i.ti').addClass(color === "dark" ? "ti-sun" : "ti-moon");
     }
   }
 
@@ -597,12 +567,7 @@ class KalipsoXJS {
   }
 
   async heartBeat() {
-    const response = await this.sendRequest(
-      "/auth/heartbeat",
-      "POST",
-      {},
-      false
-    );
+    const response = await this.sendRequest("/auth/heartbeat", "POST", {}, false);
     if (response && typeof response === "object") {
       this.pullResponse(response);
       if (response.heartBeatStop) {
