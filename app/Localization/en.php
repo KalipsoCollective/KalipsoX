@@ -223,5 +223,7 @@ return [
         'settings_could_not_be_updated' => 'Settings could not be updated.',
         'last_update' => 'Last Update',
         'dev_mode_only' => 'This page is only available in development mode.',
+        'refresh' => 'Refresh',
+        'fullscreen' => 'Fullscreen',
     ],
 ];

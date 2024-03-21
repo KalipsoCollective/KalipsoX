@@ -223,5 +223,7 @@ return [
         'settings_could_not_be_updated' => 'Ayarlar güncellenemedi.',
         'last_update' => 'Son Güncelleme',
         'dev_mode_only' => 'Bu sayfa sadece geliştirme modunda çalışır.',
+        'refresh' => 'Yenile',
+        'fullscreen' => 'Tam Ekran',
     ],
 ];
