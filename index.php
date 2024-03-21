@@ -85,7 +85,11 @@ try {
         [['POST'], '/user-roles/add', 'Panel@userRoleAdd', 'Auth@isAuthorized'],
         [['POST', 'GET'], '/user-roles/edit/:id', 'Panel@userRoleEdit', 'Auth@isAuthorized'],
         [['POST'], '/user-roles/delete/:id', 'Panel@userRoleDelete', 'Auth@isAuthorized'],
-
+        // Sessions
+        [['POST', 'GET'], '/sessions', 'Panel@sessions', 'Auth@isAuthorized'],
+        [['POST'], '/sessions/delete/:id', 'Panel@sessionDelete', 'Auth@isAuthorized'],
+        // Logs
+        [['POST', 'GET'], '/logs', 'Panel@logs', 'Auth@isAuthorized'],
     ]);
 
     // inital setup and app routes
