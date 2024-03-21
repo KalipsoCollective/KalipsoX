@@ -70,6 +70,23 @@ $endpoints = [
         'name' => 'authorization.user_roles_delete',
         'group' => 'user_roles_module',
     ],
+    // Sessions
+    'dashboard.sessions' => [
+        'default' => false,
+        'name' => 'authorization.sessions',
+        'group' => 'session_module',
+    ],
+    'dashboard.sessions.delete.:id' => [
+        'default' => false,
+        'name' => 'authorization.sessions_delete',
+        'group' => 'session_module',
+    ],
+    // Logs
+    'dashboard.logs' => [
+        'default' => false,
+        'name' => 'authorization.logs',
+        'group' => 'report_module',
+    ],
 ];
 
 /**
@@ -107,9 +124,17 @@ $roleGroups = [
         'name' => Helper::lang('authorization.user_roles_module'),
         'icon' => 'ti ti-lock',
     ],
+    'session_module' => [
+        'name' => Helper::lang('authorization.session_module'),
+        'icon' => 'ti ti-fingerprint',
+    ],
     'advanced' => [
         'name' => Helper::lang('authorization.advanced'),
         'icon' => 'ti ti-shield-cog',
+    ],
+    'report_module' => [
+        'name' => Helper::lang('authorization.report_module'),
+        'icon' => 'ti ti-report',
     ],
 ];
 
@@ -555,7 +580,273 @@ $dataTables = [
                     "-") as updated_at,
                     (SELECT COUNT(id) FROM users u WHERE u.role_id = ur.id AND u.status != "deleted") as user_count
                 FROM user_roles ur',
-        ]
+        ],
+        'sessions' => [
+            'columns' => [
+                'id' => [
+                    'name' => 'ID',
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'number',
+                ],
+                'user' => [
+                    'name' => Helper::lang('base.user'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+
+                        return '<kbd>#' . $row['user_id'] . '</kbd> ' . $d;
+                    }
+                ],
+                'auth_token' => [
+                    'name' => Helper::lang('base.auth_token'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<kbd>' . $d . '</kbd>';
+                    }
+                ],
+                'ip' => [
+                    'name' => Helper::lang('base.ip_address'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<kbd>' . $d . '</kbd>';
+                    }
+                ],
+                'header' => [
+                    'name' => Helper::lang('base.device'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => false,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        $deviceInfo = Helper::userAgentDetails($d);
+                        return '<p class="mb-0 text-nowrap" title="' . $deviceInfo['user_agent'] . '">
+                            <i class="ti ti-' . $deviceInfo['p_icon'] . '"></i> ' . $deviceInfo['platform'] . ' — 
+                            <i class="ti ti-' . $deviceInfo['b_icon'] . '"></i> ' . $deviceInfo['browser'] . ' ' . $deviceInfo['version'] . '
+                        </p>';
+                    }
+                ],
+                'last_act_on' => [
+                    'name' => Helper::lang('base.last_activity'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                ],
+                'created_at' => [
+                    'name' => Helper::lang('base.created_at'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                ],
+                'expire_at' => [
+                    'name' => Helper::lang('base.expire_at'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                ],
+                'actions' => [
+                    'name' => Helper::lang('base.actions'),
+                    'visible' => true,
+                    'searchable' => false,
+                    'orderable' => false,
+                    'formatter' => function ($d, $row) {
+
+                        global $kxAuthToken;
+
+                        if ($row['auth_token'] === $kxAuthToken) {
+                            return '';
+                        }
+
+                        $return = '';
+                        if (Helper::authorization('dashboard/sessions/delete/:id')) {
+                            $return .= '
+                                <a data-kx-again data-kx-action="' . Helper::base('dashboard/sessions/delete/' . $row['id']) . '" href="javascript:;" class="btn btn-sm btn-danger" data-bs-toggle="tooltip" title="' . Helper::lang('base.delete_session') . '">
+                                    <i class="ti ti-fingerprint-off"></i>
+                                </a>
+                            ';
+                        }
+
+                        return $return;
+                    },
+                ],
+            ],
+            'external_columns' => [
+                'last_act_at', 'user_id'
+            ],
+            'order' => [
+                'name' => 'id',
+                'dir' => 'asc',
+            ],
+            'url' => Helper::base('dashboard/data/sessions'),
+            'sql' => 'SELECT 
+                    s.id,
+                    s.user_id,
+                    (SELECT u.u_name FROM users u WHERE u.id = s.user_id) as user,
+                    s.auth_token,
+                    s.ip,
+                    s.header,
+                    s.last_act_on,
+                    IFNULL(
+                        FROM_UNIXTIME(s.last_act_at, "%Y-%m-%d %H:%i"),
+                    "-") as last_act_at,
+                    IFNULL(
+                        FROM_UNIXTIME(s.expire_at, "%Y-%m-%d %H:%i"),
+                    "-") as expire_at,
+                    IFNULL(
+                        FROM_UNIXTIME(s.created_at, "%Y-%m-%d %H:%i"),
+                    "-") as created_at
+                FROM sessions s',
+        ],
+        'logs' => [
+            'columns' => [
+                'id' => [
+                    'name' => 'ID',
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'number',
+                ],
+                'user' => [
+                    'name' => Helper::lang('base.user'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+
+                        return !empty($row['created_by']) ? '<kbd>#' . $row['created_by'] . '</kbd> ' . $d : '-';
+                    }
+                ],
+                'auth_token' => [
+                    'name' => Helper::lang('base.auth_token'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<kbd>' . $d . '</kbd>';
+                    }
+                ],
+                'endpoint' => [
+                    'name' => Helper::lang('base.endpoint'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<kbd>' . $d . '</kbd>';
+                    }
+                ],
+                'status_code' => [
+                    'name' => Helper::lang('base.status_code'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        $d = (int)$d;
+                        return '<span class="badge bg-' . ($d >= 200 && $d < 300 ? 'green' : ($d >= 300 && $d < 400 ? 'yellow' : 'red')) . '-lt">' . $d . '</span>';
+                    }
+                ],
+                'method' => [
+                    'name' => Helper::lang('base.method'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<code>' . $d . '</code>';
+                    }
+                ],
+                'ip' => [
+                    'name' => Helper::lang('base.ip_address'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<kbd>' . $d . '</kbd>';
+                    }
+                ],
+                'header' => [
+                    'name' => Helper::lang('base.device'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => false,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        $deviceInfo = Helper::userAgentDetails($d);
+                        return '<p class="mb-0 text-nowrap" title="' . $deviceInfo['user_agent'] . '">
+                            <i class="ti ti-' . $deviceInfo['p_icon'] . '"></i> ' . $deviceInfo['platform'] . ' — 
+                            <i class="ti ti-' . $deviceInfo['b_icon'] . '"></i> ' . $deviceInfo['browser'] . ' ' . $deviceInfo['version'] . '
+                        </p>';
+                    }
+                ],
+                'exec_time' => [
+                    'name' => Helper::lang('base.exec_time'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<code>' . $d . 'ms</code>';
+                    }
+                ],
+                'created_at' => [
+                    'name' => Helper::lang('base.created_at'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                ],
+                /*
+                'actions' => [
+                    'name' => Helper::lang('base.actions'),
+                    'visible' => true,
+                    'searchable' => false,
+                    'orderable' => false,
+                    'formatter' => function ($d, $row) {
+
+
+                    },
+                ], */
+            ],
+            'external_columns' => [
+                'created_by'
+            ],
+            'order' => [
+                'name' => 'id',
+                'dir' => 'asc',
+            ],
+            'url' => Helper::base('dashboard/data/logs'),
+            'sql' => 'SELECT 
+                    l.id,
+                    l.created_by,
+                    (SELECT u.u_name FROM users u WHERE u.id = l.created_by) as user,
+                    l.endpoint,
+                    l.auth_token,
+                    l.status_code,
+                    l.ip,
+                    l.header,
+                    l.exec_time,
+                    l.method,
+                    IFNULL(
+                        FROM_UNIXTIME(l.created_at, "%Y-%m-%d %H:%i"),
+                    "-") as created_at
+                FROM logs l',
+        ],
     ],
     'default' => []
 ];
@@ -683,11 +974,22 @@ $sidebarRoutes = [
             'user_roles' => [
                 'link' => '/dashboard/user-roles',
             ],
+            'sessions' => [
+                'link' => '/dashboard/sessions',
+            ],
         ],
     ],
     'settings' => [
         'icon' => 'ti ti-settings',
         'link' => '/dashboard/settings',
+    ],
+    'reports' => [
+        'icon' => 'ti ti-report',
+        'children' => [
+            'logs' => [
+                'link' => '/dashboard/logs',
+            ],
+        ],
     ],
 ];
 
