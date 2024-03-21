@@ -144,6 +144,7 @@ $settings = [
         'label' => Helper::lang('base.app_name'),
         'value' => Helper::config('settings.name'),
         'required' => true,
+        // 'attributes' => ' minlength="3" maxlength="50"',
         'col' => 'col-lg-6',
     ],
     'description' => [
