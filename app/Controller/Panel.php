@@ -18,7 +18,7 @@ use KX\Core\Response;
 
 use KX\Controller\Notification;
 use KX\Helper\HTML;
-use KX\Helper\SSP;
+use KX\Helper\DT;
 use KX\Model\Sessions;
 use KX\Model\Users;
 use KX\Model\UserRoles;
@@ -206,16 +206,15 @@ final class Panel
 
             $sqlSelect = isset($tableDetails['sql']) !== false ? $tableDetails['sql'] : '';
 
-            $model = new Model();
-            $ssp = SSP::simple_extend(
-                $request->getRequestMethod() === 'POST' ? $_POST : $_GET,
-                $model->pdo,
+            $model = new DT((new Model));
+            $data = $model->extract(
+                $request->getRequestMethod() === 'POST' ? $request->getPostParams() : $request->getGetParams(),
                 isset($tableDetails['primaryKey']) !== false ? $tableDetails['primaryKey'] : 'id',
                 $columns,
                 $sqlSelect
             );
 
-            return $response->json($ssp);
+            return $response->json($data);
         }
     }
 

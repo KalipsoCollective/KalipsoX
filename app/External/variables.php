@@ -434,8 +434,7 @@ $dataTables = [
                 'dir' => 'asc',
             ],
             'url' => Helper::base('dashboard/data/users'),
-            'sql' => '
-                (SELECT 
+            'sql' => 'SELECT 
                     u.id,
                     u.u_name,
                     u.f_name,
@@ -453,8 +452,7 @@ $dataTables = [
                     "-") as updated_at,
                     u.role_id,
                     (SELECT name FROM user_roles ur WHERE ur.id = u.role_id) as role
-                FROM users u
-            ) as result',
+                FROM users u',
         ],
         'user-roles' => [
             'columns' => [
@@ -545,8 +543,7 @@ $dataTables = [
                 'dir' => 'asc',
             ],
             'url' => Helper::base('dashboard/data/user-roles'),
-            'sql' => '
-                (SELECT 
+            'sql' => 'SELECT 
                     ur.id,
                     ur.name,
                     ur.routes,
@@ -557,8 +554,7 @@ $dataTables = [
                         FROM_UNIXTIME(ur.updated_at, "%Y-%m-%d %H:%i"),
                     "-") as updated_at,
                     (SELECT COUNT(id) FROM users u WHERE u.role_id = ur.id AND u.status != "deleted") as user_count
-                FROM user_roles ur
-            ) as result',
+                FROM user_roles ur',
         ]
     ],
     'default' => []

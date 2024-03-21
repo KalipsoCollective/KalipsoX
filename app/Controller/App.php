@@ -19,6 +19,7 @@ use KX\Core\Response;
 use KX\Controller\Notification;
 
 use KX\Model\Sessions;
+use Redis;
 
 final class App
 {
@@ -154,6 +155,33 @@ final class App
             'status' => true,
             'message' => 'Storage cleared.'
         ];
+
+        try {
+            if (class_exists('Redis')) {
+
+                $redis = new Redis();
+                $redis->connect(
+                    Helper::config('REDIS_HOST')
+                );
+                if (!empty(Helper::config('REDIS_PASSWORD'))) {
+                    $redis->auth(Helper::config('REDIS_PASSWORD'));
+                }
+                $redis->select((int)Helper::config('REDIS_DB'));
+                $redis->setOption(Redis::OPT_SERIALIZER, Redis::SERIALIZER_PHP);
+
+                if ($redis->flushDB()) {
+                    $action['redis'] = 'Storage cleared.';
+                } else {
+                    $action['redis'] = 'Storage not cleared.';
+                }
+
+                $redis->close();
+            }
+        } catch (\Exception $e) {
+            $action = [
+                'redis_error' => $e->getMessage()
+            ];
+        }
 
 
         return $response->json($action);
