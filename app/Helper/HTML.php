@@ -168,31 +168,32 @@ class HTML
                 if (isset($setting['multilanguage']) !== false && $setting['multilanguage'] && in_array($setting['type'], ['select', 'switch']) === false) {
 
                     $value = json_decode($setting['value'], true);
-                    $content .= '
+                    if (count($kxAvailableLanguages) > 1) {
+                        $content .= '
                     <div class="' . $setting['col'] . '">
                         <div class="card mb-3 multilanguage-card">
                             <div class="card-header">
                                 <ul class="nav nav-tabs card-header-tabs" data-bs-toggle="tabs">';
-                    $cardBodyContent = '';
-                    foreach ($kxAvailableLanguages as $lang) {
-                        $content .= '
+                        $cardBodyContent = '';
+                        foreach ($kxAvailableLanguages as $lang) {
+                            $content .= '
                         <li class="nav-item">
                             <a href="#settingsGroup' . $groupKey . $settingKey . $lang . '" class="nav-link' . ($lang === $kxLang ? ' active' : '') . '" data-bs-toggle="tab" aria-selected="' . ($lang === $kxLang ? 'true' : 'false') . '" role="tab" tabindex="-1">
                                 ' . Helper::lang('langs.' . $lang) . '
                             </a>
                         </li>';
-                        $cardBodyContent .= '
+                            $cardBodyContent .= '
                         <div class="tab-pane fade' . ($lang === $kxLang ? ' show active' : '') . '" id="settingsGroup' . $groupKey . $settingKey . $lang . '" role="tabpanel">
                             <div>
                                 <label class="form-label">' . $setting['label'] . ' (' . strtoupper($lang) . ')</label>
                                 ' . ($setting['type'] === 'textarea' ? '
-                                <textarea class="form-control" name="settings[' . $settingKey . '][' . $lang . ']"' . ($required ? ' required' : '') . '>' . (isset($value[$lang]) !== false ? $value[$lang] : '') . '</textarea>' :
-                            '<input type="' . $setting['type'] . '" class="form-control" name="settings[' . $settingKey . '][' . $lang . ']" value="' . (isset($setting['value'][$lang]) !== false ? $setting['value'][$lang] : '') . '"' . ($required ? ' required' : '') . ' />') . '
+                                <textarea' . (isset($setting['attributes']) !== false ? ' ' . trim($setting['attributes']) . ' ' : ' ') . 'class="form-control" name="settings[' . $settingKey . '][' . $lang . ']"' . ($required ? ' required' : '') . '>' . (isset($value[$lang]) !== false ? $value[$lang] : '') . '</textarea>' :
+                                '<input' . (isset($setting['attributes']) !== false ? ' ' . trim($setting['attributes']) . ' ' : ' ') . 'type="' . $setting['type'] . '" class="form-control" name="settings[' . $settingKey . '][' . $lang . ']" value="' . (isset($setting['value'][$lang]) !== false ? $setting['value'][$lang] : '') . '"' . ($required ? ' required' : '') . ' />') . '
                                 <div class="invalid-feedback"></div>
                             </div>
                         </div>';
-                    }
-                    $content .= '
+                        }
+                        $content .= '
                                 </ul>
                             </div>
                             <div class="card-body">
@@ -202,6 +203,18 @@ class HTML
                             </div>
                         </div>
                     </div>';
+                    } else {
+                        $content .= '
+                        <div class="' . $setting['col'] . '">
+                            <div>
+                                <label class="form-label required">' . $setting['label'] . '</label>
+                                ' . ($setting['type'] === 'textarea' ? '
+                                <textarea' . (isset($setting['attributes']) !== false ? ' ' . trim($setting['attributes']) . ' ' : ' ') . 'class="form-control" name="settings[' . $settingKey . '][' . $kxLang . ']"' . ($required ? ' required' : '') . '>' . (isset($value[$kxLang]) !== false ? $value[$kxLang] : '') . '</textarea>' :
+                            '<input' . (isset($setting['attributes']) !== false ? ' ' . trim($setting['attributes']) . ' ' : ' ') . 'type="' . $setting['type'] . '" class="form-control" name="settings[' . $settingKey . '][' . $kxLang . ']" value="' . (isset($setting['value'][$kxLang]) !== false ? $setting['value'][$kxLang] : '') . '"' . ($required ? ' required' : '') . ' />') . '
+                                <div class="invalid-feedback"></div>
+                            </div>
+                        </div>';
+                    }
                     continue;
                 }
 
@@ -216,23 +229,23 @@ class HTML
                         $opts .= '<option value="' . $oKey . '"' . ($setting['value'] === $oKey ? ' selected' : '') . '>' . $option . '</option>';
                     }
                     $content .= '
-                                <select class="form-select" name="settings[' . $settingKey . ']"' . ($required ? ' required' : '') . '>
+                                <select' . (isset($setting['attributes']) !== false ? ' ' . trim($setting['attributes']) . ' ' : ' ') . 'class="form-select" name="settings[' . $settingKey . ']"' . ($required ? ' required' : '') . '>
                                     ' . $opts . '
                                 </select>
                                 <div class="invalid-feedback"></div>';
                 } elseif ($setting['type'] === 'textarea') {
                     $content .= '
-                                <textarea class="form-control" name="settings[' . $settingKey . ']"' . ($required ? ' required' : '') . '>' . $setting['value'] . '</textarea>
+                                <textarea' . (isset($setting['attributes']) !== false ? ' ' . trim($setting['attributes']) . ' ' : ' ') . 'class="form-control" name="settings[' . $settingKey . ']"' . ($required ? ' required' : '') . '>' . $setting['value'] . '</textarea>
                                 <div class="invalid-feedback"></div>';
                 } elseif ($setting['type'] === 'switch') {
                     $content .= '
                             <label class="form-check form-switch">
-                                <input name="settings[' . $settingKey . ']" class="form-check-input" type="checkbox"' . ($setting['value'] ? ' checked' : '') . '>
+                                <input' . (isset($setting['attributes']) !== false ? ' ' . trim($setting['attributes']) . ' ' : ' ') . 'name="settings[' . $settingKey . ']" class="form-check-input" type="checkbox"' . ($setting['value'] ? ' checked' : '') . '>
                                 <span class="form-check-label">' . $setting['label'] . '</span>
                             </label>';
                 } else {
                     $content .= '
-                                <input type="' . $setting['type'] . '" class="form-control" name="settings[' . $settingKey . ']" value="' . $setting['value'] . '"' . ($required ? ' required' : '') . ' />
+                                <input' . (isset($setting['attributes']) !== false ? ' ' . trim($setting['attributes']) . ' ' : ' ') . 'type="' . $setting['type'] . '" class="form-control" name="settings[' . $settingKey . ']" value="' . $setting['value'] . '"' . ($required ? ' required' : '') . ' />
                                 <div class="invalid-feedback"></div>';
                 }
                 $content .= '
