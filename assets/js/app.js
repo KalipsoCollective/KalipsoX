@@ -284,6 +284,9 @@ class KalipsoXJS {
 
     let headers = {};
 
+    // X-Language
+    headers["X-Language"] = this.lang;
+
     let fetchOptions = {
       method: method,
       mode: "cors",
