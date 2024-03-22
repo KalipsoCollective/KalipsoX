@@ -665,6 +665,7 @@ class KalipsoXJS {
           [10, 25, 50, 100, -1],
           [10, 25, 50, 100, this.langDefinitions[this.lang].all],
         ],
+        pageLength: 25,
         ajax: {
           url: table.getAttribute("data-kx-url"),
           type: "POST",
