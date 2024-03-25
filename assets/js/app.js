@@ -436,6 +436,9 @@ class KalipsoXJS {
                 case "removeAttr":
                   $(selector).removeAttr(value);
                   break;
+                case "val":
+                  $(selector).val(value);
+                  break;
                 case "prop":
                   for (const [prop, val] of Object.entries(value)) {
                     $(selector).prop(prop, val);
