@@ -198,8 +198,10 @@ class DT
         foreach ($this->result as $row) {
             $dataRow = [];
             foreach ($this->columns as $col) {
+
                 $d = null;
-                if (isset($row->{$col['db']}) !== false) {
+
+                if (property_exists($row, $col['db'])) {
 
                     $d = $row->{$col['db']};
                     if (isset($col['formatter'])) {
