@@ -27,26 +27,32 @@ This documentation has been created to give you a quick start.
 #### Server Configurations (Apache .htaccess)
 
 ```htaccess
+Options -Indexes
+<Files .env>
+	Order allow,deny
+	Deny from all
+</Files>
 <IfModule mod_rewrite.c>
-    RewriteEngine On
-
-    RewriteCond %{HTTP:Authorization} .
-    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-
-    RewriteRule ^index\.php$ - [L]
-    RewriteCond %{REQUEST_FILENAME} !-f
-    RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule . index.php [L]
+	RewriteEngine On
+	RewriteCond %{REQUEST_FILENAME} !-l
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule .* index.php [L,QSA]
+	RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
 </IfModule>
 ```
 
 #### Server Configurations (Nginx nginx.conf)
 
 ```nginx_conf
+autoindex off;
 location / {
 	if (!-e $request_filename){
 		rewrite ^(.+)$ /index.php/$1 break;
 	}
+}
+location /.env {
+  deny all;
 }
 ```
 
