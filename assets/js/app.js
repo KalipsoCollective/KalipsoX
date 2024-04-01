@@ -593,6 +593,14 @@ class KalipsoXJS {
   }
 
   prepareDatatables() {
+    if (window.prepareDatatablesWorked) {
+      return;
+    }
+    window.prepareDatatablesWorked = true;
+    setTimeout(() => {
+      window.prepareDatatablesWorked = false;
+    }, 250);
+
     $.fn.dataTable.ext.errMode = "none";
 
     if (window.kxTables === undefined) {
