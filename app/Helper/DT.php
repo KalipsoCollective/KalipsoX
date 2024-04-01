@@ -24,6 +24,7 @@ class DT
     protected $columns;
     protected $total;
     protected $filtered;
+    protected $external = [];
 
     /**
      * DT constructor
@@ -72,6 +73,8 @@ class DT
         // prepare filter
         $this->filter();
 
+        $this->preExecute();
+
         // prepare order
         $this->order();
 
@@ -85,6 +88,7 @@ class DT
         $return['data'] = $this->formatData();
         $return['recordsTotal'] = $this->total;
         $return['recordsFiltered'] = $this->filtered ? count($this->result) : $this->total;
+        $return['external'] = $this->external;
 
         return $return;
     }
@@ -170,7 +174,26 @@ class DT
     public function limit()
     {
         if (isset($this->arguments['start']) !== false && $this->arguments['length'] !== -1) {
-            $this->model->pagination($this->arguments['length'], round($this->arguments['start'] / $this->arguments['length']));
+            $total = $this->total;
+            $start = $this->arguments['start'];
+            $length = $this->arguments['length'];
+            $totalPages = ceil($total / $length);
+
+            $currentPage = $totalPages - floor(($total - $start) / $length);
+            $page = $currentPage > $totalPages ? $totalPages : $currentPage;
+
+            $this->external = [
+                'total' => $total,
+                'totalPages' => $totalPages,
+                'currentPage' => $currentPage,
+                'perPage' => $length,
+                'page' => $page
+            ];
+
+            $this->model->pagination(
+                $length,
+                $page
+            );
         }
         return $this;
     }
@@ -183,9 +206,20 @@ class DT
     public function execute()
     {
         $this->result = $this->model->getAll();
+        return $this;
+    }
+
+    /** 
+     * Pre Execute
+     * 
+     * @return self
+     */
+    public function preExecute()
+    {
         $this->total = count($this->preModel->getAll());
         return $this;
     }
+
 
     /**
      * Format data
