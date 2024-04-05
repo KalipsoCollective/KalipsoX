@@ -1,8 +1,9 @@
 Options -Indexes
-<Files .env>
+# .htaccess, composer, and other sensitive files are protected
+<FilesMatch \.htaccess|composer\.json|composer\.lock|\.env|README\.md|LICENSE|CREDITS\.md>
 	Order allow,deny
 	Deny from all
-</Files>
+</FilesMatch>
 <IfModule mod_rewrite.c>
 	RewriteEngine On
 	RewriteCond %{REQUEST_FILENAME} !-l
