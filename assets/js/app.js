@@ -714,6 +714,8 @@ class KalipsoXJS {
           $("[data-bs-toggle='tooltip']").each((i, el) => {
             bootstrap.Tooltip.getOrCreateInstance(el);
           });
+          // timeago
+          $("time.timeago").timeago();
         },
       };
       if (this.langDefinitions[this.lang]) {
