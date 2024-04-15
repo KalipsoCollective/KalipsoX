@@ -341,6 +341,27 @@ $dataTables = [
                     'orderable' => true,
                     'type' => 'number',
                 ],
+                'activity_status' => [
+                    'name' => Helper::lang('base.activity_status'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => false,
+                    'type' => 'select',
+                    'options' => [
+                        'online' => Helper::lang('base.online'),
+                        'offline' => Helper::lang('base.offline'),
+                    ],
+                    'formatter' => function ($d, $row) {
+                        $isOnline = $d === 'online';
+                        return '
+                        <span class="text-nowrap small" data-bs-toggle="tooltip" title="' . Helper::lang('base.' . ($isOnline ? 'online' : 'offline')) . '">
+                            <span class="badge' . ($isOnline ? ' bg-green text-green-fg' : ' bg-red text-red-fg') . ' tag-status badge-empty"></span> 
+                            <time' . (!empty($row['activity_date']) ? ' class="timeago" datetime="' . date('c', (int)$row['activity_date']) . '"' : '') . '>
+                                ' . (!empty($row['activity_date']) ? date('Y-m-d H:i', (int)$row['activity_date']) : '-') . '
+                            </time>
+                        </span>';
+                    }
+                ],
                 'u_name' => [
                     'name' => Helper::lang('auth.username'),
                     'visible' => true,
@@ -452,7 +473,7 @@ $dataTables = [
                 ],
             ],
             'external_columns' => [
-                'role'
+                'role', 'activity_status', 'activity_date'
             ],
             'order' => [
                 'name' => 'id',
@@ -476,7 +497,13 @@ $dataTables = [
                         FROM_UNIXTIME(u.updated_at, "%Y-%m-%d %H:%i"),
                     "-") as updated_at,
                     u.role_id,
-                    (SELECT name FROM user_roles ur WHERE ur.id = u.role_id) as role
+                    (SELECT name FROM user_roles ur WHERE ur.id = u.role_id) as role,
+                    (SELECT last_act_at FROM sessions s WHERE s.user_id = u.id ORDER BY last_act_at DESC LIMIT 1) as activity_date,
+                    IF(
+                        (SELECT last_act_at FROM sessions s WHERE s.user_id = u.id ORDER BY last_act_at DESC LIMIT 1) < UNIX_TIMESTAMP() - 300,
+                        "offline",
+                        "online"
+                    ) as activity_status
                 FROM users u',
         ],
         'user-roles' => [
@@ -650,7 +677,10 @@ $dataTables = [
                     'type' => 'text',
                     'formatter' => function ($d, $row) {
                         $isOnline = $row['last_act_at'] > strtotime('-5 minutes');
-                        return '<span class="text-nowrap small" data-bs-toggle="tooltip" title="' . Helper::lang('base.' . ($isOnline ? 'online' : 'offline')) . '"><span class="badge' . ($isOnline ? ' bg-lime text-lime-fg' : ' bg-red text-red-fg') . ' tag-status badge-empty"></span> ' . $d . '</span>';
+                        return '
+                        <span class="text-nowrap small" data-bs-toggle="tooltip" title="' . Helper::lang('base.' . ($isOnline ? 'online' : 'offline')) . '">
+                            <span class="badge' . ($isOnline ? ' bg-green text-green-fg' : ' bg-red text-red-fg') . ' tag-status badge-empty"></span> ' . $d . '
+                        </span>';
                     }
                 ],
                 'created_at' => [
