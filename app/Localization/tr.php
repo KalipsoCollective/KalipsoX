@@ -238,6 +238,7 @@ return [
         'ip_address' => 'IP Adresi',
         'device' => 'Cihaz',
         'last_activity' => 'Son Aktivite',
+        'last_activity_at' => 'Son Aktivite Tarihi',
         'expire_at' => 'Bitiş Tarihi',
         'delete_session' => 'Oturumu Sil',
         'reports' => 'Raporlar',
@@ -247,5 +248,7 @@ return [
         'status_code' => 'Durum Kodu',
         'exec_time' => 'Çalışma Süresi',
         'method' => 'Metod',
+        'online' => 'Çevrim içi',
+        'offline' => 'Çevrim dışı',
     ],
 ];

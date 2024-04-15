@@ -238,6 +238,7 @@ return [
         'ip_address' => 'IP Address',
         'device' => 'Device',
         'last_activity' => 'Last Activity',
+        'last_activity_at' => 'Last Activity At',
         'expire_at' => 'Expire At',
         'delete_session' => 'Delete Session',
         'reports' => 'Reports',
@@ -247,5 +248,7 @@ return [
         'status_code' => 'Status Code',
         'exec_time' => 'Execution Time',
         'method' => 'Method',
+        'online' => 'Online',
+        'offline' => 'Offline',
     ],
 ];
