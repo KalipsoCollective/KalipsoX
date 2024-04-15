@@ -24,12 +24,12 @@
                     <form data-kx-form action="<?php echo $Helper::base('auth/register'); ?>" method="post" autocomplete="off">
                         <div class="mb-3">
                             <label class="form-label"><?php echo $Helper::lang('auth.username'); ?></label>
-                            <input type="text" required name="username" class="form-control" autocomplete="off">
+                            <input autofocus tabindex="1" type="text" required name="username" class="form-control" autocomplete="off">
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="mb-2">
                             <label class="form-label"><?php echo $Helper::lang('auth.email'); ?></label>
-                            <input type="email" required name="email" class="form-control" placeholder="email@example.com" autocomplete="off">
+                            <input tabindex="2" type="email" required name="email" class="form-control" placeholder="email@example.com" autocomplete="off">
                             <div class="invalid-feedback"></div>
                         </div>
                         <div class="mb-2">
@@ -37,9 +37,9 @@
                                 <?php echo $Helper::lang('auth.password'); ?>
                             </label>
                             <div class="input-group input-group-flat">
-                                <input type="password" require name="password" class="form-control" autocomplete="off">
+                                <input tabindex="3" type="password" require name="password" class="form-control" autocomplete="off">
                                 <span class="input-group-text">
-                                    <a data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
+                                    <a tabindex="4" data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
                                         <i class="ti ti-eye"></i>
                                     </a>
                                 </span>
@@ -47,7 +47,7 @@
                             </div>
                         </div>
                         <div class="form-footer">
-                            <button type="submit" class="btn btn-primary w-100">
+                            <button tabindex="5" type="submit" class="btn btn-primary w-100">
                                 <span class="btn-loader spinner-border spinner-border-sm text-light" role="status"></span>
                                 <span class="btn-text"><?php echo $Helper::lang('auth.register'); ?></span>
                             </button>

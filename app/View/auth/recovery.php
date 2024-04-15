@@ -16,11 +16,11 @@
                         <form data-kx-form action="<?php echo $Helper::base('auth/recovery'); ?>" method="post">
                             <div class="mb-3">
                                 <label class="form-label"><?php echo $Helper::lang('auth.email'); ?></label>
-                                <input type="email" required name="email" class="form-control" placeholder="email@example.com">
+                                <input tabindex="1" autofocus type="email" required name="email" class="form-control" placeholder="email@example.com">
                                 <div class="invalid-feedback"></div>
                             </div>
                             <div class="form-footer">
-                                <button type="submit" class="btn btn-primary w-100">
+                                <button tabindex="2" type="submit" class="btn btn-primary w-100">
                                     <div class="btn-loader spinner-border spinner-border-sm text-light" role="status"></div>
                                     <span class="btn-text"><?php echo $Helper::lang('auth.recovery'); ?></span>
                                 </button>
@@ -36,9 +36,9 @@
                                 <label class="form-label
                                 "><?php echo $Helper::lang('auth.new_password'); ?></label>
                                 <div class="input-group input-group-flat">
-                                    <input type="password" required name="password" class="form-control">
+                                    <input tabindex="1" type="password" required name="password" class="form-control">
                                     <span class="input-group-text">
-                                        <a data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
+                                        <a tabindex="2" data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
                                             <i class="ti ti-eye"></i>
                                         </a>
                                     </span>
@@ -49,9 +49,9 @@
                                 <label class="form-label
                                 "><?php echo $Helper::lang('auth.new_password_confirmation'); ?></label>
                                 <div class="input-group input-group-flat">
-                                    <input type="password" required name="password_again" class="form-control">
+                                    <input tabindex="3" type="password" required name="password_again" class="form-control">
                                     <span class="input-group-text">
-                                        <a data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
+                                        <a tabindex="4" data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
                                             <i class="ti ti-eye"></i>
                                         </a>
                                     </span>
@@ -59,7 +59,7 @@
                                 </div>
                             </div>
                             <div class="form-footer">
-                                <button type="submit" class="btn btn-primary w-100">
+                                <button tabindex="5" type="submit" class="btn btn-primary w-100">
                                     <span class="btn-loader
                                     spinner-border spinner-border-sm text-light" role="status"></span>
                                     <span class="btn-text"><?php echo $Helper::lang('base.reset'); ?></span>

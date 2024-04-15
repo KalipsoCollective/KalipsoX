@@ -11,19 +11,19 @@
                 <form data-kx-form action="<?php echo $Helper::base('auth/login'); ?>" method="post">
                     <div class="mb-3">
                         <label class="form-label"><?php echo $Helper::lang('auth.email_or_username'); ?></label>
-                        <input type="text" required name="username" class="form-control" placeholder="email@example.com">
+                        <input autofocus tabindex="1" type="text" required name="username" class="form-control" placeholder="email@example.com">
                         <div class="invalid-feedback"></div>
                     </div>
                     <div class="mb-2">
                         <label class="form-label">
                             <?php echo $Helper::lang('auth.password'); ?>
                             <span class="form-label-description">
-                                <a href="<?php echo $Helper::base('auth/recovery'); ?>"><?php echo $Helper::lang('auth.recovery_account'); ?></a>
+                                <a tabindex="6" href="<?php echo $Helper::base('auth/recovery'); ?>"><?php echo $Helper::lang('auth.recovery_account'); ?></a>
                             </span>
                         </label>
                         <div class="input-group input-group-flat">
-                            <input type="password" required name="password" class="form-control">
-                            <span class="input-group-text">
+                            <input tabindex="2" type="password" required name="password" class="form-control">
+                            <span tabindex="3" class="input-group-text">
                                 <a data-kx-action="show_password" class="link-secondary" title="<?php echo $Helper::lang('auth.show_password'); ?>" data-bs-toggle="tooltip">
                                     <i class="ti ti-eye"></i>
                                 </a>
@@ -33,12 +33,12 @@
                     </div>
                     <div class="mb-2">
                         <label class="form-check">
-                            <input type="checkbox" name="remember_me" class="form-check-input">
+                            <input tabindex="4" type="checkbox" name="remember_me" class="form-check-input">
                             <span class="form-check-label"><?php echo $Helper::lang('auth.remember_me'); ?></span>
                         </label>
                     </div>
                     <div class="form-footer">
-                        <button type="submit" class="btn btn-primary w-100">
+                        <button tabindex="5" type="submit" class="btn btn-primary w-100">
                             <span class="btn-loader spinner-border spinner-border-sm text-light" role="status"></span>
                             <span class="btn-text"><?php echo $Helper::lang('auth.login'); ?></span>
                         </button>
