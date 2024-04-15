@@ -642,6 +642,17 @@ $dataTables = [
                     'orderable' => true,
                     'type' => 'text',
                 ],
+                'last_act_at_readable' => [
+                    'name' => Helper::lang('base.last_activity_at'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        $isOnline = $row['last_act_at'] > strtotime('-5 minutes');
+                        return '<span class="text-nowrap small" data-bs-toggle="tooltip" title="' . Helper::lang('base.' . ($isOnline ? 'online' : 'offline')) . '"><span class="badge' . ($isOnline ? ' bg-lime text-lime-fg' : ' bg-red text-red-fg') . ' tag-status badge-empty"></span> ' . $d . '</span>';
+                    }
+                ],
                 'created_at' => [
                     'name' => Helper::lang('base.created_at'),
                     'visible' => true,
@@ -698,9 +709,10 @@ $dataTables = [
                     s.ip,
                     s.header,
                     s.last_act_on,
+                    s.last_act_at,
                     IFNULL(
                         FROM_UNIXTIME(s.last_act_at, "%Y-%m-%d %H:%i"),
-                    "-") as last_act_at,
+                    "-") as last_act_at_readable,
                     IFNULL(
                         FROM_UNIXTIME(s.expire_at, "%Y-%m-%d %H:%i"),
                     "-") as expire_at,
