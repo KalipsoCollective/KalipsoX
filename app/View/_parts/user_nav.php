@@ -14,6 +14,11 @@
     </a>
 </div>
 <div class="nav-item dropdown">
+    <a href="<?php echo $Helper::base('/'); ?>" target="_blank" class="nav-link px-0" data-bs-toggle="tooltip" data-bs-placement="bottom" aria-label="<?php echo $Helper::lang('base.go_to_home'); ?>" title="<?php echo $Helper::lang('base.go_to_home'); ?>">
+        <i class="ti ti-external-link"></i>
+    </a>
+</div>
+<div class="nav-item dropdown">
     <a href="#" class="nav-link px-0" data-bs-toggle="dropdown" data-bs-auto-close="outside" tabindex="-1" aria-label="<?php echo $Helper::lang('base.show_notifications'); ?>">
         <i class="ti ti-bell"></i>
         <span class="badge bg-red d-none notification-dot"></span>
