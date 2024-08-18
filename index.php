@@ -19,7 +19,7 @@ error_reporting(E_ALL);
 use KX\Core\Request;
 use KX\Core\Response;
 
-define('KX_VERSION', 'v1.0.0');
+define('KX_VERSION', 'v1.2.0');
 
 try {
 
@@ -88,6 +88,19 @@ try {
         // Sessions
         [['POST', 'GET'], '/sessions', 'Panel@sessions', 'Auth@isAuthorized'],
         [['POST'], '/sessions/delete/:id', 'Panel@sessionDelete', 'Auth@isAuthorized'],
+        // Modules
+        [['POST', 'GET'], '/modules', 'Panel@modules', 'Auth@isAuthorized'],
+        [['POST'], '/modules/add', 'Panel@moduleAdd', 'Auth@isAuthorized'],
+        [['POST', 'GET'], '/modules/edit/:id', 'Panel@moduleEdit', 'Auth@isAuthorized'],
+        [['POST'], '/modules/delete/:id', 'Panel@moduleDelete', 'Auth@isAuthorized'],
+        // Widgets
+        [['POST', 'GET'], '/widgets', 'Panel@widgets', 'Auth@isAuthorized'],
+        [['POST'], '/widgets/add', 'Panel@widgetAdd', 'Auth@isAuthorized'],
+        [['POST', 'GET'], '/widgets/edit/:id', 'Panel@widgetEdit', 'Auth@isAuthorized'],
+        [['POST'], '/widgets/delete/:id', 'Panel@widgetDelete', 'Auth@isAuthorized'],
+        // Languages
+        [['POST', 'GET'], '/languages', 'Panel@languages', 'Auth@isAuthorized'],
+        [['POST'], '/languages/save', 'Panel@languagesSave', 'Auth@isAuthorized'],
         // Logs
         [['POST', 'GET'], '/logs', 'Panel@logs', 'Auth@isAuthorized'],
     ]);
