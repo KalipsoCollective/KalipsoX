@@ -250,5 +250,6 @@ return [
         'method' => 'Metod',
         'online' => 'Çevrim içi',
         'offline' => 'Çevrim dışı',
+        'go_to_home' => 'Ana Sayfaya Git',
     ],
 ];

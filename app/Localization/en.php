@@ -250,5 +250,6 @@ return [
         'method' => 'Method',
         'online' => 'Online',
         'offline' => 'Offline',
+        'go_to_home' => 'Go to Home',
     ],
 ];

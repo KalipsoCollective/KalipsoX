@@ -13,7 +13,7 @@ String.prototype.hashCode = function () {
 
 class KalipsoXJS {
   // version
-  version = "1.0.0";
+  version = "1.0.2";
   lang = "en";
   langDefinitions = {
     en: {
