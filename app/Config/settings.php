@@ -17,6 +17,6 @@ return [
    'db_cache' => false,
    'route_cache' => false,
    'registration_system' => true,
-   'last_updated_at' => 1709613903,
+   'last_updated_at' => 1724013006,
    'last_updated_by' => 1,
 ];
