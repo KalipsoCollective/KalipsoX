@@ -6,7 +6,7 @@
         <div class="row row-cards">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header sticky-top top-0" style="background-color: var(--tblr-body-bg)">
                         <h3 class="card-title"><?php echo $Helper::lang('base.languages'); ?></h3>
                         <div class="card-options">
                             <?php if ($Helper::authorization('dashboard/languages/save')) : ?>
@@ -20,19 +20,22 @@
                         </div>
                     </div>
                     <form id="languageForm" class="table-responsive">
-                        <table class="table table-vcenter card-table table-striped">
+                        <table class="table table-vcenter card-table table-bordered">
                             <thead>
-                                <tr class="sticky-bottom bottom-0">
-                                    <th class="w-auto"><?php echo $Helper::lang('base.term'); ?></th>
-                                    <th class="w-25" v-for="language in languages" class="w-1">{{language}}</th>
-                                    <th class="w-1"><?php echo $Helper::lang('base.actions'); ?></th>
+                                <tr>
+                                    <th class="sticky-top top-0"><?php echo $Helper::lang('base.term'); ?></th>
+                                    <th class="sticky-top top-0" v-for="language in languages">{{language}}</th>
+                                    <th class="sticky-top top-0" class="w-1"><?php echo $Helper::lang('base.actions'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(value, key) in languageTerms" :key="key">
                                     <td><input class="form-control form-control-rounded form-control-sm" :value="key" type="text" @change="updateTerm(key, $event.target.value)" /></td>
                                     <td v-for="lang in languages" :key="lang">
-                                        <input class="form-control form-control-sm" v-model="languageTerms[key][lang]" type="text" />
+                                        <div class="text-secondary small">{{lang}}</div>
+                                        <div>
+                                            <input class="form-control form-control-sm" v-model="languageTerms[key][lang]" type="text" />
+                                        </div>
                                     </td>
                                     <td>
                                         <div class="d-grid gap-2">
