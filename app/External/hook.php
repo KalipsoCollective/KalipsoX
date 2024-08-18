@@ -1,5 +1,5 @@
 <?php
-	
+
 use \KX\Core\Helper;
 use \KX\Controller\ContentController;
 use \KX\Controller\FileController;
@@ -15,7 +15,7 @@ use \KX\Model\Contents as ContentsModel;
   $output: Output from controller method. You can make changes to it.
 */
 
-return function($type, $container, $controller, $extract, $output) {
+return function ($type, $container, $controller, $extract, $output) {
 
   return $output;
-}
+};
