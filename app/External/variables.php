@@ -81,6 +81,59 @@ $endpoints = [
         'name' => 'authorization.sessions_delete',
         'group' => 'session_module',
     ],
+    // Modules
+    'dashboard.modules' => [
+        'default' => false,
+        'name' => 'authorization.modules',
+        'group' => 'system_module',
+    ],
+    'dashboard.modules.add' => [
+        'default' => false,
+        'name' => 'authorization.modules_add',
+        'group' => 'system_module',
+    ],
+    'dashboard.modules.edit.:id' => [
+        'default' => false,
+        'name' => 'authorization.modules_edit',
+        'group' => 'system_module',
+    ],
+    'dashboard.modules.delete.:id' => [
+        'default' => false,
+        'name' => 'authorization.modules_delete',
+        'group' => 'system_module',
+    ],
+    // Widgets
+    'dashboard.widgets' => [
+        'default' => false,
+        'name' => 'authorization.widgets',
+        'group' => 'system_module',
+    ],
+    'dashboard.widgets.add' => [
+        'default' => false,
+        'name' => 'authorization.widgets_add',
+        'group' => 'system_module',
+    ],
+    'dashboard.widgets.edit.:id' => [
+        'default' => false,
+        'name' => 'authorization.widgets_edit',
+        'group' => 'system_module',
+    ],
+    'dashboard.widgets.delete.:id' => [
+        'default' => false,
+        'name' => 'authorization.widgets_delete',
+        'group' => 'system_module',
+    ],
+    // Languages
+    'dashboard.languages' => [
+        'default' => false,
+        'name' => 'authorization.languages',
+        'group' => 'system_module',
+    ],
+    'dashboard.languages.save' => [
+        'default' => false,
+        'name' => 'authorization.languages_save',
+        'group' => 'system_module',
+    ],
     // Logs
     'dashboard.logs' => [
         'default' => false,
@@ -135,6 +188,10 @@ $roleGroups = [
     'report_module' => [
         'name' => Helper::lang('authorization.report_module'),
         'icon' => 'ti ti-report',
+    ],
+    'system_module' => [
+        'name' => Helper::lang('authorization.system_module'),
+        'icon' => 'ti ti-package',
     ],
 ];
 
@@ -473,7 +530,9 @@ $dataTables = [
                 ],
             ],
             'external_columns' => [
-                'role', 'activity_status', 'activity_date'
+                'role',
+                'activity_status',
+                'activity_date'
             ],
             'order' => [
                 'name' => 'id',
@@ -724,7 +783,8 @@ $dataTables = [
                 ],
             ],
             'external_columns' => [
-                'last_act_at', 'user_id'
+                'last_act_at',
+                'user_id'
             ],
             'order' => [
                 'name' => 'id',
@@ -889,6 +949,144 @@ $dataTables = [
                     "-") as created_at
                 FROM logs l',
         ],
+        'modules' => [
+            'columns' => [
+                'id' => [
+                    'name' => 'ID',
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'number',
+                ],
+                'key' => [
+                    'name' => Helper::lang('base.key'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+
+                        return '<kbd>#' . $row['key'] . '</kbd>';
+                    }
+                ],
+                'auth_token' => [
+                    'name' => Helper::lang('base.auth_token'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<kbd>' . $d . '</kbd>';
+                    }
+                ],
+                'endpoint' => [
+                    'name' => Helper::lang('base.endpoint'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<kbd>' . $d . '</kbd>';
+                    }
+                ],
+                'status_code' => [
+                    'name' => Helper::lang('base.status_code'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        $d = (int)$d;
+                        return '<span class="badge bg-' . ($d >= 200 && $d < 300 ? 'green' : ($d >= 300 && $d < 400 ? 'yellow' : 'red')) . '-lt">' . $d . '</span>';
+                    }
+                ],
+                'method' => [
+                    'name' => Helper::lang('base.method'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<code>' . $d . '</code>';
+                    }
+                ],
+                'ip' => [
+                    'name' => Helper::lang('base.ip_address'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<kbd>' . $d . '</kbd>';
+                    }
+                ],
+                'header' => [
+                    'name' => Helper::lang('base.device'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => false,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        $deviceInfo = Helper::userAgentDetails($d);
+                        return '<p class="mb-0 text-nowrap" title="' . $deviceInfo['user_agent'] . '">
+                            <i class="ti ti-' . $deviceInfo['p_icon'] . '"></i> ' . $deviceInfo['platform'] . ' — 
+                            <i class="ti ti-' . $deviceInfo['b_icon'] . '"></i> ' . $deviceInfo['browser'] . ' ' . $deviceInfo['version'] . '
+                        </p>';
+                    }
+                ],
+                'exec_time' => [
+                    'name' => Helper::lang('base.exec_time'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                    'formatter' => function ($d, $row) {
+                        return '<code>' . $d . 'ms</code>';
+                    }
+                ],
+                'created_at' => [
+                    'name' => Helper::lang('base.created_at'),
+                    'visible' => true,
+                    'searchable' => true,
+                    'orderable' => true,
+                    'type' => 'text',
+                ],
+                /*
+                'actions' => [
+                    'name' => Helper::lang('base.actions'),
+                    'visible' => true,
+                    'searchable' => false,
+                    'orderable' => false,
+                    'formatter' => function ($d, $row) {
+
+
+                    },
+                ], */
+            ],
+            'external_columns' => [
+                'created_by'
+            ],
+            'order' => [
+                'name' => 'id',
+                'dir' => 'asc',
+            ],
+            'url' => Helper::base('dashboard/data/modules'),
+            'sql' => 'SELECT 
+                    l.id,
+                    l.created_by,
+                    (SELECT u.u_name FROM users u WHERE u.id = l.created_by) as user,
+                    l.endpoint,
+                    l.auth_token,
+                    l.status_code,
+                    l.ip,
+                    l.header,
+                    l.exec_time,
+                    l.method,
+                    IFNULL(
+                        FROM_UNIXTIME(l.created_at, "%Y-%m-%d %H:%i"),
+                    "-") as created_at
+                FROM logs l',
+        ],
     ],
     'default' => []
 ];
@@ -1024,6 +1222,20 @@ $sidebarRoutes = [
     'settings' => [
         'icon' => 'ti ti-settings',
         'link' => '/dashboard/settings',
+    ],
+    'system' => [
+        'icon' => 'ti ti-package',
+        'children' => [
+            'modules' => [
+                'link' => '/dashboard/modules',
+            ],
+            'widgets' => [
+                'link' => '/dashboard/widgets',
+            ],
+            'languages' => [
+                'link' => '/dashboard/languages',
+            ],
+        ]
     ],
     'reports' => [
         'icon' => 'ti ti-report',
