@@ -832,4 +832,40 @@ final class Panel
             'auth' => $request->getMiddlewareParams(),
         ], 'layout');
     }
+
+    public function modules(Request $request, Response $response)
+    {
+        return $response->render('panel/modules', [
+            'title' => Helper::lang('base.modules'),
+            'description' => Helper::lang('base.modules_desc'),
+            'auth' => $request->getMiddlewareParams(),
+        ], 'layout');
+    }
+
+    public function widgets(Request $request, Response $response)
+    {
+        return $response->render('panel/widgets', [
+            'title' => Helper::lang('base.widgets'),
+            'description' => Helper::lang('base.widgets_desc'),
+            'auth' => $request->getMiddlewareParams(),
+        ], 'layout');
+    }
+
+    public function languages(Request $request, Response $response)
+    {
+
+        $languages = [];
+
+        foreach (glob(Helper::path('app/Localization/*.php')) as $filename) {
+            $name = basename($filename, '.php');
+            $languages[$name] = include $filename;
+        }
+
+        return $response->render('panel/languages', [
+            'title' => Helper::lang('base.languages'),
+            'description' => Helper::lang('base.languages_desc'),
+            'auth' => $request->getMiddlewareParams(),
+            'languages' => $languages
+        ], 'layout');
+    }
 }
