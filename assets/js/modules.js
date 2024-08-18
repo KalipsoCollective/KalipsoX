@@ -4,7 +4,7 @@ const { createApp } = Vue;
 createApp({
   data() {
     return {
-      bulkData: window.languageList,
+      bulkData: structuredClone(window.languageList),
       languageTerms: {},
     };
   },
@@ -26,8 +26,9 @@ createApp({
     addTerm() {
       const newKey = prompt("Enter the new term key:");
       if (newKey) {
-        for (const lang in this.languageList) {
-          this.$set(this.languageList[lang], newKey, "");
+        this.languageTerms[newKey] = {};
+        for (const lang of this.languages) {
+          this.languageTerms[newKey][lang] = "";
         }
       }
     },
@@ -50,7 +51,11 @@ createApp({
       this.languageTerms = { ...revisedTerms };
     },
     addLanguage() {
-      this.languageList["test"] = {};
+      const newLangKey = prompt("Enter the new language key:");
+      if (newLangKey) {
+        this.bulkData[newLangKey] = {};
+        this.languageTerms["lang.code"][newLangKey] = newLangKey;
+      }
     },
     multiDimensionToSingleDimension(data, parentKey = "") {
       let result = {};
