@@ -7,7 +7,10 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header sticky-top top-0" style="background-color: var(--tblr-body-bg)">
-                        <h3 class="card-title"><?php echo $Helper::lang('base.languages'); ?></h3>
+                        <h3 class="card-title">
+                            <?php echo $Helper::lang('base.languages'); ?>
+                            <small>
+                        </h3>
                         <div class="card-options">
                             <?php if ($Helper::authorization('dashboard/languages/save')) : ?>
                                 <button class="btn btn-sm btn-primary" @click="addTerm()">
@@ -16,11 +19,14 @@
                                 <button class="ms-1 btn btn-sm btn-primary" @click="addLanguage()">
                                     <?php echo $Helper::lang('base.add_language'); ?>
                                 </button>
+                                <button class="ms-1 btn btn-sm btn-success" @click="save()">
+                                    <?php echo $Helper::lang('base.save'); ?>
+                                </button>
                             <?php endif; ?>
                         </div>
                     </div>
                     <form id="languageForm" class="table-responsive">
-                        <table class="table table-vcenter card-table table-bordered">
+                        <table class="w-auto min-vw-100 table table-vcenter card-table table-bordered">
                             <thead>
                                 <tr>
                                     <th class="sticky-top top-0"><?php echo $Helper::lang('base.term'); ?></th>
@@ -30,7 +36,7 @@
                             </thead>
                             <tbody>
                                 <tr v-for="(value, key) in languageTerms" :key="key">
-                                    <td><input class="form-control form-control-rounded form-control-sm" :value="key" type="text" @change="updateTerm(key, $event.target.value)" /></td>
+                                    <td><input :id="'term_' + key" class="form-control form-control-rounded form-control-sm" :value="key" type="text" @change="updateTerm(key, $event.target.value)" /></td>
                                     <td v-for="lang in languages" :key="lang">
                                         <div class="text-secondary small">{{lang}}</div>
                                         <div>
