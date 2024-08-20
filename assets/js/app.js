@@ -745,8 +745,10 @@ class KalipsoXJS {
   $(document).on("pjax:popstate pjax:end", function () {
     NProgress.done();
     w.kx.init(false, true);
+    modules();
   });
 
   // Initialize KalipsoXJS
   w.kx = new KalipsoXJS();
+  modules();
 })(window);
