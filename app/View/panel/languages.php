@@ -6,12 +6,16 @@
         <div class="row row-cards">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header sticky-top top-0" style="background-color: var(--tblr-body-bg)">
+                    <div class="card-header">
                         <h3 class="card-title">
                             <?php echo $Helper::lang('base.languages'); ?>
-                            <small>
+                            <span class="d-flex justify-content-center">
+                                <span class="spinner-border text-secondary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </span>
+                            </span>
                         </h3>
-                        <div class="card-options">
+                        <div class="card-actions">
                             <?php if ($Helper::authorization('dashboard/languages/save')) : ?>
                                 <button class="btn btn-sm btn-primary" @click="addTerm()">
                                     <?php echo $Helper::lang('base.add_term'); ?>
@@ -29,9 +33,9 @@
                         <table class="w-auto min-vw-100 table table-vcenter card-table table-bordered">
                             <thead>
                                 <tr>
-                                    <th class="sticky-top top-0"><?php echo $Helper::lang('base.term'); ?></th>
-                                    <th class="sticky-top top-0" v-for="language in languages">{{language}}</th>
-                                    <th class="sticky-top top-0" class="w-1"><?php echo $Helper::lang('base.actions'); ?></th>
+                                    <th><?php echo $Helper::lang('base.term'); ?></th>
+                                    <th v-for="language in languages">{{language}}</th>
+                                    <th class="w-1"><?php echo $Helper::lang('base.actions'); ?></th>
                                 </tr>
                             </thead>
                             <tbody>
